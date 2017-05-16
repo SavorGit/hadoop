@@ -39,9 +39,9 @@ import java.util.regex.Pattern;
  */
 public class BoxLog extends Configured implements Tool {
 
-    private static class BoxMapper extends Mapper<LongWritable, Text, Text, Text> {
+    private static Pattern BOX_LOG_FORMAT_REGEX = Pattern.compile("^.+,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.+,.*,?$");
 
-        private Pattern BOX_LOG_FORMAT_REGEX = Pattern.compile("^.+,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.+,.*,?$");
+    private static class BoxMapper extends Mapper<LongWritable, Text, Text, Text> {
 
         @Override
         protected void map(LongWritable key, Text value, Mapper<LongWritable, Text, Text, Text>.Context context) throws IOException, InterruptedException {
@@ -79,6 +79,11 @@ public class BoxLog extends Configured implements Tool {
     public int run(String[] arg) throws Exception {
         // TODO Auto-generated method stub
         try {
+            // 配置数据格式
+            if (arg.length > 2) {
+                BOX_LOG_FORMAT_REGEX = Pattern.compile(arg[2]);
+            }
+
             Job job = Job.getInstance(this.getConf(), BoxLog.class.getSimpleName());
             job.setJarByClass(BoxLog.class);
 
@@ -116,7 +121,13 @@ public class BoxLog extends Configured implements Tool {
             throw new IOException("please write input path and output path...");
         }
         Configuration conf = new Configuration();
-        conf.set("fs.defaultFS", "hdfs://devpd1:8020");
+
+        // 配置 HDFS 根路径
+        if (args.length > 3) {
+            conf.set("fs.defaultFS", args[3]);
+//            conf.set("fs.defaultFS", "hdfs://devpd1:8020");
+        }
+
         try {
             ToolRunner.run(conf, new BoxLog(), args);
         } catch (Exception e) {
