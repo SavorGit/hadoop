@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.littlehotspot</groupId>
+    <artifactId>hadoop</artifactId>
+    <version>1.0.0.0.1-SNAPSHOT</version>
+    <modules>
+        <module>map-reduce</module>
+    </modules>
+    <packaging>pom</packaging>
+
+    <name>Little Hot Spot Hadoop</name>
+    <url>http://www.littlehotspot.com</url>
+    <description>热点信息技术有限公司 HADOOP 工程</description>
+
+    <!--创始年份-->
+    <inceptionYear>2016</inceptionYear>
+
+    <!--描述了这个项目构建环境中的前提条件。-->
+    <prerequisites>
+        <!--构建该项目或使用该插件所需要的Maven的最低版本-->
+        <maven>4.0.0</maven>
+    </prerequisites>
+
+    <organization>
+        <name>拉萨经济技术开发区热点信息技术有限公司 - 北京分公司</name>
+        <url>http://www.littlehotspot.com</url>
+    </organization>
+
+    <!--该元素描述了项目所有License列表。 应该只列出该项目的license列表，不要列出依赖项目的 license列表。
+        如果列出多个license，用户可以选择它们中的一个而不是接受所有license。-->
+    <licenses>
+        <!--描述了项目的license，用于生成项目的web站点的license页面，其他一些报表和validation也会用到该元素。-->
+        <license>
+            <!--license用于法律上的名称-->
+            <name>拉萨经济技术开发区热点信息技术有限公司 - 北京分公司</name>
+            <!--官方的license正文页面的URL-->
+            <url>http://www.littlehotspot.com/banseon/LICENSE-2.0.txt</url>
+            <!--项目分发的主要方式：repo，可以从Maven库下载 manual， 用户必须手动下载和安装依赖-->
+            <distribution>repo</distribution>
+            <!--关于license的补充信息-->
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+
+    <!--项目的问题管理系统(Bugzilla, Jira, Scarab,或任何你喜欢的问题管理系统)的名称和URL-->
+    <issueManagement>
+        <!--问题管理系统（例如jira）的名字，-->
+        <system>产品技术部 - JAVA小组</system>
+        <!--该项目使用的问题管理系统的URL-->
+        <url>http://www.littlehotspot.com</url>
+    </issueManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <name>Nexus Release Repository</name>
+            <url>http://nexus.lizhaoweb.net:8081/content/repositories/releases</url>
+            <uniqueVersion>true</uniqueVersion>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <name>Nexus Snapshot Repository</name>
+            <url>http://nexus.lizhaoweb.net:8081/content/repositories/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>nexus.lizhaoweb.net</id>
+            <name>Nexus Release Repository</name>
+            <url>http://nexus.lizhaoweb.net/content/groups/public</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>nexus.lizhaoweb.net</id>
+            <url>http://nexus.lizhaoweb.net/content/groups/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <properties>
+        <argLine>-Dfile.encoding=UTF-8</argLine>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <runtime.environment>${env.RUNTIME_ENVIRONMENT}</runtime.environment>
+
+        <project.jkd.version>1.7</project.jkd.version>
+        <junit.version>4.12</junit.version>
+        <slf4j.version>1.7.7</slf4j.version>
+        <logback-classic.version>1.1.7</logback-classic.version>
+        <lombok.version>1.16.8</lombok.version>
+        <spring.version>4.3.0.RELEASE</spring.version>
+        <solr.version>4.10.4</solr.version>
+        <codehaus.jackson.version>1.9.13</codehaus.jackson.version>
+        <fasterxml.jackson.version>2.6.0</fasterxml.jackson.version>
+        <aspect.version>1.8.9</aspect.version>
+        <hadoop.version>2.7.3</hadoop.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+
+            <!-- Logger -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback-classic.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.logback-extensions</groupId>
+                <artifactId>logback-ext-spring</artifactId>
+                <version>0.1.4</version>
+            </dependency>
+
+            <!-- Commons -->
+            <dependency>
+                <groupId>commons-pool</groupId>
+                <artifactId>commons-pool</artifactId>
+                <version>1.6</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.6</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-dbcp</groupId>
+                <artifactId>commons-dbcp</artifactId>
+                <version>1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.5</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.10</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-jxpath</groupId>
+                <artifactId>commons-jxpath</artifactId>
+                <version>1.3</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>1.3.2</version>
+            </dependency>
+
+            <!-- HttpClient -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.5.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient-cache</artifactId>
+                <version>4.5.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpasyncclient</artifactId>
+                <version>4.1.2</version>
+            </dependency>
+
+            <!-- Spring -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jms</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jdbc</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context-support</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aspects</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-tx</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-test</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-oxm</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-orm</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-messaging</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-websocket</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aop</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+            <!-- Hadoop -->
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-common</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-hdfs</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <defaultGoal>clean install compile deploy -U</defaultGoal>
+        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+        <outputDirectory>${basedir}/target/classes</outputDirectory>
+        <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
+        <testOutputDirectory>${basedir}/target/test-classes</testOutputDirectory>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>**/*.properties</include>
+                </includes>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5</version>
+                <configuration>
+                    <source>${project.jkd.version}</source>
+                    <target>${project.jkd.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <verbose>true</verbose>
+                    <fork>true</fork>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
+                    <execution>
+                        <id>deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.0.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--<plugin>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-javadoc-plugin</artifactId>-->
+            <!--<version>2.10.4</version>-->
+            <!--<inherited>true</inherited>-->
+            <!--<configuration>-->
+            <!--<show>private</show>-->
+            <!--<nohelp>true</nohelp>-->
+            <!--<aggregate>true</aggregate>-->
+            <!--<charset>${project.build.sourceEncoding}</charset>-->
+            <!--<encoding>${project.build.sourceEncoding}</encoding>-->
+            <!--<docencoding>${project.build.sourceEncoding}</docencoding>-->
+            <!--<tags>-->
+            <!--<tag>-->
+            <!--<name>notes</name>-->
+            <!--<placement/>-->
+            <!--<head>版本.</head>-->
+            <!--</tag>-->
+            <!--</tags>-->
+            <!--</configuration>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<id>attach-javadocs</id>-->
+            <!--<phase>install</phase>-->
+            <!--<goals>-->
+            <!--<goal>jar</goal>-->
+            <!--</goals>-->
+            <!--<configuration>-->
+            <!--<encoding>${project.build.sourceEncoding}</encoding>-->
+            <!--</configuration>-->
+            <!--</execution>-->
+            <!--</executions>-->
+            <!--</plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19</version>
+                <configuration>
+                    <forkMode>once</forkMode>
+                    <argLine>${argLine}</argLine>
+                    <skipTests>true</skipTests>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <warName>${project.artifactId}-${project.version}</warName>
+                    <webXml>src/main/webapp/WEB-INF/resin-web-pre.xml</webXml>
+                    <!--<webXml>src/main/webapp/WEB-INF/tomcat-web.xml</webXml>-->
+                    <!--
+                    打包之前过滤掉不想要被打进 .war包的jar,
+                    注意：这个地方，本来路径应该是 WEB-INF/lib/anaalyzer-2.0.4.jar,
+                    但是经过多次试验,不能这样，至于咋回事儿，搞不清楚。
+                    经多方查证均无结果 暂且这样吧，虽然显得很丑陋，但是总能解决问题吧
+                    -->
+                    <!--<warSourceExcludes>-->
+                    <!--script/**/*.css,-->
+                    <!--script/**/*.js-->
+                    <!--</warSourceExcludes>-->
+                    <webResources>
+                        <!--<resource>-->
+                        <!--&lt;!&ndash; 元配置文件的目录，相对于pom.xml文件的路径 &ndash;&gt;-->
+                        <!--<directory>src/main/webapp/WEB-INF</directory>-->
+                        <!--&lt;!&ndash; 是否过滤文件，也就是是否启动 auto-config 的功能 &ndash;&gt;-->
+                        <!--<filtering>true</filtering>-->
+                        <!--&lt;!&ndash; 目标路径 &ndash;&gt;-->
+                        <!--<targetPath>WEB-INF</targetPath>-->
+                        <!--</resource>-->
+                        <!--<resource>-->
+                        <!--<directory>src/main/webapp/script</directory>-->
+                        <!--<includes>-->
+                        <!--<include>-->
+                        <!--**/*.min.css-->
+                        <!--</include>-->
+                        <!--<include>-->
+                        <!--**/*.min.js-->
+                        <!--</include>-->
+                        <!--<include>-->
+                        <!--**/highcharts*.js-->
+                        <!--</include>-->
+                        <!--<include>-->
+                        <!--**/accessibility*.js-->
+                        <!--</include>-->
+                        <!--<include>-->
+                        <!--**/gantt*.js-->
+                        <!--</include>-->
+                        <!--<include>-->
+                        <!--**/grid-axis*.js-->
+                        <!--</include>-->
+                        <!--</includes>-->
+                        <!--<targetPath>script</targetPath>-->
+                        <!--</resource>-->
+                    </webResources>
+                </configuration>
+            </plugin>
+            <!--<plugin>-->
+            <!--<groupId>net.alchim31.maven</groupId>-->
+            <!--<artifactId>yuicompressor-maven-plugin</artifactId>-->
+            <!--<version>1.5.1</version>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<phase>process-resources</phase>-->
+            <!--<goals>-->
+            <!--<goal>compress</goal>-->
+            <!--</goals>-->
+            <!--</execution>-->
+            <!--</executions>-->
+            <!--<configuration>-->
+            <!--&lt;!&ndash; 读取js,css文件采用UTF-8编码 &ndash;&gt;-->
+            <!--<encoding>${project.build.sourceEncoding}</encoding>-->
+            <!--&lt;!&ndash; 不显示js可能的错误 &ndash;&gt;-->
+            <!--<jswarn>false</jswarn>-->
+            <!--&lt;!&ndash; 若存在已压缩的文件，会先对比源文件是否有改动；有改动便压缩，无改动就不压缩 &ndash;&gt;-->
+            <!--<force>false</force>-->
+            <!--&lt;!&ndash; 在指定的列号后插入新行 &ndash;&gt;-->
+            <!--<linebreakpos>-1</linebreakpos>-->
+            <!--&lt;!&ndash; 压缩之前先执行聚合文件操作 &ndash;&gt;-->
+            <!--<preProcessAggregates>true</preProcessAggregates>-->
+            <!--&lt;!&ndash; 压缩后保存文件后缀 无后缀 &ndash;&gt;-->
+            <!--<nosuffix>false</nosuffix>-->
+            <!--<suffix>.min</suffix>-->
+            <!--&lt;!&ndash; 源目录，即需压缩的根目录 &ndash;&gt;-->
+            <!--<sourceDirectory>src/main/webapp/script</sourceDirectory>-->
+            <!--&lt;!&ndash;<outputDirectory>target/${project.artifactId}-${project.version}/script</outputDirectory>&ndash;&gt;-->
+            <!--&lt;!&ndash;<outputDirectory>target/${project.artifactId}/script</outputDirectory>&ndash;&gt;-->
+            <!--<outputDirectory>src/main/webapp/script</outputDirectory>-->
+            <!--&lt;!&ndash; 压缩js和css文件 &ndash;&gt;-->
+            <!--<includes>-->
+            <!--<include>**/*.js</include>-->
+            <!--<include>**/*.css</include>-->
+            <!--</includes>-->
+            <!--&lt;!&ndash; 以下目录和文件不会被压缩 &ndash;&gt;-->
+            <!--<excludes>-->
+            <!--<exclude>**/*.min.js</exclude>-->
+            <!--<exclude>**/*.min.css</exclude>-->
+            <!--<exclude>**/Highcharts-5.0.2/**/highcharts*.js</exclude>-->
+            <!--<exclude>**/Highcharts-5.0.2/**/accessibility*.js</exclude>-->
+            <!--<exclude>**/Highcharts-5.0.2/**/gantt*.js</exclude>-->
+            <!--<exclude>**/Highcharts-5.0.2/**/grid-axis*.js</exclude>-->
+            <!--</excludes>-->
+            <!--</configuration>-->
+            <!--</plugin>-->
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-dependency-plugin</artifactId>
+                                        <versionRange>[0.0.0,)</versionRange>
+                                        <goals>
+                                            <goal>copy-dependencies</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore/>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>
