@@ -52,18 +52,6 @@ public class BoxLog extends Configured implements Tool {
                 if (!matcher.find()) {
                     return;
                 }
-//                String[] content = msg.split(",");
-//                if (content.length < 14) {
-//                    return;
-//                }
-//                String uuid = content[0];
-//                String mac = content[12];
-//                if (uuid == null && "".equals(uuid.trim())) {
-//                    return;
-//                }
-//                if (mac == null && "".equals(mac.trim())) {
-//                    return;
-//                }
                 context.write(value, new Text());
             } catch (Exception e) {
                 // TODO: handle exception
@@ -117,24 +105,8 @@ public class BoxLog extends Configured implements Tool {
             }
         } catch (Exception e) {
             // TODO: handle exception
-//            e.toString();
-            e.printStackTrace();
+            e.toString();
         }
         return 0;
     }
-//
-//    public static void main(String[] args) throws Exception {
-//        if (args.length < 2) {
-//            throw new IOException("please write input path and output path...");
-//        }
-//        Configuration conf = new Configuration();
-//        conf.set("fs.defaultFS", "hdfs://devpd1:8020");
-////		distributedCache
-//        try {
-//            ToolRunner.run(conf, new BoxLog(), args);
-//        } catch (Exception e) {
-//            // TODO: handle exception
-//            e.toString();
-//        }
-//    }
 }
