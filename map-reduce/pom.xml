@@ -27,6 +27,7 @@
 
     <modules>
         <module>mr-box</module>
+        <module>mr-mobile</module>
     </modules>
 
 </project>
