@@ -22,6 +22,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
 import java.net.URI;
@@ -108,5 +109,19 @@ public class BoxLog extends Configured implements Tool {
             e.toString();
         }
         return 0;
+    }
+
+    public static void main(String[] args) throws Exception {
+        if (args.length < 2) {
+            throw new IOException("please write input path and output path...");
+        }
+        Configuration conf = new Configuration();
+        conf.set("fs.defaultFS", "hdfs://devpd1:8020");
+        try {
+            ToolRunner.run(conf, new BoxLog(), args);
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.toString();
+        }
     }
 }
