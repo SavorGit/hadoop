@@ -36,7 +36,7 @@ public class MobileLog extends Configured implements Tool {
 
     private static class MobileMapper extends Mapper<LongWritable, Text, Text, Text> {
 
-        private Pattern MOBILE_LOG_FORMAT_REGEX = Pattern.compile("^.+,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.+,.*,?$");
+        private Pattern MOBILE_LOG_FORMAT_REGEX = Pattern.compile("^.+,.*,.*,.*,.*,.*,.*,.*,.+,.*,.*,.*,.*,.*,.*,.*,?$");
 
         @Override
         protected void map(LongWritable key, Text value, Mapper<LongWritable, Text, Text, Text>.Context context) throws IOException, InterruptedException {
