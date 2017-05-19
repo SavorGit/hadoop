@@ -28,6 +28,7 @@
     <modules>
         <module>mr-box</module>
         <module>mr-mobile</module>
+        <module>mr-nginx</module>
     </modules>
 
 </project>
