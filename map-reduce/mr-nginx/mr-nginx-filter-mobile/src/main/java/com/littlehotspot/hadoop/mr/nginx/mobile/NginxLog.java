@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
  */
 public class NginxLog extends Configured implements Tool {
     //    private static Pattern BOX_LOG_FORMAT_REGEX = Pattern.compile("^(\\d{0,3}\\.\\d{0,3}\\.\\d{0,3}\\.\\d{0,3}) - - \\[(.+)\\] ([A-Z]+) ([^ ]+) HTTP/[^ ]+ \"(\\d{3})\" \\d+ \"(.+)\" \"(.+)\" \"(.+)\"$");
-    private static Pattern BOX_LOG_FORMAT_REGEX = Pattern.compile("^(\\d{0,3}\\.\\d{0,3}\\.\\d{0,3}\\.\\d{0,3}) - [^ ]+ \\[(.+)\\] ([A-Z]+) ([^ ]+) HTTP/[^ ]+ \"(\\d{3})\" \\d+ \"(.+)\" \"(.+)\" \"(.+)\" \"(.+)\"$");
+    private static Pattern BOX_LOG_FORMAT_REGEX = Pattern.compile("^(\\d{0,3}\\.\\d{0,3}\\.\\d{0,3}\\.\\d{0,3}) - [^ ]+ \\[(.+)\\] ([A-Z]+) ([^ ]+) HTTP/[^ ]+ \"(\\d{3})\" \\d+ \"(.+)\" \"([^-]+.*)\" \"(.+)\" \"(.+)\"$");
 
     private static class BoxMapper extends Mapper<LongWritable, Text, Text, Text> {
 
@@ -87,9 +87,9 @@ public class NginxLog extends Configured implements Tool {
             if (StringUtils.isBlank(traceInfo)) {
                 return traceInfoStringBuffer.toString();
             }
-            if (traceInfo.indexOf(';') > -1) {
-                return traceInfoStringBuffer.toString();
-            }
+//            if (traceInfo.indexOf(';') < 0) {
+//                return traceInfoStringBuffer.toString();
+//            }
             Map<String, String> parameterMap = new ConcurrentHashMap<>();
             String[] parameterArray = traceInfo.split(";");
             for (String parameter : parameterArray) {
@@ -103,18 +103,18 @@ public class NginxLog extends Configured implements Tool {
                 parameterMap.put(matcher.group(1), matcher.group(2));
             }
 
-            traceInfoStringBuffer.append(parameterMap.get("versionname")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(parameterMap.get("versioncode")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(parameterMap.get("buildversion")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(parameterMap.get("osversion")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(parameterMap.get("model")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(parameterMap.get("appname")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(parameterMap.get("clientname")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(parameterMap.get("channelid")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(parameterMap.get("channelName")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(parameterMap.get("deviceid")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(parameterMap.get("network")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(parameterMap.get("language")).append(VALUE_SPLIT_CHAR);
+            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "versionname", "")).append(VALUE_SPLIT_CHAR);
+            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "versioncode", "")).append(VALUE_SPLIT_CHAR);
+            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "buildversion", "")).append(VALUE_SPLIT_CHAR);
+            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "osversion", "")).append(VALUE_SPLIT_CHAR);
+            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "model", "")).append(VALUE_SPLIT_CHAR);
+            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "appname", "")).append(VALUE_SPLIT_CHAR);
+            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "clientname", "")).append(VALUE_SPLIT_CHAR);
+            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "channelid", "")).append(VALUE_SPLIT_CHAR);
+            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "channelName", "")).append(VALUE_SPLIT_CHAR);
+            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "deviceid", "")).append(VALUE_SPLIT_CHAR);
+            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "network", "")).append(VALUE_SPLIT_CHAR);
+            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "language", "")).append(VALUE_SPLIT_CHAR);
             return traceInfoStringBuffer.toString();
         }
 
@@ -130,6 +130,14 @@ public class NginxLog extends Configured implements Tool {
             String tarDateString = DateFormatUtils.format(date, DATA_FORMAT_TAR);
             System.out.println(tarDateString);
             return tarDateString;
+        }
+
+        private String getMapValue(Map<String, String> map, String key, String defaultValue) {
+            if (map == null) {
+                throw new IllegalArgumentException("The map is null");
+            }
+            String value = map.get(key);
+            return value == null ? defaultValue : value;
         }
     }
 
