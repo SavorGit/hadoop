@@ -44,7 +44,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.littlehotspot.hadoop.mr.mobile.MobileLog</mainClass>
+                            <mainClass>com.littlehotspot.hadoop.mr.mobile.Main</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>

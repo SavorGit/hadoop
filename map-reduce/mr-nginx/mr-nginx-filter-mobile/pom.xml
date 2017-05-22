@@ -45,7 +45,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.littlehotspot.hadoop.mr.nginx.mobile.NginxLog</mainClass>
+                            <mainClass>com.littlehotspot.hadoop.mr.nginx.mobile.Main</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>

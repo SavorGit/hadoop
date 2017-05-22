@@ -44,7 +44,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.littlehotspot.hadoop.mr.box.BoxLog</mainClass>
+                            <mainClass>com.littlehotspot.hadoop.mr.box.Main</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
