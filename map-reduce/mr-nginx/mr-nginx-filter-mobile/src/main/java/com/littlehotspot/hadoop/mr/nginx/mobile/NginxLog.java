@@ -152,7 +152,6 @@ public class NginxLog extends Configured implements Tool {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATA_FORMAT_SRC, Locale.US);
             Date date = simpleDateFormat.parse(dateString);
             String tarDateString = DateFormatUtils.format(date, DATA_FORMAT_TAR);
-            System.out.println(tarDateString);
             return tarDateString;
         }
 
