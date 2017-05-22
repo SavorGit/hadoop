@@ -13,6 +13,7 @@
     <artifactId>mr-nginx-filter-mobile</artifactId>
 
     <name>Little Hot Spot Hadoop Map-Reduce Nginx [Filter-Mobile]</name>
+    <description>读取本地文件，过滤出 NGINX 日志中的手机信息，并导入到 HDFS 。</description>
     <packaging>jar</packaging>
 
     <dependencies>
