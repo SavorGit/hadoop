@@ -64,17 +64,20 @@ public class NginxLog extends Configured implements Tool {
                 if (!matcher.find()) {
                     return;
                 }
+                if (StringUtils.isBlank(matcher.group(7)) || "-".equalsIgnoreCase(matcher.group(7).trim())) {
+                    return;
+                }
 
                 StringBuffer newValueStringBuffer = new StringBuffer();
-                newValueStringBuffer.append(matcher.group(1)).append(VALUE_SPLIT_CHAR);// Client-IP
-                newValueStringBuffer.append(this.getTimestamp(matcher.group(2))).append(VALUE_SPLIT_CHAR);// Access-Timestamp
-                newValueStringBuffer.append(matcher.group(3)).append(VALUE_SPLIT_CHAR);// HTTP-Request-Method
-                newValueStringBuffer.append(matcher.group(4)).append(VALUE_SPLIT_CHAR);// URI
-                newValueStringBuffer.append(matcher.group(5)).append(VALUE_SPLIT_CHAR);// HTTP-Response-Status
-                newValueStringBuffer.append(matcher.group(6)).append(VALUE_SPLIT_CHAR);// HTTP-Header[referer]
+                newValueStringBuffer.append(this.turnDataForNone(matcher.group(1))).append(VALUE_SPLIT_CHAR);// Client-IP
+                newValueStringBuffer.append(this.toTimestamp(matcher.group(2))).append(VALUE_SPLIT_CHAR);// Access-Timestamp
+                newValueStringBuffer.append(this.turnDataForNone(matcher.group(3))).append(VALUE_SPLIT_CHAR);// HTTP-Request-Method
+                newValueStringBuffer.append(this.turnDataForNone(matcher.group(4))).append(VALUE_SPLIT_CHAR);// URI
+                newValueStringBuffer.append(this.turnDataForNone(matcher.group(5))).append(VALUE_SPLIT_CHAR);// HTTP-Response-Status
+                newValueStringBuffer.append(this.turnDataForNone(matcher.group(6))).append(VALUE_SPLIT_CHAR);// HTTP-Header[referer]
                 newValueStringBuffer.append(this.analysisTraceInfo(matcher.group(7))).append(VALUE_SPLIT_CHAR);// HTTP-Header[traceinfo]
-                newValueStringBuffer.append(matcher.group(8)).append(VALUE_SPLIT_CHAR);// HTTP-Header[user_agent]
-                newValueStringBuffer.append(matcher.group(9)).append(VALUE_SPLIT_CHAR);// HTTP-Header[x_forwarded_for]
+                newValueStringBuffer.append(this.turnDataForNone(matcher.group(8))).append(VALUE_SPLIT_CHAR);// HTTP-Header[user_agent]
+                newValueStringBuffer.append(this.turnDataForNone(matcher.group(9))).append(VALUE_SPLIT_CHAR);// HTTP-Header[x_forwarded_for]
                 newValueStringBuffer.append(this.turnDateFormat(matcher.group(2)));// Access-Time
                 context.write(new Text(newValueStringBuffer.toString()), new Text());
             } catch (Exception e) {
@@ -103,36 +106,58 @@ public class NginxLog extends Configured implements Tool {
                 parameterMap.put(matcher.group(1), matcher.group(2));
             }
 
-            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "versionname", "")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "versioncode", "")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "buildversion", "")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "osversion", "")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "model", "")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "appname", "")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "clientname", "")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "channelid", "")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "channelName", "")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "deviceid", "")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "network", "")).append(VALUE_SPLIT_CHAR);
-            traceInfoStringBuffer.append(this.getMapValue(parameterMap, "language", "")).append(VALUE_SPLIT_CHAR);
+            traceInfoStringBuffer.append(this.getCustomParameterValue(parameterMap, "versionname", "")).append(VALUE_SPLIT_CHAR);// 版本名称
+            traceInfoStringBuffer.append(this.getCustomParameterValue(parameterMap, "versioncode", "")).append(VALUE_SPLIT_CHAR);// 版本号
+            traceInfoStringBuffer.append(this.getCustomParameterValue(parameterMap, "buildversion", "")).append(VALUE_SPLIT_CHAR);// 手机系统版本
+            traceInfoStringBuffer.append(this.getCustomParameterValue(parameterMap, "osversion", "")).append(VALUE_SPLIT_CHAR);// 系统 API 版本
+            traceInfoStringBuffer.append(this.getCustomParameterValue(parameterMap, "model", "")).append(VALUE_SPLIT_CHAR);// 机器型号
+            traceInfoStringBuffer.append(this.getCustomParameterValue(parameterMap, "appname", "")).append(VALUE_SPLIT_CHAR);// 应用名称
+            traceInfoStringBuffer.append(this.getCustomParameterValue(parameterMap, "clientname", "")).append(VALUE_SPLIT_CHAR);// 设备类型
+            traceInfoStringBuffer.append(this.getCustomParameterValue(parameterMap, "channelid", "")).append(VALUE_SPLIT_CHAR);// 渠道 ID
+            traceInfoStringBuffer.append(this.getCustomParameterValue(parameterMap, "channelName", "")).append(VALUE_SPLIT_CHAR);// 渠道名称
+            traceInfoStringBuffer.append(this.getCustomParameterValue(parameterMap, "deviceid", "")).append(VALUE_SPLIT_CHAR);// 设备 ID
+            traceInfoStringBuffer.append(this.getCustomParameterValue(parameterMap, "network", "")).append(VALUE_SPLIT_CHAR);// 网络类型
+            traceInfoStringBuffer.append(this.getCustomParameterValue(parameterMap, "language", "")).append(VALUE_SPLIT_CHAR);// 语言
             return traceInfoStringBuffer.toString();
         }
 
-        private long getTimestamp(String srcDateString) throws ParseException {
+        // NGINX 日志空数据转换
+        private String turnDataForNone(String data) {
+            if (StringUtils.isBlank(data)) {
+                return "";
+            }
+            if ("-".equalsIgnoreCase(data)) {
+                return "";
+            }
+            return data;
+        }
+
+        // NGINX 日志日期转时间截
+        private long toTimestamp(String srcDateString) throws ParseException {
+            String dateString = this.turnDataForNone(srcDateString);
+            if (StringUtils.isBlank(dateString)) {
+                return 0;
+            }
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATA_FORMAT_SRC, Locale.US);
-            Date date = simpleDateFormat.parse(srcDateString);
+            Date date = simpleDateFormat.parse(dateString);
             return date.getTime();
         }
 
+        // NGINX 日志时间格式转换
         private String turnDateFormat(String srcDateString) throws ParseException {
+            String dateString = this.turnDataForNone(srcDateString);
+            if (StringUtils.isBlank(dateString)) {
+                return "";
+            }
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATA_FORMAT_SRC, Locale.US);
-            Date date = simpleDateFormat.parse(srcDateString);
+            Date date = simpleDateFormat.parse(dateString);
             String tarDateString = DateFormatUtils.format(date, DATA_FORMAT_TAR);
             System.out.println(tarDateString);
             return tarDateString;
         }
 
-        private String getMapValue(Map<String, String> map, String key, String defaultValue) {
+        // 获取 NGINX 日志自定义参数值
+        private String getCustomParameterValue(Map<String, String> map, String key, String defaultValue) {
             if (map == null) {
                 throw new IllegalArgumentException("The map is null");
             }
