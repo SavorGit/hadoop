@@ -24,7 +24,6 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
-import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
 import java.net.URI;
@@ -64,9 +63,9 @@ public class NginxLog extends Configured implements Tool {
                 if (!matcher.find()) {
                     return;
                 }
-                if (StringUtils.isBlank(matcher.group(7)) || "-".equalsIgnoreCase(matcher.group(7).trim())) {
-                    return;
-                }
+//                if (StringUtils.isBlank(matcher.group(7)) || "-".equalsIgnoreCase(matcher.group(7).trim())) {
+//                    return;
+//                }
 
                 StringBuffer newValueStringBuffer = new StringBuffer();
                 newValueStringBuffer.append(this.turnDataForNone(matcher.group(1))).append(VALUE_SPLIT_CHAR);// Client-IP
@@ -90,9 +89,6 @@ public class NginxLog extends Configured implements Tool {
             if (StringUtils.isBlank(traceInfo)) {
                 return traceInfoStringBuffer.toString();
             }
-//            if (traceInfo.indexOf(';') < 0) {
-//                return traceInfoStringBuffer.toString();
-//            }
             Map<String, String> parameterMap = new ConcurrentHashMap<>();
             String[] parameterArray = traceInfo.split(";");
             for (String parameter : parameterArray) {
