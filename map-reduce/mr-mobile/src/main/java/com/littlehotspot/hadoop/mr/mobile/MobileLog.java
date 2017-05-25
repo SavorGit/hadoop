@@ -39,7 +39,6 @@ public class MobileLog extends Configured implements Tool {
 
         @Override
         protected void map(LongWritable key, Text value, Mapper<LongWritable, Text, Text, Text>.Context context) throws IOException, InterruptedException {
-            // TODO Auto-generated method stub
             /**数据清洗=========开始*/
             try {
                 String msg = value.toString();
@@ -49,8 +48,7 @@ public class MobileLog extends Configured implements Tool {
                 }
                 context.write(value, new Text());
             } catch (Exception e) {
-                // TODO: handle exception
-                e.toString();
+                e.printStackTrace();
             }
         }
     }
@@ -59,19 +57,16 @@ public class MobileLog extends Configured implements Tool {
 
         @Override
         protected void reduce(Text key, Iterable<Text> value, Reducer<Text, Text, Text, Text>.Context context) throws IOException, InterruptedException {
-            // TODO Auto-generated method stub
             try {
                 context.write(key, new Text());
             } catch (Exception e) {
-                // TODO: handle exception
-                e.toString();
+                e.printStackTrace();
             }
         }
     }
 
     @Override
     public int run(String[] arg) throws Exception {
-        // TODO Auto-generated method stub
         try {
             Job job = Job.getInstance(this.getConf(), MobileLog.class.getSimpleName());
             job.setJarByClass(MobileLog.class);
@@ -98,11 +93,10 @@ public class MobileLog extends Configured implements Tool {
             if (!status) {
                 throw new Exception("MapReduce task execute failed.........");
             }
+            return 0;
         } catch (Exception e) {
-            // TODO: handle exception
-//            e.toString();
             e.printStackTrace();
+            return 1;
         }
-        return 0;
     }
 }

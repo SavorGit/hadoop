@@ -13,12 +13,88 @@
     <groupId>com.littlehotspot.hadoop.mr</groupId>
     <artifactId>mr-nginx</artifactId>
 
-    <name>Little Hot Spot Hadoop Map-Reduce Nginx</name>
-    <packaging>pom</packaging>
+    <name>Little Hot Spot Hadoop Map-Reduce [Nginx]</name>
+    <packaging>jar</packaging>
 
-    <modules>
-        <module>mr-nginx-filter-1</module>
-        <module>mr-nginx-filter-mobile</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Hadoop -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-mapreduce-client-app</artifactId>
+        </dependency>
+
+        <!-- HBase -->
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+
+                    <!-- ================== 手机日志 ================== -->
+                    <!-- 从本地导入到 HDFS -->
+                    <execution>
+                        <id>mobile-local-hdfs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <classifier>mobile-local-hdfs</classifier>
+                            <includes>
+                                <include>**/util/*</include>
+                                <include>**/mapper/*</include>
+                                <include>**/reducer/*</include>
+                                <include>**/mobile/local2hdfs/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.mobile.local2hdfs.Local2HDFSMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
