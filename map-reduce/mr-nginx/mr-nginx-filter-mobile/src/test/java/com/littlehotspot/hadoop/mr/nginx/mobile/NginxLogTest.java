@@ -40,8 +40,7 @@ public class NginxLogTest {
         try {
             ToolRunner.run(conf, new NginxLog(), args);
         } catch (Exception e) {
-            // TODO: handle exception
-            e.toString();
+            e.printStackTrace();
         }
     }
 
