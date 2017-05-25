@@ -47,12 +47,12 @@ public class NginxLog extends Configured implements Tool {
         try {
             this.analysisArgument(args);
 
-            String matcherRegex = args[2];
-            String hdfsInputPath = args[0];
-            String hdfsOutputPath = args[1];
+            String matcherRegex = ArgumentUtil.getParameterValue(parameters, Argument.MapperInputFormatRegex.getName(), Argument.MapperInputFormatRegex.getDefaultValue());
+            String hdfsInputPath = ArgumentUtil.getParameterValue(parameters, Argument.InputPath.getName(), Argument.InputPath.getDefaultValue());
+            String hdfsOutputPath = ArgumentUtil.getParameterValue(parameters, Argument.OutputPath.getName(), Argument.OutputPath.getDefaultValue());
 
             // 配置数据格式
-            if (args.length > 2 && StringUtils.isNotBlank(matcherRegex)) {
+            if (StringUtils.isNotBlank(matcherRegex)) {
                 MAPPER_INPUT_FORMAT_REGEX = Pattern.compile(matcherRegex);
             }
 
