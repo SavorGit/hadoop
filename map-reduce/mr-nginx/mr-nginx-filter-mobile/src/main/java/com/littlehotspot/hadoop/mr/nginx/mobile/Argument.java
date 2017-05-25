@@ -23,6 +23,7 @@ import lombok.Getter;
  * Date of last commit:$Date$<br>
  */
 public enum Argument {
+    HDFSCluster("hdfsCluster", null),
     MapperInputFormatRegex("inRegex", null),
     InputPath("hdfsIn", null),
     OutputPath("hdfsOut", null);

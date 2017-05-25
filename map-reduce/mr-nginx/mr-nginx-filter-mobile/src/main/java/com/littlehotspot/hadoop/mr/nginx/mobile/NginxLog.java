@@ -47,9 +47,15 @@ public class NginxLog extends Configured implements Tool {
         try {
             this.analysisArgument(args);
 
+            String hdfsCluster = ArgumentUtil.getParameterValue(parameters, Argument.HDFSCluster.getName(), Argument.HDFSCluster.getDefaultValue());
             String matcherRegex = ArgumentUtil.getParameterValue(parameters, Argument.MapperInputFormatRegex.getName(), Argument.MapperInputFormatRegex.getDefaultValue());
             String hdfsInputPath = ArgumentUtil.getParameterValue(parameters, Argument.InputPath.getName(), Argument.InputPath.getDefaultValue());
             String hdfsOutputPath = ArgumentUtil.getParameterValue(parameters, Argument.OutputPath.getName(), Argument.OutputPath.getDefaultValue());
+
+            // 配置 HDFS 根路径
+            if (StringUtils.isNotBlank(hdfsCluster)) {
+                this.getConf().set("fs.defaultFS", hdfsCluster);
+            }
 
             // 配置数据格式
             if (StringUtils.isNotBlank(matcherRegex)) {

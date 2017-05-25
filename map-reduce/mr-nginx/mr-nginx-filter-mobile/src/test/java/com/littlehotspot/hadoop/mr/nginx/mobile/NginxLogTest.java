@@ -33,9 +33,9 @@ public class NginxLogTest {
     @Test
     public void run() {
         System.setProperty("hadoop.home.dir", "D:\\GreenProfram\\hadoop-2.7.3");
-        String[] args = {"hdfsIn=file:///F:\\工作环境软件\\Hadoop\\nginx_log", "hdfsOut=/home/data/hadoop/flume/test-mr/2017-05-15"};
+        String[] args = {"hdfsCluster=hdfs://devpd1:8020", "hdfsIn=file:///F:\\工作环境软件\\Hadoop\\nginx_log", "hdfsOut=/home/data/hadoop/flume/test-mr/2017-05-15"};
         Configuration conf = new Configuration();
-        conf.set("fs.defaultFS", "hdfs://devpd1:8020");
+
 //		distributedCache
         try {
             ToolRunner.run(conf, new NginxLog(), args);

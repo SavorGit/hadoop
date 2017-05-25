@@ -30,12 +30,12 @@ public class Main {
             throw new IOException("please write input path and output path...");
         }
         Configuration conf = new Configuration();
-
-        // 配置 HDFS 根路径
-        if (args.length > 3) {
-            conf.set("fs.defaultFS", args[3]);
-//            conf.set("fs.defaultFS", "hdfs://devpd1:8020");
-        }
+//
+//        // 配置 HDFS 根路径
+//        if (args.length > 3) {
+//            conf.set("fs.defaultFS", args[3]);
+////            conf.set("fs.defaultFS", "hdfs://devpd1:8020");
+//        }
 
         try {
             ToolRunner.run(conf, new NginxLog(), args);
