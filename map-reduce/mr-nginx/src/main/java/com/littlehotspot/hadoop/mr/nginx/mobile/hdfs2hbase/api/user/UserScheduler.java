@@ -3,18 +3,20 @@
  * STUPID BIRD PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  * @Project : hadoop
- * @Package : com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.hfile
+ * @Package : com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.api.user
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
- * @Time : 09:33
+ * @Time : 16:42
  */
-package com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.hfile;
+package com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.api.user;
 
 import com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.Argument;
 import com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.UserMapper;
 import com.littlehotspot.hadoop.mr.nginx.util.ArgumentUtil;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
@@ -37,16 +39,16 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * <h1>调度器 - 通过 HFile 方式把 HDFS 数据导入到 HBase</h1>
+ * <h1>调度器 - 用户 [API]</h1>
  *
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
- * @notes Created on 2017年05月24日<br>
+ * @notes Created on 2017年05月26日<br>
  * Revision of last commit:$Revision$<br>
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class HFileScheduler extends Configured implements Tool {
+public class UserScheduler extends Configured implements Tool {
 
     public static Pattern MAPPER_INPUT_FORMAT_REGEX = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
 
@@ -83,7 +85,8 @@ public class HFileScheduler extends Configured implements Tool {
             FileOutputFormat.setOutputPath(job, outputPath);
 
             // 生成HFile
-            Connection conn = ConnectionFactory.createConnection(this.getConf());
+            Configuration hBaseConfiguration = HBaseConfiguration.create(this.getConf());
+            Connection conn = ConnectionFactory.createConnection(hBaseConfiguration);
             HTable table = (HTable) conn.getTable(TableName.valueOf(hbaseTableName));
             HFileOutputFormat2.configureIncrementalLoad(job, table);
 

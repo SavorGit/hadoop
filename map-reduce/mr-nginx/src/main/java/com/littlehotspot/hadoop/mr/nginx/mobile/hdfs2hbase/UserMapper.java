@@ -3,13 +3,14 @@
  * STUPID BIRD PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  * @Project : hadoop
- * @Package : com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.hfile
+ * @Package : com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
- * @Time : 11:01
+ * @Time : 16:36
  */
-package com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.hfile;
+package com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase;
 
+import com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.hfile.HFileScheduler;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
@@ -22,16 +23,17 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 
 /**
- * <h1>Mapper - 通过 HFile 方式把 HDFS 数据导入到 HBase</h1>
+ * <h1>Mapper -  用户</h1>
  *
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
- * @notes Created on 2017年05月24日<br>
+ * @notes Created on 2017年05月26日<br>
  * Revision of last commit:$Revision$<br>
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class HFileMapper extends Mapper<LongWritable, Text, ImmutableBytesWritable, Put> {
+public class UserMapper extends Mapper<LongWritable, Text, ImmutableBytesWritable, Put> {
+    //    ImmutableBytesWritable rowKey = new ImmutableBytesWritable();
 
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
@@ -76,6 +78,9 @@ public class HFileMapper extends Mapper<LongWritable, Text, ImmutableBytesWritab
             put.addColumn(Bytes.toBytes("article"), Bytes.toBytes("machineModel"), Bytes.toBytes(machineModel));
 
             context.write(rowKeyWritable, put);
+
+//            rowKey.set(deviceIdBytes);
+//            context.write(rowKey, put);
         } catch (Exception e) {
             e.printStackTrace();
         }

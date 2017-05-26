@@ -82,8 +82,7 @@
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.mobile.local2hdfs.Local2HDFSMain
-                                    </mainClass>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.mobile.local2hdfs.Local2HDFSMain</mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
                                 </manifest>
@@ -91,6 +90,31 @@
                         </configuration>
                     </execution>
 
+                    <!-- 从 HDFS 到 HBase [用户] -->
+                    <execution>
+                        <id>mobile-hdfs-hbase-user</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <classifier>mobile-hdfs-hbase-user</classifier>
+                            <includes>
+                                <include>**/util/*</include>
+                                <include>**/mapper/*</include>
+                                <include>**/reducer/*</include>
+                                <include>**/hfile/*</include>
+                                <include>**/hfile/user/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.hfile.user.UserMain</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
 
                 </executions>
             </plugin>
