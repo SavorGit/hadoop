@@ -35,6 +35,7 @@ public class UserMapper extends Mapper<LongWritable, Text, Text, Text> {
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         try {
             String rowLineContent = value.toString();
+            System.out.println(rowLineContent);
             Matcher matcher = UserScheduler.MAPPER_INPUT_FORMAT_REGEX.matcher(rowLineContent);
             if (!matcher.find()) {
                 return;
@@ -44,6 +45,7 @@ public class UserMapper extends Mapper<LongWritable, Text, Text, Text> {
                 return;
             }
             Text keyText = new Text(deviceId);
+//            System.out.println(rowLineContent);
             context.write(keyText, value);
         } catch (Exception e) {
             e.printStackTrace();

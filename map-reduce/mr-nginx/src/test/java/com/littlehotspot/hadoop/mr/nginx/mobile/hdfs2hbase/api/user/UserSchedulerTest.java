@@ -26,10 +26,8 @@ public class UserSchedulerTest {
 
     @Test
     public void run() {
-        String[] args = {"hdfsCluster=hdfs://devpd1:8020", "hdfsIn=/home/data/hadoop/flume/test-mr/2017-05-22", "hdfsOut=/home/data/hadoop/flume/test-mr/hfile/blog", "table=blog"};
-
+        String[] args = {"hdfsCluster=hdfs://devpd1:8020", "hdfsIn=/home/data/hadoop/flume/test-mr/2017-05-19", "hdfsOut=/home/data/hadoop/flume/test-mr/hbase/test", "table=blog"};
         System.setProperty("hadoop.home.dir", "D:\\GreenProfram\\hadoop-2.7.3");
-
         Configuration conf = new Configuration();
 //        conf.set("fs.defaultFS", "hdfs://devpd1:8020");
 //        conf.set("fs.defaultFS", "file:///");

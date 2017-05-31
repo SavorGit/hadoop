@@ -32,7 +32,7 @@ public class Local2HDFSMain {
             throw new IOException("please write input path and output path...");
         }
         Configuration conf = new Configuration();
-//
+
 //        // 配置 HDFS 根路径
 //        if (args.length > 3) {
 //            conf.set("fs.defaultFS", args[3]);
