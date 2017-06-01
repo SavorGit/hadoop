@@ -10,7 +10,7 @@
  */
 package com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.hfile;
 
-import com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.Argument;
+import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.UserMapper;
 import com.littlehotspot.hadoop.mr.nginx.util.ArgumentUtil;
 import org.apache.hadoop.conf.Configured;

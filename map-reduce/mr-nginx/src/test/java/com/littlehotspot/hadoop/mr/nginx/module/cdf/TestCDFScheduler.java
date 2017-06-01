@@ -3,12 +3,12 @@
  * STUPID BIRD PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  * @Project : hadoop
- * @Package : com.littlehotspot.hadoop.mr.nginx.mobile.local2hdfs
+ * @Package : com.littlehotspot.hadoop.mr.nginx.module.cdf
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
- * @Time : 16:11
+ * @Time : 14:32
  */
-package com.littlehotspot.hadoop.mr.nginx.mobile.local2hdfs;
+package com.littlehotspot.hadoop.mr.nginx.module.cdf;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -21,16 +21,16 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * <h1>测试 - 从本地导入到 HDFS</h1>
+ * <h1>测试 - 数据格式转换</h1>
  *
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
- * @notes Created on 2017年05月25日<br>
+ * @notes Created on 2017年06月01日<br>
  * Revision of last commit:$Revision$<br>
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class Local2HDFSSchedulerTest {
+public class TestCDFScheduler {
 
     @Test
     public void run() {
@@ -40,7 +40,7 @@ public class Local2HDFSSchedulerTest {
 
 //		distributedCache
         try {
-            ToolRunner.run(conf, new Local2HDFSScheduler(), args);
+            ToolRunner.run(conf, new CDFScheduler(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }

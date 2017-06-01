@@ -3,15 +3,15 @@
  * STUPID BIRD PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  * @Project : hadoop
- * @Package : com.littlehotspot.hadoop.mr.nginx.mobile.local2hdfs
+ * @Package : com.littlehotspot.hadoop.mr.nginx.module.cdf
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
- * @Time : 17:44
+ * @Time : 14:04
  */
-package com.littlehotspot.hadoop.mr.nginx.mobile.local2hdfs;
+package com.littlehotspot.hadoop.mr.nginx.module.cdf;
 
+import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.reducer.GeneralReducer;
-import com.littlehotspot.hadoop.mr.nginx.util.ArgumentUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -24,36 +24,29 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * <h1>调度器 - 从本地导入到 HDFS</h1>
+ * <H1>调度器 - 数据格式转换</H1>
  *
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
- * @notes Created on 2017年05月19日<br>
+ * @notes Created on 2017年06月01日<br>
  * Revision of last commit:$Revision$<br>
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class Local2HDFSScheduler extends Configured implements Tool {
-
-    //    private static Pattern NGINX_LOG_FORMAT_REGEX = Pattern.compile("^(\\d{0,3}\\.\\d{0,3}\\.\\d{0,3}\\.\\d{0,3}) - - \\[(.+)\\] ([A-Z]+) ([^ ]+) HTTP/[^ ]+ \"(\\d{3})\" \\d+ \"(.+)\" \"(.+)\" \"(.+)\"$");
-    public static Pattern MAPPER_INPUT_FORMAT_REGEX = Pattern.compile("^(\\d{0,3}\\.\\d{0,3}\\.\\d{0,3}\\.\\d{0,3}) - [^ ]+ \\[(.+)\\] ([A-Z]+) ([^ ]+) HTTP/[^ ]+ \"(\\d{3})\" \\d+ \"(.+)\" \"([^-]+.*)\" \"(.+)\" \"(.+)\"$");
-
-    private static Map<String, List<String>> parameters;
+public class CDFScheduler extends Configured implements Tool {
 
     @Override
     public int run(String[] args) throws Exception {
         try {
-            this.analysisArgument(args);
+            CommonVariables.analysisArgument(args);// 解析参数
 
-            String hdfsCluster = ArgumentUtil.getParameterValue(parameters, Argument.HDFSCluster.getName(), Argument.HDFSCluster.getDefaultValue());
-            String matcherRegex = ArgumentUtil.getParameterValue(parameters, Argument.MapperInputFormatRegex.getName(), Argument.MapperInputFormatRegex.getDefaultValue());
-            String hdfsInputPath = ArgumentUtil.getParameterValue(parameters, Argument.InputPath.getName(), Argument.InputPath.getDefaultValue());
-            String hdfsOutputPath = ArgumentUtil.getParameterValue(parameters, Argument.OutputPath.getName(), Argument.OutputPath.getDefaultValue());
+            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
+            String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
+            String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
+            String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
             // 配置 HDFS 根路径
             if (StringUtils.isNotBlank(hdfsCluster)) {
@@ -62,7 +55,7 @@ public class Local2HDFSScheduler extends Configured implements Tool {
 
             // 配置数据格式
             if (StringUtils.isNotBlank(matcherRegex)) {
-                MAPPER_INPUT_FORMAT_REGEX = Pattern.compile(matcherRegex);
+                CommonVariables.MAPPER_INPUT_FORMAT_REGEX = Pattern.compile(matcherRegex);
             }
 
             Path inputPath = new Path(hdfsInputPath);
@@ -74,7 +67,7 @@ public class Local2HDFSScheduler extends Configured implements Tool {
             FileInputFormat.addInputPath(job, inputPath);
             FileOutputFormat.setOutputPath(job, outputPath);
 
-            job.setMapperClass(Local2HDFSMapper.class);
+            job.setMapperClass(CDFMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
 
@@ -98,7 +91,4 @@ public class Local2HDFSScheduler extends Configured implements Tool {
         }
     }
 
-    private void analysisArgument(String[] args) {
-        parameters = ArgumentUtil.analysisArgument(args);
-    }
 }

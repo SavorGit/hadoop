@@ -3,20 +3,20 @@
  * STUPID BIRD PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  * @Project : hadoop
- * @Package : com.littlehotspot.hadoop.mr.nginx.mobile.local2hdfs
+ * @Package : com.littlehotspot.hadoop.mr.nginx.module.cdf
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
- * @Time : 11:03
+ * @Time : 14:02
  */
-package com.littlehotspot.hadoop.mr.nginx.mobile.local2hdfs;
+package com.littlehotspot.hadoop.mr.nginx.module.cdf;
 
+import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.util.ArgumentUtil;
 import com.littlehotspot.hadoop.mr.nginx.util.Constant;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Mapper;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -28,22 +28,22 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 /**
- * <h1>Mapper - 从本地导入到 HDFS</h1>
+ * <h1>Mapper - 数据格式转换</h1>
  *
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
- * @notes Created on 2017年05月24日<br>
+ * @notes Created on 2017年06月01日<br>
  * Revision of last commit:$Revision$<br>
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class Local2HDFSMapper extends Mapper<LongWritable, Text, Text, Text> {
+public class CDFMapper extends org.apache.hadoop.mapreduce.Mapper<LongWritable, Text, Text, Text> {
 
     @Override
-    protected void map(LongWritable key, Text value, Mapper<LongWritable, Text, Text, Text>.Context context) throws IOException, InterruptedException {
+    protected void map(LongWritable key, Text value, org.apache.hadoop.mapreduce.Mapper<LongWritable, Text, Text, Text>.Context context) throws IOException, InterruptedException {
         try {
             String rowLineContent = value.toString();
-            Matcher matcher = Local2HDFSScheduler.MAPPER_INPUT_FORMAT_REGEX.matcher(rowLineContent);
+            Matcher matcher = CommonVariables.MAPPER_INPUT_FORMAT_REGEX.matcher(rowLineContent);
             if (!matcher.find()) {
                 return;
             }
@@ -77,18 +77,18 @@ public class Local2HDFSMapper extends Mapper<LongWritable, Text, Text, Text> {
         String[] parameterArray = traceInfo.trim().split(";");
         Map<String, List<String>> parameterMap = ArgumentUtil.analysisArgument(parameterArray);
 
-        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, ArgumentTraceInfo.VersionName.getName(), ArgumentTraceInfo.VersionName.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 版本名称
-        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, ArgumentTraceInfo.VersionCode.getName(), ArgumentTraceInfo.VersionCode.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 版本号
-        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, ArgumentTraceInfo.BuildVersion.getName(), ArgumentTraceInfo.BuildVersion.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 手机系统版本
-        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, ArgumentTraceInfo.OSVersion.getName(), ArgumentTraceInfo.OSVersion.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 系统 API 版本
-        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, ArgumentTraceInfo.MachineModel.getName(), ArgumentTraceInfo.MachineModel.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 机器型号
-        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, ArgumentTraceInfo.AppName.getName(), ArgumentTraceInfo.AppName.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 应用名称
-        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, ArgumentTraceInfo.DeviceType.getName(), ArgumentTraceInfo.DeviceType.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 设备类型
-        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, ArgumentTraceInfo.ChannelId.getName(), ArgumentTraceInfo.ChannelId.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 渠道 ID
-        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, ArgumentTraceInfo.ChannelName.getName(), ArgumentTraceInfo.ChannelName.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 渠道名称
-        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, ArgumentTraceInfo.DeviceId.getName(), ArgumentTraceInfo.DeviceId.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 设备 ID
-        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, ArgumentTraceInfo.Network.getName(), ArgumentTraceInfo.Network.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 网络类型
-        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, ArgumentTraceInfo.Language.getName(), ArgumentTraceInfo.Language.getDefaultValue()));// 语言
+        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, Argument.VersionName.getName(), Argument.VersionName.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 版本名称
+        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, Argument.VersionCode.getName(), Argument.VersionCode.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 版本号
+        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, Argument.BuildVersion.getName(), Argument.BuildVersion.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 手机系统版本
+        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, Argument.OSVersion.getName(), Argument.OSVersion.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 系统 API 版本
+        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, Argument.MachineModel.getName(), Argument.MachineModel.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 机器型号
+        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, Argument.AppName.getName(), Argument.AppName.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 应用名称
+        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, Argument.DeviceType.getName(), Argument.DeviceType.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 设备类型
+        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, Argument.ChannelId.getName(), Argument.ChannelId.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 渠道 ID
+        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, Argument.ChannelName.getName(), Argument.ChannelName.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 渠道名称
+        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, Argument.DeviceId.getName(), Argument.DeviceId.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 设备 ID
+        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, Argument.Network.getName(), Argument.Network.getDefaultValue())).append(Constant.VALUE_SPLIT_CHAR);// 网络类型
+        traceInfoStringBuffer.append(ArgumentUtil.getParameterValue(parameterMap, Argument.Language.getName(), Argument.Language.getDefaultValue()));// 语言
 
         return traceInfoStringBuffer.toString();
     }

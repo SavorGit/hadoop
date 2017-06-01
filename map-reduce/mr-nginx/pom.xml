@@ -64,25 +64,26 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
 
-                    <!-- ================== 手机日志 ================== -->
-                    <!-- 从本地导入到 HDFS -->
+                    <!-- 转换数据格式 -->
                     <execution>
-                        <id>mobile-local-hdfs</id>
+                        <id>convert-data-format</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
                         <phase>package</phase>
                         <configuration>
-                            <classifier>mobile-local-hdfs</classifier>
+                            <finalName>nginx-log</finalName>
+                            <classifier>convert-data-format</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
                             <includes>
-                                <include>**/util/*</include>
-                                <include>**/mapper/*</include>
-                                <include>**/reducer/*</include>
-                                <include>**/mobile/local2hdfs/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/mapper/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/cdf/*</include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.mobile.local2hdfs.Local2HDFSMain</mainClass>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.cdf.CDFMain</mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
                                 </manifest>
@@ -98,17 +99,20 @@
                         </goals>
                         <phase>package</phase>
                         <configuration>
+                            <finalName>nginx-log</finalName>
                             <classifier>mobile-hdfs-hbase-user</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
                             <includes>
-                                <include>**/util/*</include>
-                                <include>**/mapper/*</include>
-                                <include>**/reducer/*</include>
-                                <include>**/hfile/*</include>
-                                <include>**/hfile/user/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/mapper/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/hfile/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/hfile/user/*</include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.hfile.user.UserMain</mainClass>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.hfile.user.UserMain
+                                    </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
                                 </manifest>

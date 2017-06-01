@@ -10,7 +10,6 @@
  */
 package com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.api.user;
 
-import com.littlehotspot.hadoop.mr.nginx.mobile.local2hdfs.Local2HDFSScheduler;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.util.ToolRunner;
@@ -42,7 +41,7 @@ public class UserMain {
 //        }
 
         try {
-            ToolRunner.run(conf, new Local2HDFSScheduler(), args);
+            ToolRunner.run(conf, new UserScheduler(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }

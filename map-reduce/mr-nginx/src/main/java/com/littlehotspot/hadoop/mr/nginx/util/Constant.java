@@ -10,6 +10,11 @@
  */
 package com.littlehotspot.hadoop.mr.nginx.util;
 
+import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
+
+import java.util.List;
+import java.util.Map;
+
 /**
  * <h1>常量 - NGINX</h1>
  *
@@ -24,4 +29,24 @@ public class Constant {
     public static final String DATA_FORMAT_1 = "dd/MMM/yyyy:HH:mm:ss Z";
     public static final String DATA_FORMAT_2 = "yyyy-MM-dd HH:mm:ss Z";
     public static final char VALUE_SPLIT_CHAR = 0x0001;
+
+    public static class CommonVariables {
+
+        private static Map<String, List<String>> parameters;
+
+        public static void analysisArgument(String[] args) {
+            if (args == null) {
+                throw new IllegalArgumentException("Argument 'args' is null");
+            }
+            parameters = ArgumentUtil.analysisArgument(args);
+        }
+
+        public static String getParameterValue(Argument argument) {
+            if (argument == null) {
+                throw new IllegalArgumentException("Argument 'argument' is null");
+            }
+            String value = ArgumentUtil.getParameterValue(parameters, argument.getName(), argument.getDefaultValue());
+            return value;
+        }
+    }
 }
