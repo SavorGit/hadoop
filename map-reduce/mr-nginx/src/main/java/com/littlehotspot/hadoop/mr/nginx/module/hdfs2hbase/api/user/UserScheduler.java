@@ -3,17 +3,15 @@
  * STUPID BIRD PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  * @Project : hadoop
- * @Package : com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.api.user
+ * @Package : com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
- * @Time : 16:42
+ * @Time : 15:31
  */
-package com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.api.user;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
-import com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.api.UserMapper;
 import com.littlehotspot.hadoop.mr.nginx.reducer.GeneralReducer;
-import com.littlehotspot.hadoop.mr.nginx.util.ArgumentUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -26,8 +24,6 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -35,28 +31,24 @@ import java.util.regex.Pattern;
  *
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
- * @notes Created on 2017年05月26日<br>
+ * @notes Created on 2017年06月01日<br>
  * Revision of last commit:$Revision$<br>
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
 public class UserScheduler extends Configured implements Tool {
 
-    public static Pattern MAPPER_INPUT_FORMAT_REGEX = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
-
-    private static Map<String, List<String>> parameters;
-
     @Override
     public int run(String[] args) throws Exception {
         try {
-            this.analysisArgument(args);// 解析参数
+            CommonVariables.analysisArgument(args);// 解析参数
 
             // 获取参数
-            String hbaseTableName = ArgumentUtil.getParameterValue(parameters, Argument.HbaseTable.getName(), Argument.HbaseTable.getDefaultValue());
-            String hdfsCluster = ArgumentUtil.getParameterValue(parameters, Argument.HDFSCluster.getName(), Argument.HDFSCluster.getDefaultValue());
-            String matcherRegex = ArgumentUtil.getParameterValue(parameters, Argument.MapperInputFormatRegex.getName(), Argument.MapperInputFormatRegex.getDefaultValue());
-            String hdfsInputPath = ArgumentUtil.getParameterValue(parameters, Argument.InputPath.getName(), Argument.InputPath.getDefaultValue());
-            String hdfsOutputPath = ArgumentUtil.getParameterValue(parameters, Argument.OutputPath.getName(), Argument.OutputPath.getDefaultValue());
+            String hbaseTableName = CommonVariables.getParameterValue(Argument.HbaseTable);
+            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
+            String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
+            String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
+            String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
             // 配置 HDFS 根路径
             if (StringUtils.isNotBlank(hdfsCluster)) {
@@ -65,7 +57,7 @@ public class UserScheduler extends Configured implements Tool {
 
             // 配置数据格式
             if (StringUtils.isNotBlank(matcherRegex)) {
-                MAPPER_INPUT_FORMAT_REGEX = Pattern.compile(matcherRegex);
+                CommonVariables.MAPPER_INPUT_FORMAT_REGEX = Pattern.compile(matcherRegex);
             }
 
             Path inputPath = new Path(hdfsInputPath);
@@ -104,7 +96,4 @@ public class UserScheduler extends Configured implements Tool {
         }
     }
 
-    private void analysisArgument(String[] args) {
-        parameters = ArgumentUtil.analysisArgument(args);
-    }
 }

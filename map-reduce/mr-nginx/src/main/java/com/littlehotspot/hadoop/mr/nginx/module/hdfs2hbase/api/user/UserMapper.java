@@ -3,14 +3,13 @@
  * STUPID BIRD PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  * @Project : hadoop
- * @Package : com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.api
+ * @Package : com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
- * @Time : 09:15
+ * @Time : 15:29
  */
-package com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.api;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
 
-import com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.api.user.UserScheduler;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -24,7 +23,7 @@ import java.util.regex.Matcher;
  *
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
- * @notes Created on 2017年05月31日<br>
+ * @notes Created on 2017年06月01日<br>
  * Revision of last commit:$Revision$<br>
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
@@ -36,7 +35,7 @@ public class UserMapper extends Mapper<LongWritable, Text, Text, Text> {
         try {
             String rowLineContent = value.toString();
             System.out.println(rowLineContent);
-            Matcher matcher = UserScheduler.MAPPER_INPUT_FORMAT_REGEX.matcher(rowLineContent);
+            Matcher matcher = CommonVariables.MAPPER_INPUT_FORMAT_REGEX.matcher(rowLineContent);
             if (!matcher.find()) {
                 return;
             }
