@@ -13,7 +13,6 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.reducer.GeneralReducer;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -41,19 +40,13 @@ public class UserScheduler extends Configured implements Tool {
     @Override
     public int run(String[] args) throws Exception {
         try {
-            CommonVariables.analysisArgument(args);// 解析参数
+            CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
 
             // 获取参数
             String hbaseTableName = CommonVariables.getParameterValue(Argument.HbaseTable);
-            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
             String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
-
-            // 配置 HDFS 根路径
-            if (StringUtils.isNotBlank(hdfsCluster)) {
-                this.getConf().set("fs.defaultFS", hdfsCluster);
-            }
 
             // 配置数据格式
             if (StringUtils.isNotBlank(matcherRegex)) {
@@ -78,7 +71,7 @@ public class UserScheduler extends Configured implements Tool {
             FileInputFormat.addInputPath(job, inputPath);
             FileOutputFormat.setOutputPath(job, outputPath);
 
-            FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), new Configuration());
+            FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());
             if (fileSystem.exists(outputPath)) {
                 fileSystem.delete(outputPath, true);
             }

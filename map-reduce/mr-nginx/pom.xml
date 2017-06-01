@@ -64,7 +64,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
 
-                    <!-- 转换数据格式 -->
+                    <!-- Nginx 日志转换数据格式 -->
                     <execution>
                         <id>convert-data-format</id>
                         <goals>

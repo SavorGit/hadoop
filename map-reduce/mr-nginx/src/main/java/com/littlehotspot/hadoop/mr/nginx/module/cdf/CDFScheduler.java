@@ -13,7 +13,6 @@ package com.littlehotspot.hadoop.mr.nginx.module.cdf;
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.reducer.GeneralReducer;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -41,17 +40,11 @@ public class CDFScheduler extends Configured implements Tool {
     @Override
     public int run(String[] args) throws Exception {
         try {
-            CommonVariables.analysisArgument(args);// 解析参数
+            CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
 
-            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
             String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
-
-            // 配置 HDFS 根路径
-            if (StringUtils.isNotBlank(hdfsCluster)) {
-                this.getConf().set("fs.defaultFS", hdfsCluster);
-            }
 
             // 配置数据格式
             if (StringUtils.isNotBlank(matcherRegex)) {
@@ -61,7 +54,7 @@ public class CDFScheduler extends Configured implements Tool {
             Path inputPath = new Path(hdfsInputPath);
             Path outputPath = new Path(hdfsOutputPath);
 
-            Job job = Job.getInstance(this.getConf(), this.getClass().getSimpleName());
+            Job job = Job.getInstance(this.getConf(), this.getClass().getName());
             job.setJarByClass(this.getClass());
 
             FileInputFormat.addInputPath(job, inputPath);
@@ -75,7 +68,7 @@ public class CDFScheduler extends Configured implements Tool {
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(Text.class);
 
-            FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), new Configuration());
+            FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());
             if (fileSystem.exists(outputPath)) {
                 fileSystem.delete(outputPath, true);
             }

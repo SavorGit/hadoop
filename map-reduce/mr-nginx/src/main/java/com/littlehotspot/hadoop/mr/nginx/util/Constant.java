@@ -11,6 +11,8 @@
 package com.littlehotspot.hadoop.mr.nginx.util;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
+import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.conf.Configuration;
 
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,16 @@ public class Constant {
             }
             String value = ArgumentUtil.getParameterValue(parameters, argument.getName(), argument.getDefaultValue());
             return value;
+        }
+
+        public static void initMapReduce(Configuration configuration, String[] args) {
+            analysisArgument(args);
+
+            // 配置 HDFS 根路径
+            String hdfsCluster = com.littlehotspot.hadoop.mr.nginx.module.cdf.CommonVariables.getParameterValue(Argument.HDFSCluster);
+            if (StringUtils.isNotBlank(hdfsCluster)) {
+                configuration.set("fs.defaultFS", hdfsCluster);
+            }
         }
     }
 }

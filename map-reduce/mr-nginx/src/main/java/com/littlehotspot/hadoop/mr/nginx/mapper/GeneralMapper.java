@@ -3,23 +3,21 @@
  * STUPID BIRD PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  * @Project : hadoop
- * @Package : com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user
+ * @Package : com.littlehotspot.hadoop.mr.nginx.mapper
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
- * @Time : 15:29
+ * @Time : 16:06
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
+package com.littlehotspot.hadoop.mr.nginx.mapper;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
 
 /**
- * <h1>Mapper - 用户</h1>
+ * <h1>Mapper - 通用</h1>
  *
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
@@ -28,24 +26,12 @@ import java.util.regex.Matcher;
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class UserMapper extends Mapper<LongWritable, Text, Text, Text> {
+public class GeneralMapper extends Mapper<LongWritable, Text, Text, Text> {
 
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         try {
-            String rowLineContent = value.toString();
-            System.out.println(rowLineContent);
-            Matcher matcher = CommonVariables.MAPPER_INPUT_FORMAT_REGEX.matcher(rowLineContent);
-            if (!matcher.find()) {
-                return;
-            }
-            String deviceId = matcher.group(16);// 设备 ID
-            if (StringUtils.isBlank(deviceId)) {
-                return;
-            }
-            Text keyText = new Text(deviceId);
-//            System.out.println(rowLineContent);
-            context.write(keyText, new Text());
+            context.write(value, new Text());
         } catch (Exception e) {
             e.printStackTrace();
         }
