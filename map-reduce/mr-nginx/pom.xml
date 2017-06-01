@@ -72,11 +72,12 @@
                         </goals>
                         <phase>package</phase>
                         <configuration>
-                            <finalName>nginx-log</finalName>
+                            <!--<finalName>nginx-log</finalName>-->
                             <classifier>convert-data-format</classifier>
                             <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/mapper/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/cdf/*</include>
@@ -99,11 +100,12 @@
                         </goals>
                         <phase>package</phase>
                         <configuration>
-                            <finalName>nginx-log</finalName>
+                            <!--<finalName>nginx-log</finalName>-->
                             <classifier>mobile-hdfs-hbase-user</classifier>
                             <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/mapper/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/hfile/*</include>
