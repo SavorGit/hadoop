@@ -36,7 +36,7 @@ public class TestCDFScheduler {
     public void run() {
         System.setProperty("hadoop.home.dir", "D:\\GreenProfram\\hadoop-2.7.3");
         String[] args = {
-                "hdfsCluster=hdfs://onlinemain:8020",
+                "hdfsCluster=hdfs://devpd1:8020",
                 "hdfsIn=file:///F:\\工作环境软件\\Hadoop\\nginx_log",
                 "inRegex=^(\\d{0,3}\\.\\d{0,3}\\.\\d{0,3}\\.\\d{0,3}) - [^ ]+ \\[(.+)\\] ([A-Z]+) ([^ ]+) HTTP/[^ ]+ \"(\\d{3})\" \\d+ \"(.+)\" \"(.*deviceid.*)\" \"(.+)\" \"(.+)\"$",
                 "hdfsOut=/home/data/hadoop/flume/test-mr/2017-05-15"
