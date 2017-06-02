@@ -11,6 +11,7 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -40,9 +41,9 @@ public class UserScheduler extends Configured implements Tool {
     public int run(String[] args) throws Exception {
         try {
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
+            CommonVariables.hBaseHelper = new HBaseHelper(this.getConf());
 
             // 获取参数
-            String hbaseTableName = CommonVariables.getParameterValue(Argument.HbaseTable);
             String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);

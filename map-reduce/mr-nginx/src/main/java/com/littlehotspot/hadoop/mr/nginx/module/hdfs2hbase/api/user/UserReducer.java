@@ -50,6 +50,9 @@ public class UserReducer extends Reducer<Text, Text, Text, Text> {
 //                targetUserBean.setProjectionTime();
                 this.setDownloadTime(sourceUserBean, targetUserBean);
             }
+
+            CommonVariables.hBaseHelper.insert(targetUserBean);
+
             context.write(new Text(targetUserBean.rowLine()), new Text());
         } catch (Exception e) {
             e.printStackTrace();

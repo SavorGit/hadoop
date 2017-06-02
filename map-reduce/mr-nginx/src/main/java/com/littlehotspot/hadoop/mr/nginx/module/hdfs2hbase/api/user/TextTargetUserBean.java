@@ -24,46 +24,56 @@ import lombok.Data;
  * Date of last commit:$Date$<br>
  */
 @Data
+@HBaseTable(tableName = "user", familyName = "basic")
 public class TextTargetUserBean {
 
     /**
      * 设备标识
      */
+    @HBaseColumn(columnName = "deviceId")
+    @HBaseRowKey
     private String deviceId;
 
     /**
      * 设备类型
      */
+    @HBaseColumn(columnName = "deviceType")
     private String deviceType;
 
     /**
      * 机型
      */
+    @HBaseColumn(columnName = "machineModel")
     private String machineModel;
 
     /**
      * TOKEN
      */
+    @HBaseColumn(columnName = "token")
     private String token;
 
     /**
      * 下载时间
      */
+    @HBaseColumn(columnName = "downloadTime")
     private String downloadTime;
 
     /**
      * 来源
      */
+    @HBaseColumn(columnName = "since")
     private String since;
 
     /**
      * 首次投屏时间
      */
+    @HBaseColumn(columnName = "projectionTime")
     private String projectionTime;
 
     /**
      * 首次点播时间
      */
+    @HBaseColumn(columnName = "demandTime")
     private String demandTime;
 
     public String rowLine() {

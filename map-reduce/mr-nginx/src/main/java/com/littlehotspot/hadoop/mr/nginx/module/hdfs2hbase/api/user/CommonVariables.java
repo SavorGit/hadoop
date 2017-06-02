@@ -10,6 +10,7 @@
  */
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
 
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
 import com.littlehotspot.hadoop.mr.nginx.util.Constant;
 
 import java.util.regex.Pattern;
@@ -30,4 +31,6 @@ public class CommonVariables extends Constant.CommonVariables {
      * Mapper 输入时正则过滤
      */
     public static Pattern MAPPER_INPUT_FORMAT_REGEX = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
+
+    public static HBaseHelper hBaseHelper;
 }
