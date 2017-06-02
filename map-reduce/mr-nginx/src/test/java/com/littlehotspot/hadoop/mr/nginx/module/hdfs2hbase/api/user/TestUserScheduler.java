@@ -28,8 +28,11 @@ public class TestUserScheduler {
     public void run() {
         String[] args = {
                 "hdfsCluster=hdfs://onlinemain:8020",
-                "hdfsIn=/home/data/hadoop/flume/nginx_log/export/2017-05-31",
-                "hdfsOut=/home/data/hadoop/flume/nginx_log/export/test-hbase",
+//                "hdfsIn=/home/data/hadoop/flume/nginx_log/export/2017-05-31",
+//                "hdfsOut=/home/data/hadoop/flume/nginx_log/export/test-hbase",
+                "hdfsIn=/home/data/hadoop/flume/test-mr/2017-05-15",
+                "hdfsOut=/home/data/hadoop/flume/test-mr/test-hbase",
+//                "inRegex=^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$",
                 "table=blog"
         };
         System.setProperty("hadoop.home.dir", "D:\\GreenProfram\\hadoop-2.7.3");

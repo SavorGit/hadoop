@@ -55,7 +55,7 @@ public class Constant {
             analysisArgument(args);
 
             // 配置 HDFS 根路径
-            String hdfsCluster = com.littlehotspot.hadoop.mr.nginx.module.cdf.CommonVariables.getParameterValue(Argument.HDFSCluster);
+            String hdfsCluster = getParameterValue(Argument.HDFSCluster);
             if (StringUtils.isNotBlank(hdfsCluster)) {
                 configuration.set("fs.defaultFS", hdfsCluster);
             }

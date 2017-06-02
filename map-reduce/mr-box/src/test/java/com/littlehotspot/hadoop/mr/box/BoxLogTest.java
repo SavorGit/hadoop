@@ -26,15 +26,14 @@ public class BoxLogTest {
     @Test
     public void run() {
         System.setProperty("hadoop.home.dir", "D:\\GreenProfram\\hadoop-2.7.3");
-        String[] args = {"/home/data/hadoop/flume/box_source/2017-05-15", "/home/data/hadoop/flume/test-mr/2017-05-15"};
+        String[] args = {"/home/data/hadoop/flume/box_source/2017-05-31", "/home/data/hadoop/flume/test-mr/2017-05-31"};
         Configuration conf = new Configuration();
         conf.set("fs.defaultFS", "hdfs://devpd1:8020");
 //		distributedCache
         try {
             ToolRunner.run(conf, new BoxLog(), args);
         } catch (Exception e) {
-            // TODO: handle exception
-            e.toString();
+            e.printStackTrace();
         }
     }
 }

@@ -92,29 +92,27 @@
                         </configuration>
                     </execution>
 
-                    <!-- 从 HDFS 到 HBase [用户] -->
+                    <!-- [用户] -->
                     <execution>
-                        <id>mobile-hdfs-hbase-user</id>
+                        <id>hdfs-user</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
                         <phase>package</phase>
                         <configuration>
                             <!--<finalName>nginx-log</finalName>-->
-                            <classifier>mobile-hdfs-hbase-user</classifier>
+                            <classifier>hdfs-user</classifier>
                             <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/mapper/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/hfile/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/hfile/user/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.mobile.hdfs2hbase.hfile.user.UserMain
-                                    </mainClass>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.UserMain</mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
                                 </manifest>

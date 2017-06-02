@@ -34,18 +34,18 @@ public class UserMapper extends Mapper<LongWritable, Text, Text, Text> {
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         try {
             String rowLineContent = value.toString();
-            System.out.println(rowLineContent);
+//            System.out.println(rowLineContent);
             Matcher matcher = CommonVariables.MAPPER_INPUT_FORMAT_REGEX.matcher(rowLineContent);
             if (!matcher.find()) {
                 return;
             }
-            String deviceId = matcher.group(16);// 设备 ID
+            String deviceId = matcher.group(16);
             if (StringUtils.isBlank(deviceId)) {
                 return;
             }
             Text keyText = new Text(deviceId);
-//            System.out.println(rowLineContent);
-            context.write(keyText, new Text());
+            System.out.println(rowLineContent);
+            context.write(keyText, value);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -40,8 +40,7 @@ public class Main {
         try {
             ToolRunner.run(conf, new BoxLog(), args);
         } catch (Exception e) {
-            // TODO: handle exception
-            e.toString();
+            e.printStackTrace();
         }
     }
 }

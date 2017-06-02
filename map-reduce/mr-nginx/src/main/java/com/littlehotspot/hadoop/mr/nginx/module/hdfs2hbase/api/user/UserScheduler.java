@@ -11,7 +11,6 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
-import com.littlehotspot.hadoop.mr.nginx.reducer.GeneralReducer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -56,7 +55,7 @@ public class UserScheduler extends Configured implements Tool {
             Path inputPath = new Path(hdfsInputPath);
             Path outputPath = new Path(hdfsOutputPath);
 
-            Job job = Job.getInstance(this.getConf(), this.getClass().getSimpleName());
+            Job job = Job.getInstance(this.getConf(), this.getClass().getName());
             job.setJarByClass(this.getClass());
 
             job.setMapperClass(UserMapper.class);
@@ -64,7 +63,7 @@ public class UserScheduler extends Configured implements Tool {
             job.setMapOutputValueClass(Text.class);
 
 
-            job.setReducerClass(GeneralReducer.class);
+            job.setReducerClass(UserReducer.class);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(Text.class);
 

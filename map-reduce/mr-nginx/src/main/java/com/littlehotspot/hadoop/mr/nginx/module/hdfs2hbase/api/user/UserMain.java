@@ -11,7 +11,6 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
@@ -32,7 +31,7 @@ public class UserMain {
         if (args.length < 2) {
             throw new IOException("please write input path and output path...");
         }
-        Configuration conf = HBaseConfiguration.create();
+        Configuration conf = new Configuration();
 //
 //        // 配置 HDFS 根路径
 //        if (args.length > 3) {
