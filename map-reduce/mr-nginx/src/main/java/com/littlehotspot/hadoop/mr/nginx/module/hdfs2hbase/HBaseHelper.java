@@ -112,8 +112,8 @@ public class HBaseHelper {
      */
     public void insertRecord(String tableName, String rowKey, String family, String column, String value) throws IOException {
         HTable table = new HTable(this.conf, tableName);
-        Put put = new Put(rowKey.getBytes());
-        put.add(family.getBytes(), column.getBytes(), value.getBytes());
+        Put put = new Put(Bytes.toBytes(rowKey));
+        put.add(Bytes.toBytes(family), Bytes.toBytes(column), Bytes.toBytes(value));
         table.put(put);
         System.out.println(tableName + "插入key:" + rowKey + "行成功!");
     }
@@ -172,6 +172,10 @@ public class HBaseHelper {
         }
 
         String rowKey = rowKeyObject.toString();
+        if (rowKey == null || rowKey.trim().isEmpty()) {
+            return;
+        }
+
         HTable table = new HTable(this.conf, tableName);// HTabel负责跟记录相关的操作如增删改查等
         Put put = new Put(Bytes.toBytes(rowKey));// 设置rowkey
         Set<Map.Entry<String, Object>> entrySet = columnMap.entrySet();
@@ -197,7 +201,7 @@ public class HBaseHelper {
      */
     public void deleteRecord(String tableName, String rowKey) throws IOException {
         HTable table = new HTable(this.conf, tableName);
-        Delete del = new Delete(rowKey.getBytes());
+        Delete del = new Delete(Bytes.toBytes(rowKey));
         table.delete(del);
         System.out.println(tableName + "删除行" + rowKey + "成功!");
     }
@@ -212,7 +216,7 @@ public class HBaseHelper {
      */
     public Result getOneRecord(String tableName, String rowKey) throws IOException {
         HTable table = new HTable(this.conf, tableName);
-        Get get = new Get(rowKey.getBytes());
+        Get get = new Get(Bytes.toBytes(rowKey));
         return table.get(get);
     }
 
@@ -228,13 +232,14 @@ public class HBaseHelper {
         Scan scan = new Scan();
         ResultScanner scanner = table.getScanner(scan);
         List<Result> list = new ArrayList<>();
-        for (Result r : scanner) {
-            list.add(r);
+        for (Result result : scanner) {
+            list.add(result);
         }
         scanner.close();
         return list;
     }
 
+    // 从方法中获取数据
     private Object getDataFromMethods(Object bean, Class<?> beanClass, Map<String, Object> columnMap) throws IllegalAccessException, InvocationTargetException {
         if (bean == null || beanClass == null) {
             return null;
@@ -266,6 +271,7 @@ public class HBaseHelper {
         return rowKeyObject == null ? rowKeyObjectFromSub : rowKeyObject;
     }
 
+    // 从属性中获取数据
     private Object getDataFromFields(Object bean, Class<?> beanClass, Map<String, Object> columnMap) throws IllegalAccessException {
         if (bean == null || beanClass == null) {
             return null;
@@ -298,10 +304,9 @@ public class HBaseHelper {
         return rowKeyObject == null ? rowKeyObjectFromSub : rowKeyObject;
     }
 
+    // 设置属性权限
     private Object getFieldValue(Object bean, Field field) throws IllegalAccessException {
         field.setAccessible(true);
         return field.get(bean);
     }
-
-
 }
