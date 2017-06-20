@@ -12,7 +12,7 @@
     <groupId>com.littlehotspot.hadoop.mr</groupId>
     <artifactId>mr-mobile</artifactId>
 
-    <name>Little Hot Spot Hadoop Map-Reduce [Mobile]</name>
+    <name>Hadoop Map-Reduce [Mobile]</name>
     <packaging>jar</packaging>
 
     <dependencies>

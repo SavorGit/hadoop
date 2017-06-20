@@ -7,14 +7,11 @@
     <groupId>com.littlehotspot</groupId>
     <artifactId>hadoop</artifactId>
     <version>1.0.0.0.1-SNAPSHOT</version>
-    <modules>
-        <module>map-reduce</module>
-    </modules>
-    <packaging>pom</packaging>
 
-    <name>Little Hot Spot Hadoop</name>
+    <name>Hadoop</name>
     <url>http://www.littlehotspot.com</url>
     <description>热点信息技术有限公司 HADOOP 工程</description>
+    <packaging>pom</packaging>
 
     <!--创始年份-->
     <inceptionYear>2016</inceptionYear>
@@ -577,5 +574,9 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <modules>
+        <module>map-reduce</module>
+    </modules>
 
 </project>

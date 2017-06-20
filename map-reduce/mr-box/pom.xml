@@ -12,7 +12,7 @@
     <groupId>com.littlehotspot.hadoop.mr</groupId>
     <artifactId>mr-box</artifactId>
 
-    <name>Little Hot Spot Hadoop Map-Reduce [Box]</name>
+    <name>Hadoop Map-Reduce [Box]</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -34,6 +34,14 @@
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-mapreduce-client-app</artifactId>
         </dependency>
+
+        <!-- 自定义插件 -->
+        <dependency>
+            <groupId>net.lizhaoweb.common.util.data</groupId>
+            <artifactId>convert</artifactId>
+            <version>1.0.0.0.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>

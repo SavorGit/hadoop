@@ -13,7 +13,7 @@
     <groupId>com.littlehotspot.hadoop.mr</groupId>
     <artifactId>mr-nginx</artifactId>
 
-    <name>Little Hot Spot Hadoop Map-Reduce [Nginx]</name>
+    <name>Hadoop Map-Reduce [Nginx]</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -55,6 +55,14 @@
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>
         </dependency>
+
+        <!-- 自定义 -->
+        <dependency>
+            <groupId>net.lizhaoweb.common.util.data</groupId>
+            <artifactId>convert</artifactId>
+            <version>1.0.0.0.1-SNAPSHOT</version>
+        </dependency>
+        
     </dependencies>
 
     <build>
