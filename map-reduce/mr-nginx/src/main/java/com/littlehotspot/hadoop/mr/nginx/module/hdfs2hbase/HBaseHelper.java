@@ -175,6 +175,7 @@ public class HBaseHelper {
         HTable table = new HTable(this.conf, tableName);// HTabel负责跟记录相关的操作如增删改查等
         Put put = new Put(Bytes.toBytes(rowKey));// 设置rowkey
         Set<Map.Entry<String, Object>> entrySet = columnMap.entrySet();
+        long version = System.currentTimeMillis();
         for (Map.Entry<String, Object> entry : entrySet) {
             String columnName = entry.getKey();
             Object valueObject = entry.getValue();
@@ -182,7 +183,7 @@ public class HBaseHelper {
             if (valueObject != null) {
                 value = valueObject.toString();
             }
-            put.add(Bytes.toBytes(familyName), Bytes.toBytes(columnName), Bytes.toBytes(value));
+            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes(columnName), version, Bytes.toBytes(value));
         }
         table.put(put);
     }
