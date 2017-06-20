@@ -16,7 +16,7 @@ public class TargetSadBaseBean {
     /**
      * rowKey
      */
-    @HBaseColumn(columnName = "rowKey")
+//    @HBaseColumn(columnName = "rowKey")
     @HBaseRowKey
     private String rowKey;
 
