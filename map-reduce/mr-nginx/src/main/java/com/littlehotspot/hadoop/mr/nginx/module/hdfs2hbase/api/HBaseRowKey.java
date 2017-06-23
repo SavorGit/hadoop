@@ -8,7 +8,7 @@
  * @EMAIL 404644381@qq.com
  * @Time : 16:31
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api;
 
 import java.lang.annotation.*;
 

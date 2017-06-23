@@ -1,8 +1,7 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.sad.all_data;
 
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.sad.TargetSadBaseBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.HBaseColumn;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.HBaseTable;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.HBaseTable;
 import lombok.Data;
 
 /**

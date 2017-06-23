@@ -10,9 +10,9 @@
  */
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase;
 
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.HBaseColumn;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.HBaseRowKey;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.HBaseTable;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.HBaseColumn;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.HBaseRowKey;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.HBaseTable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
