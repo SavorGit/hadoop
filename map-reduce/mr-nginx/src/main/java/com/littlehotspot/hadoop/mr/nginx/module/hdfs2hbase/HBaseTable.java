@@ -6,14 +6,14 @@
  * @Package : com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
- * @Time : 16:23
+ * @Time : 16:16
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase;
 
 import java.lang.annotation.*;
 
 /**
- * <h1>注解 - HBase 列</h1>
+ * <h1>注解 - HBase 表</h1>
  *
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
@@ -23,10 +23,12 @@ import java.lang.annotation.*;
  * Date of last commit:$Date$<br>
  */
 @Documented
-@Target({ElementType.FIELD, ElementType.METHOD})
+@Target(ElementType.TYPE)
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HBaseColumn {
+public @interface HBaseTable {
 
-    String columnName();
+    String tableName() default "test";
+
+    String familyName() default "info";
 }

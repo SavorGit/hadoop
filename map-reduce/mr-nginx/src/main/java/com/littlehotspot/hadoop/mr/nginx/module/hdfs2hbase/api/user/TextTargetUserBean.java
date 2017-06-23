@@ -10,9 +10,9 @@
  */
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
 
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.HBaseColumn;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.HBaseRowKey;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.HBaseTable;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseColumn;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseRowKey;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseTable;
 import com.littlehotspot.hadoop.mr.nginx.util.Constant;
 import lombok.Data;
 
