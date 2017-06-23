@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder location="classpath:config/jdbc.properties"
+                                  ignore-unresolvable="true"/>
+
+    <bean id="jdbc.mysql.api.config" abstract="true">
+        <property name="driverClassName" value="${jdbc.mysql.api.driverClassName}"/>
+        <property name="initialSize" value="${jdbc.mysql.api.initialSize}"/>
+        <property name="maxIdle" value="${jdbc.mysql.api.maxIdle}"/>
+        <property name="minIdle" value="${jdbc.mysql.api.minIdle}"/>
+        <property name="maxActive" value="${jdbc.mysql.api.maxActive}"/>
+        <property name="removeAbandoned" value="${jdbc.mysql.api.removeAbandoned}"/>
+        <property name="removeAbandonedTimeout" value="${jdbc.mysql.api.removeAbandonedTimeout}"/>
+        <property name="maxWait" value="${jdbc.mysql.api.maxWait}"/>
+        <property name="validationQuery" value="${jdbc.mysql.api.validationQuery}"/>
+        <property name="testOnBorrow" value="${jdbc.mysql.api.testOnBorrow}"/>
+        <property name="timeBetweenEvictionRunsMillis" value="${jdbc.mysql.api.timeBetweenEvictionRunsMillis}"/>
+    </bean>
+
+    <!-- 读 savor 数据库  -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" parent="jdbc.mysql.api.config"
+          destroy-method="close">
+        <property name="url" value="${savor.read.jdbc.mysql.api.url}"/>
+        <property name="username" value="${savor.read.jdbc.mysql.api.username}"/>
+        <property name="password" value="${savor.read.jdbc.mysql.api.password}"/>
+    </bean>
+    <bean name="sessionFactoryName" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:config/mybatis.xml"/>
+        <property name="mapperLocations">
+            <list>
+                <value>classpath:com/littlehotspot/hadoop/mr/nginx/mysql/mapper/I*Mapper.xml</value>
+            </list>
+        </property>
+    </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.littlehotspot.hadoop.mr.nginx.mysql.mapper"/>
+        <property name="sqlSessionFactoryBeanName" value="sessionFactoryName"/>
+    </bean>
+
+</beans>
