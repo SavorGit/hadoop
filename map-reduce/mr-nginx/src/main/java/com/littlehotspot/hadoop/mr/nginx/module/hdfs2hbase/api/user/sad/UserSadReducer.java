@@ -1,5 +1,9 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad;
 
+import com.littlehotspot.hadoop.mr.nginx.mysql.service.BoxService;
+import com.littlehotspot.hadoop.mr.nginx.mysql.service.HotelService;
+import com.littlehotspot.hadoop.mr.nginx.mysql.service.MediaService;
+import com.littlehotspot.hadoop.mr.nginx.mysql.service.RoomService;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -58,15 +62,24 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
 
     private void setPropertiesForRelaBean(TextTargetSadRelaBean bean, TextTargetSadActBean source) {
         bean.setRowKey(source.getMobile_id() + source.getTimestamps());
+
         bean.setHotel(source.getHotel_id());
-        bean.setHotel_name("");
+        HotelService hotelService = new HotelService();
+        bean.setHotel_name(hotelService.getName(source.getHotel_id()));
+
         bean.setRoom(source.getRoom_id());
-        bean.setRoom_name("");
+        RoomService roomService = new RoomService();
+        bean.setRoom_name(roomService.getName(source.getRoom_id()));
+
         bean.setBox_mac(source.getMac());
-        bean.setBox_name("");
+        BoxService boxService = new BoxService();
+        bean.setBox_name(boxService.getName(source.getMac()));
+
         bean.setMedia(source.getMedia_id());
-        bean.setMedia_name("");
-        bean.setMedia_down_url("");
+        MediaService mediaService = new MediaService();
+        bean.setMedia_name(mediaService.getName(source.getMedia_id()));
+        bean.setMedia_down_url(mediaService.getUrl(source.getMedia_id()));
+
         bean.setApk_version(source.getApk_version());
         bean.setAds_version(source.getAds_period());
         bean.setDema_version(source.getDemand_period());
