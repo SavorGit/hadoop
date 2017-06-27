@@ -8,18 +8,18 @@
  * @EMAIL 404644381@qq.com
  * @Time : 15:31
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.UserReadMapper;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.UserReadReducer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class UserScheduler extends Configured implements Tool {
+public class UserReadScheduler extends Configured implements Tool {
 
     @Override
     public int run(String[] args) throws Exception {
@@ -52,7 +52,7 @@ public class UserScheduler extends Configured implements Tool {
 
             // 配置数据格式
             if (StringUtils.isNotBlank(matcherRegex)) {
-                CommonVariables.MAPPER_BOX_FORMAT_REGEX = Pattern.compile(matcherRegex);
+                CommonVariables.MAPPER_INPUT_FORMAT_REGEX = Pattern.compile(matcherRegex);
             }
 
             Path inputPath = new Path(hdfsInputPath);
@@ -61,12 +61,12 @@ public class UserScheduler extends Configured implements Tool {
             Job job = Job.getInstance(this.getConf(), this.getClass().getName());
             job.setJarByClass(this.getClass());
 
-            job.setMapperClass(UserMapper.class);
+            job.setMapperClass(UserReadMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
 
 
-            job.setReducerClass(UserReducer.class);
+            job.setReducerClass(UserReadReducer.class);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(Text.class);
 

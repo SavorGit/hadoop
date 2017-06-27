@@ -26,6 +26,8 @@ public enum Argument {
     HDFSCluster("hdfsCluster", null),
     MapperInputFormatRegex("inRegex", null),
     InputPath("hdfsIn", null),
+    InputPathStart("hdfsInStart", null),
+    InputPathEnd("hdfsInEnd", null),
     OutputPath("hdfsOut", null),
     HbaseTable("table", null),
 

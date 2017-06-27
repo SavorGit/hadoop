@@ -8,7 +8,7 @@
  * @EMAIL 404644381@qq.com
  * @Time : 15:29
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.io.LongWritable;
@@ -28,23 +28,23 @@ import java.util.regex.Matcher;
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class UserMapper extends Mapper<LongWritable, Text, Text, Text> {
+public class UserReadMapper extends Mapper<LongWritable, Text, Text, Text> {
 
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         try {
             String rowLineContent = value.toString();
 //            System.out.println(rowLineContent);
-            Matcher matcher = CommonVariables.MAPPER_BOX_FORMAT_REGEX.matcher(rowLineContent);
+            Matcher matcher = CommonVariables.MAPPER_INPUT_FORMAT_REGEX.matcher(rowLineContent);
             if (!matcher.find()) {
                 return;
             }
-            String deviceId = matcher.group(9);
-            if (StringUtils.isBlank(deviceId)||deviceId.equals(null)||deviceId.equals("null")) {
+            String deviceId = matcher.group(10);
+            if (StringUtils.isBlank(deviceId)) {
                 return;
             }
             Text keyText = new Text(deviceId);
-            System.out.println(deviceId);
+            System.out.println(rowLineContent);
             context.write(keyText, value);
         } catch (Exception e) {
             e.printStackTrace();

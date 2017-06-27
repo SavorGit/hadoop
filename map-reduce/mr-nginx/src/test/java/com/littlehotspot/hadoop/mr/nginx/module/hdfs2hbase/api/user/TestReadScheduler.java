@@ -11,6 +11,10 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
 
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.MobileLogDuration;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.MobileLogEnd;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.MobileLogStart;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.UserReadScheduler;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.util.ToolRunner;
@@ -26,19 +30,20 @@ import java.util.List;
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class TestUserScheduler {
+public class TestReadScheduler {
 
 
     @Test
     public void run() {
         String[] args = {
                 "hdfsCluster=hdfs://devpd1:8020",
-//                "hdfsIn=/home/data/hadoop/flume/nginx_log/export/2017-05-31",
-//                "hdfsOut=/home/data/hadoop/flume/nginx_log/export/test-hbase",
-                "hdfsIn=/user/hive/warehouse/box_log_distinct",
-                "hdfsOut=/home/data/hadoop/flume/test-mr/test-hbase",
+//                "hdfsIn=/home/data/hadoop/flume/test-mr/read_text",
+//                "hdfsOut=/home/data/hadoop/flume/test-mr/test-read_end",
+                "hdfsInStart=/home/data/hadoop/flume/test-mr/test-read_end",
+                "hdfsInEnd=/home/data/hadoop/flume/test-mr/test-read_start",
+                "hdfsOut=/home/data/hadoop/flume/test-mr/test-read_duration",
 //                "inRegex=^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$",
-                "table=user"
+                "table=user_read"
         };
         System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
         Configuration conf = new Configuration();
@@ -51,29 +56,13 @@ public class TestUserScheduler {
 
 //		distributedCache
         try {
-            ToolRunner.run(conf, new UserScheduler(), args);
+            ToolRunner.run(conf, new MobileLogDuration(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    @Test
-    public void getAll() {
 
-        System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
-        Configuration conf = new Configuration();
-
-        try {
-            List<Result> user = new HBaseHelper(conf).getAllRecord("user");
-
-            for (Result result : user) {
-                System.out.println(result.toString());
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 
 }

@@ -10,7 +10,6 @@
  */
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
@@ -33,21 +32,19 @@ public class UserReducer extends Reducer<Text, Text, Text, Text> {
     protected void reduce(Text key, Iterable<Text> value, Reducer<Text, Text, Text, Text>.Context context) throws IOException, InterruptedException {
         try {
             Iterator<Text> textIterator = value.iterator();
-            TextTargetUserBean targetUserBean = new TextTargetUserBean();
+            TargetUserAttrBean targetUserBean = new TargetUserAttrBean();
             while (textIterator.hasNext()) {
                 Text item = textIterator.next();
                 if (item == null) {
                     continue;
                 }
                 String rowLineContent = item.toString();
-                TextSourceUserBean sourceUserBean = new TextSourceUserBean(rowLineContent);
-                targetUserBean.setDeviceId(sourceUserBean.getDeviceId());
+                SourceUserBean sourceUserBean = new SourceUserBean(rowLineContent);
+                targetUserBean.setDeviceId(sourceUserBean.getMobileId());
                 targetUserBean.setDeviceType(sourceUserBean.getDeviceType());
-                targetUserBean.setMachineModel(sourceUserBean.getMachineModel());
-                targetUserBean.setSince(sourceUserBean.getChannelId());
-//                targetUserBean.setToken();
-//                targetUserBean.setDemandTime();
-//                targetUserBean.setProjectionTime();
+                targetUserBean.setMachineModel(sourceUserBean.getDeviceModel());
+                targetUserBean.setToken(sourceUserBean.getDeviceToken());
+
                 this.setDownloadTime(sourceUserBean, targetUserBean);
             }
 
@@ -59,25 +56,25 @@ public class UserReducer extends Reducer<Text, Text, Text, Text> {
         }
     }
 
-    private void setDownloadTime(TextSourceUserBean sourceUserBean, TextTargetUserBean targetUserBean) {
+    private void setDownloadTime(SourceUserBean sourceUserBean, TargetUserAttrBean targetUserBean) {
         if (sourceUserBean == null) {
             throw new IllegalArgumentException("Argument 'sourceUserBean' is null");
         }
         if (targetUserBean == null) {
             throw new IllegalArgumentException("Argument 'targetUserBean' is null");
         }
-        String timestamp = sourceUserBean.getTimestamp();
-        if (timestamp == null) {
-            return;
-        }
-        if (!timestamp.matches("^\\d+$")) {
-            return;
-        }
-        timestamp = timestamp.trim();
-        if (StringUtils.isBlank(targetUserBean.getDownloadTime())) {
-            targetUserBean.setDownloadTime(timestamp);
-        } else if (targetUserBean.getDownloadTime().compareTo(timestamp) > 0) {
-            targetUserBean.setDownloadTime(timestamp);
-        }
+//        String timestamp = sourceUserBean.getTimestamp();
+//        if (timestamp == null) {
+//            return;
+//        }
+//        if (!timestamp.matches("^\\d+$")) {
+//            return;
+//        }
+//        timestamp = timestamp.trim();
+//        if (StringUtils.isBlank(targetUserBean.getDownloadTime())) {
+//            targetUserBean.setDownloadTime(timestamp);
+//        } else if (targetUserBean.getDownloadTime().compareTo(timestamp) > 0) {
+//            targetUserBean.setDownloadTime(timestamp);
+//        }
     }
 }
