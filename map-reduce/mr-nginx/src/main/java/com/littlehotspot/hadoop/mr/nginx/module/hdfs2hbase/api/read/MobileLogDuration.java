@@ -120,10 +120,10 @@ public class MobileLogDuration extends Configured implements Tool {
                             targetReadBean.setStart(matcherStart.group(5));
                             targetReadBean.setEnd(matcherEnd.group(5));
                             targetReadBean.setConId(matcherStart.group(8));
-                                for (HashMap<String, String> content : contents) {
+                                for (HashMap<String, Object> content : contents) {
                                     if (content.get("id").toString().equals(matcherStart.group(8))){
-                                        targetReadBean.setConNam(content.get("title"));
-                                        targetReadBean.setContent(content.get("content"));
+                                        targetReadBean.setConNam(content.get("title").toString());
+                                        targetReadBean.setContent(content.get("content").toString());
                                     }
                                 }
                             Long duration = Long.valueOf(matcherEnd.group(5)) - Long.valueOf(matcherStart.group(5));
@@ -136,21 +136,21 @@ public class MobileLogDuration extends Configured implements Tool {
                             targetReadRelaBean.setDeviceId(matcherStart.group(10));
                             targetReadRelaBean.setStart(matcherStart.group(5));
                             targetReadRelaBean.setCatId(matcherStart.group(9));
-                            for (HashMap<String, String> cate : cates) {
+                            for (HashMap<String, Object> cate : cates) {
                                 if (cate.get("id").toString().equals(matcherStart.group(9))){
-                                    targetReadRelaBean.setCatName(cate.get("name"));
+                                    targetReadRelaBean.setCatName(cate.get("name").toString());
                                 }
                             }
                             targetReadRelaBean.setHotel(matcherStart.group(3));
-                            for (HashMap<String, String> hotel : hotels) {
+                            for (HashMap<String, Object> hotel : hotels) {
                                 if (hotel.get("id").toString().equals(matcherStart.group(3))){
-                                    targetReadRelaBean.setHotelName(hotel.get("name"));
+                                    targetReadRelaBean.setHotelName(hotel.get("name").toString());
                                 }
                             }
                             targetReadRelaBean.setRoom(matcherStart.group(4));
-                            for (HashMap<String, String> room : rooms) {
+                            for (HashMap<String, Object> room : rooms) {
                                 if (room.get("id").toString().equals(matcherStart.group(4))){
-                                    targetReadRelaBean.setRoomName(room.get("name"));
+                                    targetReadRelaBean.setRoomName(room.get("name").toString());
                                 }
                             }
                             CommonVariables.hBaseHelper.insert(targetReadBean);

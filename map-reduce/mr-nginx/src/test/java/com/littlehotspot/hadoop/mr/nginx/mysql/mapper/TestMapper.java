@@ -41,12 +41,12 @@ public class TestMapper {
 //        for (HashMap<String, String> stringStringHashMap : all) {
 //            System.out.println(stringStringHashMap.toString());
 //        }
-        List<HashMap<String, String>> all = contentMapper.getAll();
-        for (HashMap<String, String> stringStringHashMap : all) {
+        List<HashMap<String, Object>> all = contentMapper.getAll();
+        for (HashMap<String, Object> stringStringHashMap : all) {
             System.out.println(stringStringHashMap);
         }
-        List<HashMap<String, String>> all1 = categoryMapper.getAll();
-        for (HashMap<String, String> stringStringHashMap : all1) {
+        List<HashMap<String, Object>> all1 = categoryMapper.getAll();
+        for (HashMap<String, Object> stringStringHashMap : all1) {
             System.out.println(stringStringHashMap);
         }
     }
