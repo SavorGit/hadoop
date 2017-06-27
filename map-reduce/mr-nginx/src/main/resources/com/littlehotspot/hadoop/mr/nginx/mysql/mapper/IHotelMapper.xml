@@ -4,4 +4,7 @@
 <select id="getCount" resultType="java.lang.Integer">
     SELECT count(*) from savor_hotel
 </select>
+    <select id="getAll" resultType="java.util.Map">
+        SELECT * from savor_hotel
+    </select>
 </mapper>

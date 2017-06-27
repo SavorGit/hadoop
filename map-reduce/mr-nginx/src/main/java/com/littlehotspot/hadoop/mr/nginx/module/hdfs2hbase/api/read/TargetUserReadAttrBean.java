@@ -63,6 +63,12 @@ public class TargetUserReadAttrBean {
     private String conNam;
 
     /**
+     * 设备类型
+     */
+    @HBaseColumn(columnName = "content")
+    private String content;
+
+    /**
      * 机型
      */
     @HBaseColumn(columnName = "v_time")
@@ -96,6 +102,7 @@ public class TargetUserReadAttrBean {
         rowLine.append(this.getEnd() == null ? "" : this.getEnd()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getConId() == null ? "" : this.getConId()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getConNam() == null ? "" : this.getConNam()).append(Constant.VALUE_SPLIT_CHAR);
+        rowLine.append(this.getContent() == null ? "" : this.getContent()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getVTime() == null ? "" : this.getVTime()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getLongitude() == null ? "" : this.getLongitude()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getLatitude() == null ? "" : this.getLatitude()).append(Constant.VALUE_SPLIT_CHAR);
