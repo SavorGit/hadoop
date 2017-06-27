@@ -8,5 +8,5 @@ import java.util.List;
  * Created by Administrator on 2017-06-23 下午 3:00.
  */
 public interface ICategoryMapper {
-    List<HashMap<String,String>> getAll();
+    List<HashMap<String,Object>> getAll();
 }

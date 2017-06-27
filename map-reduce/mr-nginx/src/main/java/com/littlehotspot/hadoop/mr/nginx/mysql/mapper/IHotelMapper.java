@@ -10,5 +10,5 @@ import java.util.List;
 public interface IHotelMapper {
     int getCount();
 
-    List<HashMap<String,String>> getAll();
+    List<HashMap<String,Object>> getAll();
 }

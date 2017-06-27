@@ -9,5 +9,5 @@ import java.util.List;
  */
 public interface IContentMapper {
 
-    List<HashMap<String,String>> getAll();
+    List<HashMap<String,Object>> getAll();
 }
