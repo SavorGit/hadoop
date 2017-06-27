@@ -135,7 +135,7 @@ public class TextSourceUserBean {
     private String language;
 
     public TextSourceUserBean(String text) {
-        Matcher matcher = CommonVariables.MAPPER_INPUT_FORMAT_REGEX.matcher(text);
+        Matcher matcher = CommonVariables.MAPPER_NGINX_FORMAT_REGEX.matcher(text);
         if (!matcher.find()) {
             return;
         }

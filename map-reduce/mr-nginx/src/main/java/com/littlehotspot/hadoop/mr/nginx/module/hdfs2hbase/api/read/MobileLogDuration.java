@@ -12,7 +12,14 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
-import com.littlehotspot.hadoop.mr.nginx.util.Constant;
+import com.littlehotspot.hadoop.mr.nginx.mysql.mapper.ICategoryMapper;
+import com.littlehotspot.hadoop.mr.nginx.mysql.mapper.IContentMapper;
+import com.littlehotspot.hadoop.mr.nginx.mysql.mapper.IHotelMapper;
+import com.littlehotspot.hadoop.mr.nginx.mysql.mapper.IRoomMapper;
+import com.littlehotspot.hadoop.mr.nginx.mysql.service.CategoryService;
+import com.littlehotspot.hadoop.mr.nginx.mysql.service.ContentService;
+import com.littlehotspot.hadoop.mr.nginx.mysql.service.HotelService;
+import com.littlehotspot.hadoop.mr.nginx.mysql.service.RoomService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -26,6 +33,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.net.URI;
@@ -33,6 +41,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -80,16 +89,21 @@ public class MobileLogDuration extends Configured implements Tool {
 
     private static class MobileReduce extends Reducer<Text, Text, Text, Text> {
 
+
         @Override
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
+                List<HashMap<String, Object>> hotels = new HotelService().getAll();
+                List<HashMap<String, Object>> rooms = new RoomService().getAll();
+                List<HashMap<String, Object>> contents = new ContentService().getAll();
+                List<HashMap<String, Object>> cates = new CategoryService().getAll();
                 for (String start : starts.keySet()) {
                     for (String end : ends.keySet()) {
                         if (start.equals(end)){
-                            String startLine = starts.get(start);
-                            Matcher matcherStart = CommonVariables.MAPPER_INPUT_FORMAT_REGEX.matcher(start);
-                            String endLine = ends.get(end);
-                            Matcher matcherEnd = CommonVariables.MAPPER_INPUT_FORMAT_REGEX.matcher(endLine);
+                            String s = starts.get(start);
+                            Matcher matcherStart = CommonVariables.MAPPER_INPUT_FORMAT_REGEX.matcher(s);
+
+                            Matcher matcherEnd = CommonVariables.MAPPER_INPUT_FORMAT_REGEX.matcher(ends.get(end));
                             if (!matcherStart.find()) {
                                 return;
                             }
@@ -97,45 +111,51 @@ public class MobileLogDuration extends Configured implements Tool {
                                 return;
                             }
                             Long duation = Long.valueOf(matcherEnd.group(5)) - Long.valueOf(matcherStart.group(5));
-                            StringBuffer rowLine = new StringBuffer();
-                            rowLine.append(matcherStart.group(10)+matcherStart.group(5).substring(0,10)).append(Constant.VALUE_SPLIT_CHAR);
-                            rowLine.append(matcherStart.group(10)).append(Constant.VALUE_SPLIT_CHAR);
-                            rowLine.append(matcherStart.group(5)).append(Constant.VALUE_SPLIT_CHAR);
-                            rowLine.append(matcherEnd.group(5)).append(Constant.VALUE_SPLIT_CHAR);
-                            rowLine.append(matcherStart.group(8)).append(Constant.VALUE_SPLIT_CHAR);
-                            rowLine.append(matcherStart.group(13)).append(Constant.VALUE_SPLIT_CHAR);
-                            rowLine.append(matcherStart.group(14)).append(Constant.VALUE_SPLIT_CHAR);
-                            rowLine.append(matcherStart.group(12)).append(Constant.VALUE_SPLIT_CHAR);
-                            rowLine.append(matcherStart.group(9)).append(Constant.VALUE_SPLIT_CHAR);
-                            rowLine.append(matcherStart.group(3)).append(Constant.VALUE_SPLIT_CHAR);
-                            rowLine.append(matcherStart.group(4)).append(Constant.VALUE_SPLIT_CHAR);
-                            rowLine.append(duation.toString()).append(Constant.VALUE_SPLIT_CHAR);
-                            rowLine.append("hotelName").append(Constant.VALUE_SPLIT_CHAR);
-                            rowLine.append("roomName").append(Constant.VALUE_SPLIT_CHAR);
-                            rowLine.append("cateName").append(Constant.VALUE_SPLIT_CHAR);
-                            rowLine.append("contentName").append(Constant.VALUE_SPLIT_CHAR);
 
+                            TargetUserReadAttrBean targetReadBean = new TargetUserReadAttrBean();
+                            TargetUserReadRelaBean targetReadRelaBean = new TargetUserReadRelaBean();
+                            String deviceId = matcherStart.group(10);
+                            targetReadBean.setRowKey(matcherStart.group(10)+matcherStart.group(5).substring(0,10));
+                            targetReadBean.setDeviceId(matcherStart.group(10));
+                            targetReadBean.setStart(matcherStart.group(5));
+                            targetReadBean.setEnd(matcherEnd.group(5));
+                            targetReadBean.setConId(matcherStart.group(8));
+                                for (HashMap<String, String> content : contents) {
+                                    if (content.get("id").toString().equals(matcherStart.group(8))){
+                                        targetReadBean.setConNam(content.get("title"));
+                                        targetReadBean.setContent(content.get("content"));
+                                    }
+                                }
+                            Long duration = Long.valueOf(matcherEnd.group(5)) - Long.valueOf(matcherStart.group(5));
+                            targetReadBean.setVTime(duration.toString());
+                            targetReadBean.setLongitude(matcherStart.group(13));
+                            targetReadBean.setLatitude(matcherStart.group(14));
+                            targetReadBean.setOsType(matcherStart.group(12));
 
-//                            TargetUserReadAttrBean targetReadBean = new TargetUserReadAttrBean();
-//                            TargetUserReadRelaBean targetReadRelaBean = new TargetUserReadRelaBean();
-//                            String deviceId = matcherStart.group(10);
-//                            targetReadBean.setRowKey(matcherStart.group(10)+matcherStart.group(5).substring(0,10));
-//                            targetReadBean.setDeviceId(matcherStart.group(10));
-//                            targetReadBean.setStart(matcherStart.group(5));
-//                            targetReadBean.setEnd(matcherEnd.group(5));
-//                            targetReadBean.setConId(matcherStart.group(8));
-//                            Long duration = Long.valueOf(matcherEnd.group(5)) - Long.valueOf(matcherStart.group(5));
-//                            targetReadBean.setVTime(duration.toString());
-//                            targetReadBean.setLongitude(matcherStart.group(13));
-//                            targetReadBean.setLatitude(matcherStart.group(14));
-//                            targetReadBean.setOsType(matcherStart.group(12));
-//
-//                            targetReadRelaBean.setRowKey(matcherStart.group(10)+matcherStart.group(5).substring(0,10));
-//                            targetReadRelaBean.setDeviceId(matcherStart.group(10));
-//                            targetReadRelaBean.setStart(matcherStart.group(5));
-//                            targetReadRelaBean.setCatId(matcherStart.group(9));
-//                            targetReadRelaBean.setHotel(matcherStart.group(3));
-//                            targetReadRelaBean.setRoom(matcherStart.group(4));
+                            targetReadRelaBean.setRowKey(matcherStart.group(10)+matcherStart.group(5).substring(0,10));
+                            targetReadRelaBean.setDeviceId(matcherStart.group(10));
+                            targetReadRelaBean.setStart(matcherStart.group(5));
+                            targetReadRelaBean.setCatId(matcherStart.group(9));
+                            for (HashMap<String, String> cate : cates) {
+                                if (cate.get("id").toString().equals(matcherStart.group(9))){
+                                    targetReadRelaBean.setCatName(cate.get("name"));
+                                }
+                            }
+                            targetReadRelaBean.setHotel(matcherStart.group(3));
+                            for (HashMap<String, String> hotel : hotels) {
+                                if (hotel.get("id").toString().equals(matcherStart.group(3))){
+                                    targetReadRelaBean.setHotelName(hotel.get("name"));
+                                }
+                            }
+                            targetReadRelaBean.setRoom(matcherStart.group(4));
+                            for (HashMap<String, String> room : rooms) {
+                                if (room.get("id").toString().equals(matcherStart.group(4))){
+                                    targetReadRelaBean.setRoomName(room.get("name"));
+                                }
+                            }
+                            CommonVariables.hBaseHelper.insert(targetReadBean);
+
+                            CommonVariables.hBaseHelper.insert(targetReadRelaBean);
                         }
                     }
                 }
