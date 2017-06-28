@@ -18,18 +18,33 @@ import java.util.regex.Pattern;
 public class CommonVariables extends Constant.CommonVariables {
 
     /**
-     * Mapper 输入时正则过滤
+     * 开始投屏
      */
     public static Pattern MAPPER_INPUT_FORMAT_REGEX_START_PRO = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(start)\u0001(projection)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
 
+    /**
+     * 结束投屏
+     */
     public static Pattern MAPPER_INPUT_FORMAT_REGEX_END_PRO = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(end)\u0001(projection)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
 
+    /**
+     * 开始点播
+     */
     public static Pattern MAPPER_INPUT_FORMAT_REGEX_START_DEM = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(start)\u0001(vod)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
 
+    /**
+     * 结束点播
+     */
     public static Pattern MAPPER_INPUT_FORMAT_REGEX_END_DEM = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(end)\u0001(vod)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
 
+    /**
+     * input regex
+     */
     public static Pattern MAPPER_INPUT_FORMAT_REGEX = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
 
+    /**
+     * final regex
+     */
     public static Pattern MAPPER_INPUT_FORMAT_REGEX_FINAL = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(end|start)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
 
     public static HBaseHelper hBaseHelper;

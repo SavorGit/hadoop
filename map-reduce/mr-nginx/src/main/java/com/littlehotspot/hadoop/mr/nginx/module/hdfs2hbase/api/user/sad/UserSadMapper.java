@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 
 /**
- * <h1> title </h1>
+ * <h1> 用户行为最终过滤 </h1>
  * Created by Administrator on 2017-06-27 下午 3:04.
  */
 public class UserSadMapper extends Mapper<LongWritable, Text, Text, Text> {
@@ -28,15 +28,6 @@ public class UserSadMapper extends Mapper<LongWritable, Text, Text, Text> {
             if (StringUtils.isBlank(uuidMediaId)) {
                 return;
             }
-
-            String act = matcher.group(6);
-
-            StringBuffer stringBuffer = new StringBuffer(rowLineContent);
-//            if(act.equals("start")){
-//                stringBuffer.append()
-//            }else{
-//
-//            }
 
             Text keyText = new Text(uuidMediaId);
 //            System.out.println(rowLineContent);

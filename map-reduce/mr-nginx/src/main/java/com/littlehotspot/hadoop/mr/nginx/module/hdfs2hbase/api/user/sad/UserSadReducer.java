@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 /**
- * <h1> title </h1>
+ * <h1> 用户行为最终处理并插入到 Hbase </h1>
  * Created by Administrator on 2017-06-27 下午 3:05.
  */
 public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
@@ -40,8 +40,10 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
 
             }
 
-            CommonVariables.hBaseHelper.insert(targetSadAttrBean);
-            CommonVariables.hBaseHelper.insert(targetSadRelaBean);
+            if(targetSadAttrBean.getStart() != 0 && targetSadAttrBean.getEnd() != 0) {
+                CommonVariables.hBaseHelper.insert(targetSadAttrBean);
+                CommonVariables.hBaseHelper.insert(targetSadRelaBean);
+            }
 
 //            context.write(new Text(targetUserSadActBean.rowLine()), new Text());
         } catch (Exception e) {

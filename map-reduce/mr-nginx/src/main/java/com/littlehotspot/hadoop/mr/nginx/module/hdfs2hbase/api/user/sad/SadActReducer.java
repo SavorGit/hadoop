@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 /**
- * <h1> title </h1>
+ * <h1> 用户行为reducer </h1>
  * Created by Administrator on 2017-06-26 下午 5:56.
  */
 public class SadActReducer extends Reducer<Text, Text, Text, Text> {
