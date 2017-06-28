@@ -7,9 +7,9 @@ import java.io.IOException;
 
 /**
  * <h1> title </h1>
- * Created by Administrator on 2017-06-28 上午 11:30.
+ * Created by Administrator on 2017-06-28 下午 3:42.
  */
-public class SadActMain {
+public class UserSadMain {
 
     public static void main(String[] args) throws IOException {
         if (args.length < 3) {
@@ -18,13 +18,9 @@ public class SadActMain {
 
         Configuration conf = new Configuration();
         try {
-            ToolRunner.run(conf, new SadActScheduler(), args);
+            ToolRunner.run(conf, new UserSadScheduler(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
-
-
-
 }

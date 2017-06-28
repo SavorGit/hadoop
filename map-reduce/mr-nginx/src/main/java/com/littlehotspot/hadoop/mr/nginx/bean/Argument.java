@@ -44,6 +44,9 @@ public enum Argument {
     ChannelName("channelName", ""),// 渠道名称
     Network("network", ""),// 网络类型
     Language("language", ""),// 语言
+
+    SadActType("sadActType", ""),// 投屏点播类型
+    SadType("sadType", ""),// 用户行为类型
     ;
 
     @Getter

@@ -17,7 +17,7 @@ public class SadActReducer extends Reducer<Text, Text, Text, Text> {
     protected void reduce(Text key, Iterable<Text> value, Reducer<Text, Text, Text, Text>.Context context) throws IOException, InterruptedException {
         try {
             Configuration conf = context.getConfiguration();
-            SadActType sadType = SadActType.valueOf(conf.get("sadType"));
+            SadActType sadType = SadActType.valueOf(conf.get("sadActType"));
 
             TextTargetSadActBean targetUserSadActBean = TargetBeanFactory.getTargetActBean(sadType);
 

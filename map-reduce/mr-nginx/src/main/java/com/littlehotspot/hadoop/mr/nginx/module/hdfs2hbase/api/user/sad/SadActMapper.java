@@ -22,9 +22,9 @@ public class SadActMapper extends Mapper<LongWritable, Text, Text, Text> {
             String rowLineContent = value.toString();
 
             Configuration conf = context.getConfiguration();
-            SadActType sadType = SadActType.valueOf(conf.get("sadType"));
+            SadActType sadActType = SadActType.valueOf(conf.get("sadActType"));
             Matcher matcher;
-            switch (sadType) {
+            switch (sadActType) {
                 case START_PRO:
                     matcher = CommonVariables.MAPPER_INPUT_FORMAT_REGEX_START_PRO.matcher(rowLineContent);
                     break;
@@ -59,7 +59,7 @@ public class SadActMapper extends Mapper<LongWritable, Text, Text, Text> {
             }
 
             Long time;
-            if (sadType.equals(SadActType.START_DEM) || SadActType.START_PRO.equals(sadType)) {
+            if (sadActType.equals(SadActType.END_DEM) || SadActType.END_PRO.equals(sadActType)) {
                 time = 9999999999999L - Long.decode(timestamp);
             } else {
                 time = Long.decode(timestamp);

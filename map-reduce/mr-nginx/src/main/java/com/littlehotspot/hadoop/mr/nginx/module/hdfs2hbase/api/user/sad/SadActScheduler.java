@@ -27,6 +27,8 @@ public class SadActScheduler extends Configured implements Tool {
             // 获取参数
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
+            String sadActType = CommonVariables.getParameterValue(Argument.SadActType);
+            this.getConf().set("sadActType", sadActType);
 
             Path inputPath = new Path(hdfsInputPath);
             Path outputPath = new Path(hdfsOutputPath);

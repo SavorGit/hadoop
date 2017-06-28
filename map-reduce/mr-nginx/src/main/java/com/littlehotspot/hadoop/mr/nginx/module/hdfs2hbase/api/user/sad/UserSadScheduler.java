@@ -27,7 +27,8 @@ public class UserSadScheduler extends Configured implements Tool {
             // 获取参数
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
-
+            String sadType = CommonVariables.getParameterValue(Argument.SadType);
+            this.getConf().set("sadType", sadType);
 
             String[] inpath = hdfsInputPath.split(";");
             Path inputPath = new Path(inpath[0]);
