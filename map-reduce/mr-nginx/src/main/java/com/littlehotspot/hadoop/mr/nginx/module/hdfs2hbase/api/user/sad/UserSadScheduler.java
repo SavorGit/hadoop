@@ -14,7 +14,7 @@ import org.apache.hadoop.util.Tool;
 import java.net.URI;
 
 /**
- * <h1> title </h1>
+ * <h1> 用户行为最终处理 </h1>
  * Created by Administrator on 2017-06-27 下午 3:05.
  */
 public class UserSadScheduler extends Configured implements Tool {

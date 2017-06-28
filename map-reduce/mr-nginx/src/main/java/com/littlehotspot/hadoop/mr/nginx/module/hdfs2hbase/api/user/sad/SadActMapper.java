@@ -10,7 +10,8 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 
 /**
- * <h1> title </h1>
+ * <h1> 用户行为过滤Mapper </h1>
+ * <p>
  * Created by Administrator on 2017-06-23 上午 11:28.
  */
 public class SadActMapper extends Mapper<LongWritable, Text, Text, Text> {
@@ -58,13 +59,14 @@ public class SadActMapper extends Mapper<LongWritable, Text, Text, Text> {
             }
 
             Long time;
-            if(sadType.equals(SadActType.START_DEM) || SadActType.START_PRO.equals(sadType)) {
+            if (sadType.equals(SadActType.START_DEM) || SadActType.START_PRO.equals(sadType)) {
                 time = 9999999999999L - Long.decode(timestamp);
-            }else {
+            } else {
                 time = Long.decode(timestamp);
             }
 
             Text keyText = new Text(uuid + mediaId + time);
+
 //            System.out.println(rowLineContent);
             context.write(keyText, value);
         } catch (Exception e) {

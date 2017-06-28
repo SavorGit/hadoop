@@ -1,7 +1,8 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad;
 
 /**
- * <h1> 投屏点播标识 </h1>
+ * <h1> 用户行为 </h1>
+ *
  * Created by Administrator on 2017-06-26 下午 3:36.
  */
 public enum SadActType {

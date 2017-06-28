@@ -1,7 +1,5 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad;
 
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseColumn;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseRowKey;
 import com.littlehotspot.hadoop.mr.nginx.util.Constant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,92 +7,78 @@ import lombok.NoArgsConstructor;
 import java.util.regex.Matcher;
 
 /**
- * <h1> title </h1>
+ * <h1> 用户行为中间处理文件（投屏开始、结束 和 点播开始、结束） </h1>
  * Created by Administrator on 2017-06-26 下午 4:55.
  */
 @Data
 @NoArgsConstructor
 public class TextTargetSadActBean {
 
-    @HBaseRowKey
     private String rowKey;
 
     /**
      * 操作关联标识
      */
-    @HBaseColumn(columnName = "uuid")
     private String uuid;
 
     /**
      * 酒店标识
      */
-    @HBaseColumn(columnName = "hotel_id")
     private String hotel_id;
 
     /**
      * 包间标识
      */
-    @HBaseColumn(columnName = "room_id")
     private String room_id;
 
     /**
      * 时间截
      */
-    @HBaseColumn(columnName = "timestamps")
     private String timestamps;
 
     /**
      * 操作类型
      */
-    @HBaseColumn(columnName = "option_type")
     private String option_type;
 
     /**
      * 业务类型
      */
-    @HBaseColumn(columnName = "media_type")
     private String media_type;
 
     /**
      * 媒体标识
      */
-    @HBaseColumn(columnName = "media_id")
     private String media_id;
 
     /**
      * 手机标识
      */
-    @HBaseColumn(columnName = "mobile_id")
     private String mobile_id;
 
     /**
      * 机顶盒APK版本
      */
-    @HBaseColumn(columnName = "apk_version")
     private String apk_version;
 
     /**
      * 广告期号
      */
-    @HBaseColumn(columnName = "ads_period")
     private String ads_period;
 
     /**
      * 点播期号
      */
-    @HBaseColumn(columnName = "demand_period")
     private String demand_period;
 
     /**
      * 通用参数值
      */
-    @HBaseColumn(columnName = "common_value")
     private String common_value;
 
     /**
      * 机顶盒MAC
      */
-    @HBaseColumn(columnName = "mac")
     private String mac;
 
     public String rowLine() {

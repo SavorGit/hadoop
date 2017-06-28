@@ -5,7 +5,7 @@ import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.TextTarg
 import lombok.Data;
 
 /**
- * <h1> title </h1>
+ * <h1> 用户投屏明细表（attr列簇） </h1>
  * Created by Administrator on 2017-06-26 下午 3:31.
  */
 @Data

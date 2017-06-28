@@ -14,7 +14,7 @@ import org.apache.hadoop.util.Tool;
 import java.net.URI;
 
 /**
- * <h1> title </h1>
+ * <h1> 用户行为处理 </h1>
  * Created by Administrator on 2017-06-26 上午 11:02.
  */
 public class SadActScheduler extends Configured implements Tool {
@@ -23,7 +23,7 @@ public class SadActScheduler extends Configured implements Tool {
     public int run(String[] args) throws Exception {
         try {
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
-            CommonVariables.hBaseHelper = new HBaseHelper(this.getConf());
+//            CommonVariables.hBaseHelper = new HBaseHelper(this.getConf());
             // 获取参数
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);

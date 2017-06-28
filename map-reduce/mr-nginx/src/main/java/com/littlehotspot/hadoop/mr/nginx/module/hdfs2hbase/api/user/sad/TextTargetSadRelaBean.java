@@ -5,7 +5,7 @@ import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseRowKey;
 import lombok.Data;
 
 /**
- * <h1> title </h1>
+ * <h1> 用户行为最终表BaseBean（rela列簇） </h1>
  * Created by Administrator on 2017-06-27 下午 4:00.
  */
 @Data
