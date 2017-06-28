@@ -1,6 +1,5 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
@@ -16,10 +15,7 @@ public class SadActReducer extends Reducer<Text, Text, Text, Text> {
     @Override
     protected void reduce(Text key, Iterable<Text> value, Reducer<Text, Text, Text, Text>.Context context) throws IOException, InterruptedException {
         try {
-            Configuration conf = context.getConfiguration();
-            SadActType sadType = SadActType.valueOf(conf.get("sadActType"));
-
-            TextTargetSadActBean targetUserSadActBean = TargetBeanFactory.getTargetActBean(sadType);
+            TextTargetSadActBean targetUserSadActBean = TargetBeanFactory.getTargetActBean();
 
             Iterator<Text> textIterator = value.iterator();
             while (textIterator.hasNext()) {

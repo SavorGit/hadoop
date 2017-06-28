@@ -1,11 +1,7 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad;
 
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.demand.TargetUserDemandEndBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.demand.TargetUserDemandStartBean;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.demand.TextTargetUserDemandAttrBean;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.demand.TextTargetUserDemandRelaBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.projection.TargetUserProjectionEndBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.projection.TargetUserProjectionStartBean;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.projection.TextTargetUserProjectionAttrBean;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.projection.TextTargetUserProjectionRelaBean;
 
@@ -15,18 +11,8 @@ import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.projecti
  */
 public class TargetBeanFactory {
 
-    public static TextTargetSadActBean getTargetActBean(SadActType sadType){
-        switch (sadType) {
-            case START_PRO:
-                return new TargetUserProjectionStartBean();
-            case END_PRO:
-                return new TargetUserProjectionEndBean();
-            case START_DEM:
-                return new TargetUserDemandStartBean();
-            case END_DEM:
-                return new TargetUserDemandEndBean();
-        }
-        return null;
+    public static TextTargetSadActBean getTargetActBean(){
+        return new TextTargetSadActBean();
 
     }
 
