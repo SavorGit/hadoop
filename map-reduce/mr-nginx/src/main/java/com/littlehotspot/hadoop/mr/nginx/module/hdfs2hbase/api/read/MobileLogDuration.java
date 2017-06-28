@@ -137,17 +137,33 @@ public class MobileLogDuration extends Configured implements Tool {
                             targetReadRelaBean.setStart(matcherStart.group(5));
                             targetReadRelaBean.setCatId(matcherStart.group(9));
                             for (HashMap<String, Object> cate : cates) {
-                                if (cate.get("id").toString().equals(matcherStart.group(9))){
+                                if (matcherStart.group(9).equals("-1")){
+                                    targetReadRelaBean.setCatName("热点");
+                                }
+                                else if (matcherStart.group(9).equals("-2")){
+                                    targetReadRelaBean.setCatName("点播");
+                                }
+                                else if (cate.get("id").toString().equals(matcherStart.group(9))){
                                     targetReadRelaBean.setCatName(cate.get("name").toString());
                                 }
                             }
-                            targetReadRelaBean.setHotel(matcherStart.group(3));
+                            String reg = "[0-9]+";
+                            if (!matcherStart.group(3).matches(reg)){
+                                targetReadRelaBean.setHotel("");
+                            }else {
+                                targetReadRelaBean.setHotel(matcherStart.group(3));
+                            }
+
                             for (HashMap<String, Object> hotel : hotels) {
                                 if (hotel.get("id").toString().equals(matcherStart.group(3))){
                                     targetReadRelaBean.setHotelName(hotel.get("name").toString());
                                 }
                             }
-                            targetReadRelaBean.setRoom(matcherStart.group(4));
+                            if (!matcherStart.group(4).matches(reg)){
+                                targetReadRelaBean.setRoom("");
+                            }else {
+                                targetReadRelaBean.setRoom(matcherStart.group(4));
+                            }
                             for (HashMap<String, Object> room : rooms) {
                                 if (room.get("id").toString().equals(matcherStart.group(4))){
                                     targetReadRelaBean.setRoomName(room.get("name").toString());
