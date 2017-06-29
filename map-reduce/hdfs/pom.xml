@@ -57,7 +57,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
 
-                    <!-- 机顶盒日志第一次清洗 -->
+                    <!-- 利用正则表达式清洗 HDFS 文件 -->
                     <execution>
                         <id>clean-by-regex</id>
                         <goals>
