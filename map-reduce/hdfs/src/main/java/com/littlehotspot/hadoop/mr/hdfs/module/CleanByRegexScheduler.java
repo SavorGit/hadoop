@@ -11,7 +11,6 @@
 package com.littlehotspot.hadoop.mr.hdfs.module;
 
 import com.littlehotspot.hadoop.mr.hdfs.mapper.CleanByRegexMapper;
-import com.littlehotspot.hadoop.mr.hdfs.reducer.GeneralReducer;
 import com.littlehotspot.hadoop.mr.hdfs.util.Argument;
 import com.littlehotspot.hadoop.mr.hdfs.util.CleanByRegexConstant;
 import org.apache.hadoop.conf.Configured;
