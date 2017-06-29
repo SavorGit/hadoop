@@ -72,8 +72,10 @@
                                 <include>**/com/littlehotspot/hadoop/mr/hdfs/util/Argument.class</include>
                                 <include>**/com/littlehotspot/hadoop/mr/hdfs/util/ArgumentUtil.class</include>
                                 <include>**/com/littlehotspot/hadoop/mr/hdfs/util/Constant.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/util/Constant$*.class</include>
                                 <include>**/com/littlehotspot/hadoop/mr/hdfs/util/CleanByRegexConstant.class</include>
                                 <include>**/com/littlehotspot/hadoop/mr/hdfs/mapper/CleanByRegexMapper.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/reducer/GeneralReducer.class</include>
                                 <include>**/com/littlehotspot/hadoop/mr/hdfs/module/CleanByRegexScheduler.class
                                 </include>
                                 <include>**/com/littlehotspot/hadoop/mr/hdfs/module/CleanByRegexMain.class</include>

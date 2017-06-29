@@ -23,6 +23,7 @@ import lombok.Getter;
  * Date of last commit:$Date$<br>
  */
 public enum Argument {
+    JobName("jobName", null),// 任务名称
     HDFSCluster("hdfsCluster", null),// HDFS 集群地址
     MapperInputFormatRegex("inRegex", null),// 输入时的正则匹配
     InputPath("hdfsIn", null),// 输入的 HDFS 路径

@@ -10,7 +10,6 @@
  */
 package com.littlehotspot.hadoop.mr.hdfs.module;
 
-import com.littlehotspot.hadoop.mr.hdfs.util.CleanByRegexConstant;
 import org.apache.hadoop.util.ToolRunner;
 import org.junit.Test;
 
@@ -33,9 +32,10 @@ public class TestCleanByRegexScheduler {
         try {
             System.setProperty("hadoop.home.dir", "D:\\GreenProfram\\hadoop-2.7.3");
             String[] args = {
+                    "jobName=Box-Log Clean",
                     "hdfsCluster=hdfs://devpd1:8020",
-                    "hdfsIn=/home/data/hadoop/flume/test-box-source/2017-06-27",
-                    "hdfsOut=/home/data/hadoop/flume/test-mr/2017-06-27",
+                    "hdfsIn=/home/data/hadoop/flume/box_source/2017-06-28",
+                    "hdfsOut=/home/data/hadoop/flume/box_export/2017-06-28",
                     "inRegex=^.+,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.+,.*,?$"
             };
             ToolRunner.run(null, new CleanByRegexScheduler(), args);
@@ -46,7 +46,5 @@ public class TestCleanByRegexScheduler {
 
         System.out.println("\n\n");
         System.out.println(String.format("耗时 %s 秒", (endTime - startTime) / 1000.0));
-        System.out.println(String.format("源行数 %s", CleanByRegexConstant.LINE_COUNT_SOURCE_DATA));
-        System.out.println(String.format("结果行数 %s", CleanByRegexConstant.LINE_COUNT_RESULT_DATA));
     }
 }

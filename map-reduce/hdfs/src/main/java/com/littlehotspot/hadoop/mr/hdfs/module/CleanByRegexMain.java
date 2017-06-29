@@ -32,9 +32,11 @@ public class CleanByRegexMain {
      * 主方法。
      *
      * @param args 参数列表。参数名：
-     *             hdfsCluster Hdfs 集群地址
-     *             hdfsIn      输入的 HDFS 路径
-     *             hdfsOut     输出的 HDFS 路径
+     *             jobName      任务名称(可选)
+     *             hdfsCluster  Hdfs 集群地址(可选)
+     *             inRegex      输入 Mapper 的正则表达式
+     *             hdfsIn       输入的 HDFS 路径
+     *             hdfsOut      输出的 HDFS 路径
      * @throws Exception 异常
      */
     public static void main(String[] args) throws Exception {
