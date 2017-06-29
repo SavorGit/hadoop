@@ -8,9 +8,13 @@
  * @EMAIL 404644381@qq.com
  * @Time : 15:38
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.CommonVariables;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.NgxSrcUserBean;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.UserActBean;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -30,12 +34,13 @@ import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 
 /**
  * 手机日志
  */
-public class MobileLogEnd extends Configured implements Tool {
+public class UserReadLog extends Configured implements Tool {
 
     private static class MobileMapper extends Mapper<LongWritable, Text, Text, Text> {
 
@@ -45,24 +50,20 @@ public class MobileLogEnd extends Configured implements Tool {
             /**数据清洗=========开始*/
             try {
                 String msg = value.toString();
-                Matcher matcher = CommonVariables.MAPPER_LOG_FORMAT_REGEX.matcher(msg);
+                Matcher matcher = CommonVariables.MAPPER_MOBILE_LOG_FORMAT_REGEX.matcher(msg);
                 if (!matcher.find()) {
                     return;
                 }
-                if (StringUtils.isBlank(matcher.group(9))) {
+                if (StringUtils.isBlank(matcher.group(16))) {
                     return;
                 }
-//                String timestemps = matcher.group(5);
-//                if (!isYesterday(Long.valueOf(timestemps))){
-//                    return;
-//                }
-                if (StringUtils.isBlank(matcher.group(5))||!matcher.group(5).equals("end")){
+                if (StringUtils.isBlank(matcher.group(5))||!matcher.group(5).equals("start")){
                     return;
                 }
                 if (StringUtils.isBlank(matcher.group(6))||!matcher.group(6).equals("content")){
                     return;
                 }
-                context.write(value, new Text());
+                context.write(new Text(matcher.group(16)), value);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -74,7 +75,30 @@ public class MobileLogEnd extends Configured implements Tool {
         @Override
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
-                context.write(key, new Text());
+                Iterator<Text> iterator = value.iterator();
+                NgxSrcUserBean sourceUserBean = null;
+                UserActBean userActBean = new UserActBean();
+                Integer count=0;
+                while (iterator.hasNext()){
+                    Text item = iterator.next();
+                    if (item == null) {
+                        continue;
+                    }
+                    String rowLineContent = item.toString();
+                    Matcher matcher = CommonVariables.MAPPER_MOBILE_FORMAT_REGEX.matcher(rowLineContent);
+                    if (!matcher.find()) {
+                        return;
+                    }
+                    userActBean.setDeviceId(matcher.group(16));
+                    if (StringUtils.isBlank(userActBean.getTime())){
+                        userActBean.setTime(matcher.group(5));
+                    }else if (Long.valueOf(userActBean.getTime())>=Long.valueOf(matcher.group(5))){
+                        userActBean.setTime(matcher.group(5));
+                    }
+                    count ++;
+                }
+                userActBean.setCount(count.toString());
+                context.write(new Text(sourceUserBean.rowLine()), new Text());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -92,8 +116,8 @@ public class MobileLogEnd extends Configured implements Tool {
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
-            Job job = Job.getInstance(this.getConf(), MobileLogEnd.class.getSimpleName());
-            job.setJarByClass(MobileLogEnd.class);
+            Job job = Job.getInstance(this.getConf(), UserReadLog.class.getSimpleName());
+            job.setJarByClass(UserReadLog.class);
 
             /**作业输入*/
             Path inputPath = new Path(hdfsInputPath);

@@ -12,6 +12,8 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.SourceUserBean;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.TargetUserAttrBean;
 import com.littlehotspot.hadoop.mr.nginx.mysql.mapper.ICategoryMapper;
 import com.littlehotspot.hadoop.mr.nginx.mysql.mapper.IContentMapper;
 import com.littlehotspot.hadoop.mr.nginx.mysql.mapper.IHotelMapper;
@@ -39,10 +41,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 
 /**
@@ -54,9 +53,21 @@ public class MobileLogDuration extends Configured implements Tool {
 
     private static Map<String,String> ends;
 
+    private static List<HashMap<String, Object>> hotels;
+
+    private static List<HashMap<String, Object>> rooms;
+
+    private static List<HashMap<String, Object>> contents;
+
+    private static List<HashMap<String, Object>> cates;
+
     static {
         starts=new HashMap<String, String>();
         ends=new HashMap<String, String>();
+        hotels = new HotelService().getAll();
+        rooms = new RoomService().getAll();
+        contents = new ContentService().getAll();
+        cates = new CategoryService().getAll();
     }
 
     private static class MobileMapper extends Mapper<LongWritable, Text, Text, Text> {
@@ -66,21 +77,19 @@ public class MobileLogDuration extends Configured implements Tool {
             /**数据清洗=========开始*/
             try {
                 String msg = value.toString();
-                Matcher matcher = CommonVariables.MAPPER_INPUT_FORMAT_REGEX.matcher(msg);
+                Matcher matcher = CommonVariables.MAPPER_LOG_FORMAT_REGEX.matcher(msg);
                 if (!matcher.find()) {
                     return;
                 }
-                String option = matcher.group(6);
-                if (!StringUtils.isBlank(option)&&option.equals("start")){
-                    starts.put(matcher.group(2),msg);
+//                if (!StringUtils.isBlank(matcher.group(6))&&matcher.group(6).equals("start")){
+//                    starts.put(matcher.group(2),msg);
+//
+//                }
+//                if (!StringUtils.isBlank(matcher.group(6))&&matcher.group(6).equals("end")){
+//                    ends.put(matcher.group(2),msg);
+//                }
 
-                }
-                if (!StringUtils.isBlank(option)&&option.equals("end")){
-                    ends.put(matcher.group(2),msg);
-                }
-
-//                System.out.println(value.toString());
-                context.write(new Text(), new Text());
+                context.write(new Text(matcher.group(1)), value);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -93,89 +102,86 @@ public class MobileLogDuration extends Configured implements Tool {
         @Override
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
-                List<HashMap<String, Object>> hotels = new HotelService().getAll();
-                List<HashMap<String, Object>> rooms = new RoomService().getAll();
-                List<HashMap<String, Object>> contents = new ContentService().getAll();
-                List<HashMap<String, Object>> cates = new CategoryService().getAll();
-                for (String start : starts.keySet()) {
-                    for (String end : ends.keySet()) {
-                        if (start.equals(end)){
-                            String s = starts.get(start);
-                            Matcher matcherStart = CommonVariables.MAPPER_INPUT_FORMAT_REGEX.matcher(s);
+                Iterator<Text> textIterator = value.iterator();
+                TargetUserReadAttrBean targetReadBean = new TargetUserReadAttrBean();
+                TargetUserReadRelaBean targetReadRelaBean = new TargetUserReadRelaBean();
+                String timestemps =null;
+                while (textIterator.hasNext()) {
+                    Text item = textIterator.next();
+                    if (item == null) {
+                        continue;
+                    }
+                    String rowLineContent = item.toString();
+                    SourceMobileBean sourceMobileBean = new SourceMobileBean(rowLineContent);
 
-                            Matcher matcherEnd = CommonVariables.MAPPER_INPUT_FORMAT_REGEX.matcher(ends.get(end));
-                            if (!matcherStart.find()) {
-                                return;
+                    targetReadBean.setRowKey(sourceMobileBean.getMobileId()+sourceMobileBean.getUuid().substring(0,10));
+                    targetReadBean.setDeviceId(sourceMobileBean.getMobileId());
+                    if (StringUtils.isBlank(timestemps)){
+                        targetReadBean.setStart(sourceMobileBean.getTimestamps());
+                        timestemps=sourceMobileBean.getTimestamps();
+                    }else if (Long.valueOf(timestemps)<Long.valueOf(sourceMobileBean.getTimestamps())){
+                        targetReadBean.setEnd(sourceMobileBean.getTimestamps());
+                    }else if (Long.valueOf(timestemps)>Long.valueOf(sourceMobileBean.getTimestamps())){
+                        targetReadBean.setStart(sourceMobileBean.getTimestamps());
+                        targetReadBean.setEnd(timestemps);
+                    }
+                    targetReadBean.setConId(sourceMobileBean.getContentId());
+                        for (HashMap<String, Object> content : contents) {
+                            if (content.get("id").toString().equals(sourceMobileBean.getContentId())){
+                                targetReadBean.setConNam(content.get("title").toString());
+                                targetReadBean.setContent(content.get("content").toString());
                             }
-                            if (!matcherEnd.find()) {
-                                return;
-                            }
-                            Long duation = Long.valueOf(matcherEnd.group(5)) - Long.valueOf(matcherStart.group(5));
+                        }
+                    if (!(StringUtils.isBlank(targetReadBean.getStart())||StringUtils.isBlank(targetReadBean.getEnd()))){
+                        Long duration = Long.valueOf(targetReadBean.getEnd()) - Long.valueOf(targetReadBean.getStart());
+                        targetReadBean.setVTime(duration.toString());
+                    }
 
-                            TargetUserReadAttrBean targetReadBean = new TargetUserReadAttrBean();
-                            TargetUserReadRelaBean targetReadRelaBean = new TargetUserReadRelaBean();
-                            String deviceId = matcherStart.group(10);
-                            targetReadBean.setRowKey(matcherStart.group(10)+matcherStart.group(5).substring(0,10));
-                            targetReadBean.setDeviceId(matcherStart.group(10));
-                            targetReadBean.setStart(matcherStart.group(5));
-                            targetReadBean.setEnd(matcherEnd.group(5));
-                            targetReadBean.setConId(matcherStart.group(8));
-                                for (HashMap<String, Object> content : contents) {
-                                    if (content.get("id").toString().equals(matcherStart.group(8))){
-                                        targetReadBean.setConNam(content.get("title").toString());
-                                        targetReadBean.setContent(content.get("content").toString());
-                                    }
-                                }
-                            Long duration = Long.valueOf(matcherEnd.group(5)) - Long.valueOf(matcherStart.group(5));
-                            targetReadBean.setVTime(duration.toString());
-                            targetReadBean.setLongitude(matcherStart.group(13));
-                            targetReadBean.setLatitude(matcherStart.group(14));
-                            targetReadBean.setOsType(matcherStart.group(12));
+                    targetReadBean.setLongitude(sourceMobileBean.getLongitude());
+                    targetReadBean.setLatitude(sourceMobileBean.getLatitude());
+                    targetReadBean.setOsType(sourceMobileBean.getOsType());
 
-                            targetReadRelaBean.setRowKey(matcherStart.group(10)+matcherStart.group(5).substring(0,10));
-                            targetReadRelaBean.setDeviceId(matcherStart.group(10));
-                            targetReadRelaBean.setStart(matcherStart.group(5));
-                            targetReadRelaBean.setCatId(matcherStart.group(9));
-                            for (HashMap<String, Object> cate : cates) {
-                                if (matcherStart.group(9).equals("-1")){
-                                    targetReadRelaBean.setCatName("热点");
-                                }
-                                else if (matcherStart.group(9).equals("-2")){
-                                    targetReadRelaBean.setCatName("点播");
-                                }
-                                else if (cate.get("id").toString().equals(matcherStart.group(9))){
-                                    targetReadRelaBean.setCatName(cate.get("name").toString());
-                                }
-                            }
-                            String reg = "[0-9]+";
-                            if (!matcherStart.group(3).matches(reg)){
-                                targetReadRelaBean.setHotel("");
-                            }else {
-                                targetReadRelaBean.setHotel(matcherStart.group(3));
-                            }
-
-                            for (HashMap<String, Object> hotel : hotels) {
-                                if (hotel.get("id").toString().equals(matcherStart.group(3))){
-                                    targetReadRelaBean.setHotelName(hotel.get("name").toString());
-                                }
-                            }
-                            if (!matcherStart.group(4).matches(reg)){
-                                targetReadRelaBean.setRoom("");
-                            }else {
-                                targetReadRelaBean.setRoom(matcherStart.group(4));
-                            }
-                            for (HashMap<String, Object> room : rooms) {
-                                if (room.get("id").toString().equals(matcherStart.group(4))){
-                                    targetReadRelaBean.setRoomName(room.get("name").toString());
-                                }
-                            }
-                            CommonVariables.hBaseHelper.insert(targetReadBean);
-
-                            CommonVariables.hBaseHelper.insert(targetReadRelaBean);
+                    targetReadRelaBean.setRowKey(sourceMobileBean.getMobileId()+sourceMobileBean.getUuid().substring(0,10));
+                    targetReadRelaBean.setDeviceId(sourceMobileBean.getMobileId());
+                    targetReadRelaBean.setCatId(sourceMobileBean.getCategoryId());
+                    for (HashMap<String, Object> cate : cates) {
+                        if (sourceMobileBean.getCategoryId().equals("-1")){
+                            targetReadRelaBean.setCatName("热点");
+                        }
+                        else if (sourceMobileBean.getCategoryId().equals("-2")){
+                            targetReadRelaBean.setCatName("点播");
+                        }
+                        else if (cate.get("id").toString().equals(sourceMobileBean.getCategoryId())){
+                            targetReadRelaBean.setCatName(cate.get("name").toString());
                         }
                     }
+                    String reg = "[0-9]+";
+                    if (!sourceMobileBean.getHotelId().matches(reg)){
+                        targetReadRelaBean.setHotel("");
+                    }else {
+                        targetReadRelaBean.setHotel(sourceMobileBean.getHotelId());
+                    }
+
+                    for (HashMap<String, Object> hotel : hotels) {
+                        if (hotel.get("id").toString().equals(sourceMobileBean.getHotelId())){
+                            targetReadRelaBean.setHotelName(hotel.get("name").toString());
+                        }
+                    }
+                    if (!sourceMobileBean.getRoomId().matches(reg)){
+                        targetReadRelaBean.setRoom("");
+                    }else {
+                        targetReadRelaBean.setRoom(sourceMobileBean.getRoomId());
+                    }
+                    for (HashMap<String, Object> room : rooms) {
+                        if (room.get("id").toString().equals(sourceMobileBean.getRoomId())){
+                            targetReadRelaBean.setRoomName(room.get("name").toString());
+                        }
+                    }
+                    CommonVariables.hBaseHelper.insert(targetReadBean);
+
+                    CommonVariables.hBaseHelper.insert(targetReadRelaBean);
                 }
-//                context.write(key, new Text());
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -209,7 +215,7 @@ public class MobileLogDuration extends Configured implements Tool {
 
             /**作业输出*/
             Path outputPath = new Path(hdfsOutputPath);
-            FileSystem fileSystem = FileSystem.get(URI.create(outputPath.toString()), new Configuration());
+            FileSystem fileSystem = FileSystem.get(URI.create(outputPath.toString()), this.getConf());
             if (fileSystem.exists(outputPath)) {
                 fileSystem.delete(outputPath, true);
             }

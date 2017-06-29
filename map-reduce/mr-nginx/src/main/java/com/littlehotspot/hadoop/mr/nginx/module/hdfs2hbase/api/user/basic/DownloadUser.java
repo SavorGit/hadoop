@@ -8,9 +8,11 @@
  * @EMAIL 404644381@qq.com
  * @Time : 15:38
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.CommonVariables;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -35,7 +37,7 @@ import java.util.regex.Matcher;
 /**
  * 手机日志
  */
-public class MobileLogEnd extends Configured implements Tool {
+public class DownloadUser extends Configured implements Tool {
 
     private static class MobileMapper extends Mapper<LongWritable, Text, Text, Text> {
 
@@ -45,21 +47,12 @@ public class MobileLogEnd extends Configured implements Tool {
             /**数据清洗=========开始*/
             try {
                 String msg = value.toString();
-                Matcher matcher = CommonVariables.MAPPER_LOG_FORMAT_REGEX.matcher(msg);
+                Matcher matcher = CommonVariables.MAPPER_INPUT_FORMAT_REGEX.matcher(msg);
                 if (!matcher.find()) {
                     return;
                 }
-                if (StringUtils.isBlank(matcher.group(9))) {
-                    return;
-                }
-//                String timestemps = matcher.group(5);
-//                if (!isYesterday(Long.valueOf(timestemps))){
-//                    return;
-//                }
-                if (StringUtils.isBlank(matcher.group(5))||!matcher.group(5).equals("end")){
-                    return;
-                }
-                if (StringUtils.isBlank(matcher.group(6))||!matcher.group(6).equals("content")){
+                String deviceId = matcher.group(10);
+                if (StringUtils.isBlank(deviceId)||deviceId.equals(null)||deviceId.equals("null")) {
                     return;
                 }
                 context.write(value, new Text());
@@ -92,8 +85,8 @@ public class MobileLogEnd extends Configured implements Tool {
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
-            Job job = Job.getInstance(this.getConf(), MobileLogEnd.class.getSimpleName());
-            job.setJarByClass(MobileLogEnd.class);
+            Job job = Job.getInstance(this.getConf(), DownloadUser.class.getSimpleName());
+            job.setJarByClass(DownloadUser.class);
 
             /**作业输入*/
             Path inputPath = new Path(hdfsInputPath);

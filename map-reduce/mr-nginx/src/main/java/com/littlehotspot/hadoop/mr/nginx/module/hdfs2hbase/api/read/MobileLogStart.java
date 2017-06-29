@@ -11,7 +11,6 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -48,27 +47,23 @@ public class MobileLogStart extends Configured implements Tool {
             /**数据清洗=========开始*/
             try {
                 String msg = value.toString();
-                Matcher matcher = CommonVariables.MAPPER_INPUT_FORMAT_REGEX.matcher(msg);
+                Matcher matcher = CommonVariables.MAPPER_LOG_FORMAT_REGEX.matcher(msg);
                 if (!matcher.find()) {
                     return;
                 }
-                String deviceId = matcher.group(10);
-                if (StringUtils.isBlank(deviceId)||deviceId.equals(null)||deviceId.equals("null")) {
+                if (StringUtils.isBlank(matcher.group(9))) {
                     return;
                 }
 //                String timestemps = matcher.group(5);
 //                if (!isYesterday(Long.valueOf(timestemps))){
 //                    return;
 //                }
-                String option = matcher.group(6);
-                if (StringUtils.isBlank(option)||!option.equals("start")){
+                if (StringUtils.isBlank(matcher.group(5))||!matcher.group(5).equals("start")){
                     return;
                 }
-                String mediaType = matcher.group(7);
-                if (StringUtils.isBlank(mediaType)||!mediaType.equals("content")){
+                if (StringUtils.isBlank(matcher.group(6))||!matcher.group(6).equals("content")){
                     return;
                 }
-                System.out.println(value.toString());
                 context.write(value, new Text());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -93,7 +88,6 @@ public class MobileLogStart extends Configured implements Tool {
         try {
 
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
-            CommonVariables.hBaseHelper = new HBaseHelper(this.getConf());
 
             // 获取参数
             String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
@@ -112,7 +106,7 @@ public class MobileLogStart extends Configured implements Tool {
 
             /**作业输出*/
             Path outputPath = new Path(hdfsOutputPath);
-            FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), new Configuration());
+            FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());
             if (fileSystem.exists(outputPath)) {
                 fileSystem.delete(outputPath, true);
             }

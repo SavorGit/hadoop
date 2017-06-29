@@ -17,7 +17,6 @@ public class HotelService {
 
     public int getCount() {
 
-        System.out.println(hotelMapper);
         return hotelMapper.getCount();
     }
 
