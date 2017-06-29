@@ -41,12 +41,6 @@ public class CleanByRegexMain {
         if (args.length < 2) {
             throw new IOException("please write input path and output path...");
         }
-        Configuration conf = new Configuration();
-
-        try {
-            ToolRunner.run(conf, new CleanByRegexScheduler(), args);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ToolRunner.run(new Configuration(), new CleanByRegexScheduler(), args);
     }
 }

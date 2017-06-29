@@ -40,10 +40,6 @@ public class GeneralMapper extends Mapper<LongWritable, Text, Text, Text> {
      */
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-        try {
-            context.write(value, new Text());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        context.write(value, new Text());
     }
 }

@@ -51,52 +51,59 @@ public class CleanByRegexScheduler extends Configured implements Tool {
      */
     @Override
     public int run(String[] args) throws Exception {
-        try {
-            CleanByRegexConstant.CommonVariables.initMapReduce(this.getConf(), args);// 解析参数并初始化 MAP REDUCE
+        CleanByRegexConstant.CommonVariables.initMapReduce(this.getConf(), args);// 解析参数并初始化 MAP REDUCE
 
-            String matcherRegex = CleanByRegexConstant.CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
-            String hdfsInputPath = CleanByRegexConstant.CommonVariables.getParameterValue(Argument.InputPath);
-            String hdfsOutputPath = CleanByRegexConstant.CommonVariables.getParameterValue(Argument.OutputPath);
-
-            // 配置数据格式
-            if (matcherRegex == null) {
-                throw new IllegalArgumentException("The argument['inRegex'] for this program is null");
-            }
-
-            CleanByRegexConstant.MAPPER_INPUT_FORMAT_REGEX = Pattern.compile(matcherRegex);
-
-            Path inputPath = new Path(hdfsInputPath);
-            Path outputPath = new Path(hdfsOutputPath);
-
-            Job job = Job.getInstance(this.getConf(), this.getClass().getSimpleName());
-            job.setJarByClass(this.getClass());
-
-            FileInputFormat.addInputPath(job, inputPath);
-            FileOutputFormat.setOutputPath(job, outputPath);
-
-            /**作业输入*/
-            job.setMapperClass(CleanByRegexMapper.class);
-            job.setMapOutputKeyClass(Text.class);
-            job.setMapOutputValueClass(Text.class);
-
-            /**作业输出*/
-            job.setReducerClass(GeneralReducer.class);
-            job.setOutputKeyClass(Text.class);
-            job.setOutputValueClass(Text.class);
-
-            FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());
-            if (fileSystem.exists(outputPath)) {
-                fileSystem.delete(outputPath, true);
-            }
-
-            boolean status = job.waitForCompletion(true);
-            if (!status) {
-                throw new Exception("Box log clean 1 MapReduce task execute failed");
-            }
-            return 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 1;
+        // Mapper 输入正则表达式
+        String matcherRegex = CleanByRegexConstant.CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
+        if (matcherRegex == null) {
+            throw new IllegalArgumentException("The argument['inRegex'] for this program is null");
         }
+
+        // Hdfs 读取路径
+        String hdfsInputPath = CleanByRegexConstant.CommonVariables.getParameterValue(Argument.InputPath);
+        if (hdfsInputPath == null) {
+            throw new IllegalArgumentException("The argument['hdfsIn'] for this program is null");
+        }
+
+        // Hdfs 写入路径
+        String hdfsOutputPath = CleanByRegexConstant.CommonVariables.getParameterValue(Argument.OutputPath);
+        if (hdfsOutputPath == null) {
+            throw new IllegalArgumentException("The argument['hdfsOut'] for this program is null");
+        }
+
+
+        CleanByRegexConstant.MAPPER_INPUT_FORMAT_REGEX = Pattern.compile(matcherRegex);// 生成正则匹配对象
+
+        Path inputPath = new Path(hdfsInputPath);
+        Path outputPath = new Path(hdfsOutputPath);
+
+        Job job = Job.getInstance(this.getConf(), this.getClass().getSimpleName());
+        job.setJarByClass(this.getClass());
+
+        FileInputFormat.addInputPath(job, inputPath);
+        FileOutputFormat.setOutputPath(job, outputPath);
+
+        // 作业输入
+        job.setMapperClass(CleanByRegexMapper.class);
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(Text.class);
+
+        // 作业输出
+        job.setReducerClass(GeneralReducer.class);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
+
+        // 如果输入路径已经存在，则删除
+        FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());
+        if (fileSystem.exists(outputPath)) {
+            fileSystem.delete(outputPath, true);
+        }
+
+        boolean status = job.waitForCompletion(true);
+        if (!status) {
+            String exceptionMessage = String.format("MapReduce[clean-by-regex()] task execute failed", matcherRegex);
+            throw new RuntimeException(exceptionMessage);
+        }
+        return 0;
     }
 }

@@ -69,18 +69,19 @@
                             <classifier>clean-1</classifier>
                             <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
                             <includes>
-                                <include>**/com/littlehotspot/hadoop/mr/box/util/Argument.class</include>
-                                <include>**/com/littlehotspot/hadoop/mr/box/util/ArgumentUtil.class</include>
-                                <include>**/com/littlehotspot/hadoop/mr/box/util/Constant.class</include>
-                                <include>**/com/littlehotspot/hadoop/mr/box/util/LogClean1Constant.class</include>
-                                <include>**/com/littlehotspot/hadoop/mr/box/mapper/LogClean1Mapper.class</include>
-                                <include>**/com/littlehotspot/hadoop/mr/box/reducer/GeneralReducer.class</include>
-                                <include>**/com/littlehotspot/hadoop/mr/box/module/LogClean1Scheduler.class</include>
-                                <include>**/com/littlehotspot/hadoop/mr/box/module/LogClean1Main.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/util/Argument.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/util/ArgumentUtil.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/util/Constant.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/util/CleanByRegexConstant.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/mapper/CleanByRegexMapper.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/reducer/GeneralReducer.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/module/CleanByRegexScheduler.class
+                                </include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/module/CleanByRegexMain.class</include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.box.module.LogClean1Main</mainClass>
+                                    <mainClass>com.littlehotspot.hadoop.mr.hdfs.module.CleanByRegexMain</mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
                                 </manifest>

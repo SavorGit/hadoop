@@ -39,10 +39,6 @@ public class GeneralReducer extends Reducer<Text, Text, Text, Text> {
      */
     @Override
     protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
-        try {
-            context.write(key, new Text());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        context.write(key, new Text());
     }
 }

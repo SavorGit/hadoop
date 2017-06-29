@@ -42,16 +42,11 @@ public class CleanByRegexMapper extends Mapper<LongWritable, Text, Text, Text> {
      */
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-
-        try {
-            String msg = value.toString();
-            Matcher matcher = CleanByRegexConstant.MAPPER_INPUT_FORMAT_REGEX.matcher(msg);
-            if (!matcher.find()) {
-                return;
-            }
-            context.write(value, new Text());
-        } catch (Exception e) {
-            e.printStackTrace();
+        String msg = value.toString();
+        Matcher matcher = CleanByRegexConstant.MAPPER_INPUT_FORMAT_REGEX.matcher(msg);
+        if (!matcher.find()) {
+            return;
         }
+        context.write(value, new Text());
     }
 }
