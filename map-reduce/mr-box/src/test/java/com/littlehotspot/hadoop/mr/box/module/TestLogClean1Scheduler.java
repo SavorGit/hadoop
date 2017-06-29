@@ -1,37 +1,41 @@
-package com.littlehotspot.hadoop.mr.box; /**
+/**
  * Copyright (c) 2017, Stupid Bird and/or its affiliates. All rights reserved.
  * STUPID BIRD PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  * @Project : hadoop
- * @Package : PACKAGE_NAME
+ * @Package : com.littlehotspot.hadoop.mr.box.module
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
- * @Time : 16:00
+ * @Time : 10:48
  */
+package com.littlehotspot.hadoop.mr.box.module;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 import org.junit.Test;
 
 /**
+ * <h1>单元测试 - 机顶盒日志第一次清洗</h1>
+ *
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
- * @notes Created on 2017年05月16日<br>
+ * @EMAIL 404644381@qq.com
+ * @notes Created on 2017年06月29日<br>
  * Revision of last commit:$Revision$<br>
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class BoxLogTest {
+public class TestLogClean1Scheduler {
 
     @Test
     public void run() {
         System.setProperty("hadoop.home.dir", "D:\\GreenProfram\\hadoop-2.7.3");
-        String[] args = {"/home/data/hadoop/flume/box_source/2017-05-31", "/home/data/hadoop/flume/test-mr/2017-05-31"};
-        Configuration conf = new Configuration();
-        conf.set("fs.defaultFS", "hdfs://devpd1:8020");
-//		distributedCache
+        String[] args = {
+                "hdfsCluster=hdfs://devpd1:8020",
+                "hdfsIn=/home/data/hadoop/flume/box_source/2017-06-27",
+                "hdfsOut=/home/data/hadoop/flume/test-mr/2017-06-27"
+        };
         try {
-            ToolRunner.run(conf, new BoxLog(), args);
+            ToolRunner.run(null, new LogClean1Scheduler(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }
