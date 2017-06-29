@@ -47,6 +47,7 @@ public class CleanByRegexMapper extends Mapper<LongWritable, Text, Text, Text> {
         if (!matcher.find()) {
             return;
         }
+        System.out.println(value);
         context.write(value, new Text());
     }
 }

@@ -28,16 +28,21 @@ public class TestCleanByRegexScheduler {
 
     @Test
     public void run() {
-        System.setProperty("hadoop.home.dir", "D:\\GreenProfram\\hadoop-2.7.3");
-        String[] args = {
-                "hdfsCluster=hdfs://devpd1:8020",
-                "hdfsIn=/home/data/hadoop/flume/box_source/2017-06-27",
-                "hdfsOut=/home/data/hadoop/flume/test-mr/2017-06-27"
-        };
+        long startTime = System.currentTimeMillis();
         try {
+            System.setProperty("hadoop.home.dir", "D:\\GreenProfram\\hadoop-2.7.3");
+            String[] args = {
+                    "hdfsCluster=hdfs://devpd1:8020",
+                    "hdfsIn=/home/data/hadoop/flume/box_source/2017-06-27",
+                    "hdfsOut=/home/data/hadoop/flume/test-mr/2017-06-27",
+                    "inRegex=^.+,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.+,.*,?$"
+            };
             ToolRunner.run(null, new CleanByRegexScheduler(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        long endTime = System.currentTimeMillis();
+        String message = String.format("\n\n耗时 %s 秒\n", (endTime - startTime) / 1000.0);
+        System.out.println(message);
     }
 }
