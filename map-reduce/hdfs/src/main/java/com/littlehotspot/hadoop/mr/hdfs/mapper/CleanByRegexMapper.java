@@ -42,7 +42,7 @@ public class CleanByRegexMapper extends Mapper<LongWritable, Text, Text, Text> {
      */
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-        ++CleanByRegexConstant.LINE_COUNT_SOURCE_DATA;
+//        ++CleanByRegexConstant.LINE_COUNT_SOURCE_DATA;
 
         String msg = value.toString();
         Matcher matcher = CleanByRegexConstant.MAPPER_INPUT_FORMAT_REGEX.matcher(msg);
@@ -50,7 +50,7 @@ public class CleanByRegexMapper extends Mapper<LongWritable, Text, Text, Text> {
             return;
         }
 
-        ++CleanByRegexConstant.LINE_COUNT_RESULT_DATA;
+//        ++CleanByRegexConstant.LINE_COUNT_RESULT_DATA;
         context.write(value, new Text());
     }
 }
