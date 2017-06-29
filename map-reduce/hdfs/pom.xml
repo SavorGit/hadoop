@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>map-reduce</artifactId>
+        <groupId>com.littlehotspot.hadoop</groupId>
+        <version>1.0.0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.littlehotspot.hadoop.mr</groupId>
+    <artifactId>mr-hdfs</artifactId>
+
+    <name>Hadoop Map-Reduce [HDFS]</name>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Hadoop -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-mapreduce-client-app</artifactId>
+        </dependency>
+
+        <!-- 自定义插件 -->
+        <dependency>
+            <groupId>net.lizhaoweb.common.util.data</groupId>
+            <artifactId>convert</artifactId>
+            <version>1.0.0.0.1</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+
+                    <!-- 机顶盒日志第一次清洗 -->
+                    <execution>
+                        <id>clean-1</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>clean-1</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/box/util/Argument.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/util/ArgumentUtil.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/util/Constant.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/util/LogClean1Constant.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/mapper/LogClean1Mapper.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/reducer/GeneralReducer.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/module/LogClean1Scheduler.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/module/LogClean1Main.class</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.box.module.LogClean1Main</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
