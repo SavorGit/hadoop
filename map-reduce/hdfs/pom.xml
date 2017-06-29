@@ -59,14 +59,14 @@
 
                     <!-- 机顶盒日志第一次清洗 -->
                     <execution>
-                        <id>clean-1</id>
+                        <id>clean-by-regex</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
                         <phase>package</phase>
                         <configuration>
                             <!--<finalName>nginx-log</finalName>-->
-                            <classifier>clean-1</classifier>
+                            <classifier>clean-by-regex</classifier>
                             <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/hdfs/util/Argument.class</include>
