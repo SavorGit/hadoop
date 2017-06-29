@@ -15,7 +15,6 @@ import com.littlehotspot.hadoop.mr.box.reducer.GeneralReducer;
 import com.littlehotspot.hadoop.mr.box.util.Argument;
 import com.littlehotspot.hadoop.mr.box.util.LogClean1Constant;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -65,30 +64,33 @@ public class LogClean1Scheduler extends Configured implements Tool {
                 LogClean1Constant.MAPPER_INPUT_FORMAT_REGEX = Pattern.compile(matcherRegex);
             }
 
+            Path inputPath = new Path(hdfsInputPath);
+            Path outputPath = new Path(hdfsOutputPath);
+
             Job job = Job.getInstance(this.getConf(), this.getClass().getSimpleName());
             job.setJarByClass(this.getClass());
 
-            /**作业输入*/
-            Path inputPath = new Path(hdfsInputPath);
             FileInputFormat.addInputPath(job, inputPath);
+            FileOutputFormat.setOutputPath(job, outputPath);
+
+            /**作业输入*/
             job.setMapperClass(LogClean1Mapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
 
             /**作业输出*/
-            Path outputPath = new Path(hdfsOutputPath);
-            FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), new Configuration());
-            if (fileSystem.exists(outputPath)) {
-                fileSystem.delete(outputPath, true);
-            }
-            FileOutputFormat.setOutputPath(job, outputPath);
             job.setReducerClass(GeneralReducer.class);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(Text.class);
 
+            FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());
+            if (fileSystem.exists(outputPath)) {
+                fileSystem.delete(outputPath, true);
+            }
+
             boolean status = job.waitForCompletion(true);
             if (!status) {
-                throw new Exception("MapReduce task execute failed.........");
+                throw new Exception("Box log clean 1 MapReduce task execute failed");
             }
             return 0;
         } catch (Exception e) {
