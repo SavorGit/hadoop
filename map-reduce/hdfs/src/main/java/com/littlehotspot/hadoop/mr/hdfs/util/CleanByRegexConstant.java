@@ -29,4 +29,14 @@ public class CleanByRegexConstant extends Constant {
      * MAPPER 输入正则表达式
      */
     public static Pattern MAPPER_INPUT_FORMAT_REGEX;
+
+    /**
+     * 源数据行数
+     */
+    public static long LINE_COUNT_SOURCE_DATA;
+
+    /**
+     * 结果行数
+     */
+    public static long LINE_COUNT_RESULT_DATA;
 }

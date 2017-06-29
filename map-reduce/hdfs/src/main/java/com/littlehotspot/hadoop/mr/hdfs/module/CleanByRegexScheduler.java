@@ -88,10 +88,10 @@ public class CleanByRegexScheduler extends Configured implements Tool {
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);
 
-        // 作业输出
-        job.setReducerClass(GeneralReducer.class);
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(Text.class);
+//        // 作业输出
+//        job.setReducerClass(GeneralReducer.class);
+//        job.setOutputKeyClass(Text.class);
+//        job.setOutputValueClass(Text.class);
 
         // 如果输入路径已经存在，则删除
         FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());
