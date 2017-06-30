@@ -42,7 +42,6 @@ public class UserSadScheduler extends Configured implements Tool {
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
 
-
             job.setReducerClass(UserSadReducer.class);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(Text.class);

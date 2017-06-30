@@ -1,9 +1,9 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad;
 
-import com.littlehotspot.hadoop.mr.nginx.mysql.service.BoxService;
-import com.littlehotspot.hadoop.mr.nginx.mysql.service.HotelService;
-import com.littlehotspot.hadoop.mr.nginx.mysql.service.MediaService;
-import com.littlehotspot.hadoop.mr.nginx.mysql.service.RoomService;
+import com.littlehotspot.hadoop.mr.nginx.mysql.JdbcReader;
+import com.littlehotspot.hadoop.mr.nginx.mysql.MysqlCommonVariables;
+import com.littlehotspot.hadoop.mr.nginx.mysql.model.Hotel;
+import com.littlehotspot.hadoop.mr.nginx.mysql.model.SelectModel;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -36,7 +36,7 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
                 TextTargetSadActBean sourceUserSadBean = new TextTargetSadActBean(rowLineContent);
 
                 this.setPropertiesForAttrBean(targetSadAttrBean, sourceUserSadBean);
-                this.setPropertiesForRelaBean(targetSadRelaBean, sourceUserSadBean);
+                this.setPropertiesForRelaBean(conf, targetSadRelaBean, sourceUserSadBean);
 
             }
 
@@ -62,28 +62,44 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
         }
     }
 
-    private void setPropertiesForRelaBean(TextTargetSadRelaBean bean, TextTargetSadActBean source) {
+    private void setPropertiesForRelaBean(Configuration conf, TextTargetSadRelaBean bean, TextTargetSadActBean source) throws Exception {
         bean.setRowKey(source.getMobile_id() + source.getTimestamps());
 
-        bean.setHotel(source.getHotel_id());
-        HotelService hotelService = new HotelService();
-        bean.setHotel_name(hotelService.getName(source.getHotel_id()));
+        String hotelId = source.getHotel_id();
+        bean.setHotel(hotelId);
+
+        //读取mysql
+        readMysqlHotel(conf.get("hdfsCluster"));
+        Hotel hotel = (Hotel) MysqlCommonVariables.modelMap.get(hotelId);
+        bean.setHotel_name(hotel.getName());
 
         bean.setRoom(source.getRoom_id());
-        RoomService roomService = new RoomService();
-        bean.setRoom_name(roomService.getName(source.getRoom_id()));
+//        RoomService roomService = new RoomService();
+//        bean.setRoom_name(roomService.getName(source.getRoom_id()));
 
         bean.setBox_mac(source.getMac());
-        BoxService boxService = new BoxService();
-        bean.setBox_name(boxService.getName(source.getMac()));
+//        BoxService boxService = new BoxService();
+//        bean.setBox_name(boxService.getName(source.getMac()));
 
         bean.setMedia(source.getMedia_id());
-        MediaService mediaService = new MediaService();
-        bean.setMedia_name(mediaService.getName(source.getMedia_id()));
-        bean.setMedia_down_url(mediaService.getUrl(source.getMedia_id()));
+//        MediaService mediaService = new MediaService();
+//        bean.setMedia_name(mediaService.getName(source.getMedia_id()));
+//        bean.setMedia_down_url(mediaService.getUrl(source.getMedia_id()));
 
         bean.setApk_version(source.getApk_version());
         bean.setAds_version(source.getAds_period());
         bean.setDema_version(source.getDemand_period());
+    }
+
+
+    public void readMysqlHotel(String hdfsCluster) throws Exception{
+        SelectModel selectModel = new SelectModel();
+        selectModel.setInputClass(Hotel.class);
+        selectModel.setTableName("savor_hotel");
+        selectModel.setFields(MysqlCommonVariables.hotelFields);
+        selectModel.setOutput("/home/data/hadoop/flume/test_hbase/mysql");
+
+        JdbcReader.read(hdfsCluster,selectModel);
+
     }
 }
