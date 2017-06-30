@@ -12,6 +12,7 @@ package com.littlehotspot.hadoop.mr.hdfs.module;
 
 import com.littlehotspot.hadoop.mr.hdfs.mapper.CleanByRegexMapper;
 import com.littlehotspot.hadoop.mr.hdfs.util.Argument;
+import com.littlehotspot.hadoop.mr.hdfs.util.ArgumentFactory;
 import com.littlehotspot.hadoop.mr.hdfs.util.CleanByRegexConstant;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configured;
@@ -57,54 +58,53 @@ public class CleanByRegexScheduler extends Configured implements Tool {
         CleanByRegexConstant.CommonVariables.initMapReduce(this.getConf(), args);// 解析参数并初始化 MAP REDUCE
 
         // Mapper 输入正则表达式
-        String jobName = CleanByRegexConstant.CommonVariables.getParameterValue(Argument.JobName);
+        String jobName = ArgumentFactory.getParameterValue(Argument.JobName);
         System.out.println("\tInput[Job-Name]           : " + jobName);
 
         // Mapper 输入正则表达式
-        String matcherRegex = CleanByRegexConstant.CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
+        String matcherRegex = ArgumentFactory.getParameterValue(Argument.MapperInputFormatRegex);
         System.out.println("\tInput[Mapper-Input-Regex] : " + matcherRegex);
         if (matcherRegex == null) {
             throw new IllegalArgumentException("The argument['inRegex'] for this program is null");
         }
 
         // Hdfs 读取路径
-        String hdfsInputPath = CleanByRegexConstant.CommonVariables.getParameterValue(Argument.InputPath);
+        String hdfsInputPath = ArgumentFactory.getParameterValue(Argument.InputPath);
         System.out.println("\tInput[HDFS-Input-Path]    : " + hdfsInputPath);
         if (hdfsInputPath == null) {
             throw new IllegalArgumentException("The argument['hdfsIn'] for this program is null");
         }
 
         // Hdfs 写入路径
-        String hdfsOutputPath = CleanByRegexConstant.CommonVariables.getParameterValue(Argument.OutputPath);
+        String hdfsOutputPath = ArgumentFactory.getParameterValue(Argument.OutputPath);
         System.out.println("\tInput[HDFS-Output-Path]   : " + hdfsOutputPath);
         if (hdfsOutputPath == null) {
             throw new IllegalArgumentException("The argument['hdfsOut'] for this program is null");
         }
 
 
-        CleanByRegexConstant.MAPPER_INPUT_FORMAT_REGEX = Pattern.compile(matcherRegex);// 生成正则匹配对象
-
-        Path inputPath = new Path(hdfsInputPath);
-        Path outputPath = new Path(hdfsOutputPath);
-
         if (StringUtils.isBlank(jobName)) {
             jobName = this.getClass().getName();
         }
+
+        this.getConf().setPattern(CleanByRegexConstant.HadoopConfig.Key.MAPPER_INPUT_FORMAT_REGEX_PATTERN, Pattern.compile(matcherRegex));// 配置 Mapper 输入的正则匹配对象
         Job job = Job.getInstance(this.getConf(), jobName);
         job.setJarByClass(this.getClass());
 
-        FileInputFormat.addInputPath(job, inputPath);
-        FileOutputFormat.setOutputPath(job, outputPath);
 
         // 作业输入
+        Path inputPath = new Path(hdfsInputPath);
+        FileInputFormat.addInputPath(job, inputPath);
         job.setMapperClass(CleanByRegexMapper.class);
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);
 
-//        // 作业输出
-//        job.setReducerClass(GeneralReducer.class);
-//        job.setOutputKeyClass(Text.class);
-//        job.setOutputValueClass(Text.class);
+        // 作业输出
+        Path outputPath = new Path(hdfsOutputPath);
+        FileOutputFormat.setOutputPath(job, outputPath);
+//            job.setReducerClass(GeneralReducer.class);
+//            job.setOutputKeyClass(Text.class);
+//            job.setOutputValueClass(Text.class);
 
         // 如果输入路径已经存在，则删除
         FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());
@@ -113,10 +113,6 @@ public class CleanByRegexScheduler extends Configured implements Tool {
         }
 
         boolean status = job.waitForCompletion(true);
-
-        System.out.println(String.format("源 行 数 : %s", CleanByRegexConstant.LINE_COUNT_SOURCE_DATA));
-        System.out.println(String.format("结果行数 : %s", CleanByRegexConstant.LINE_COUNT_RESULT_DATA));
-
         if (!status) {
             String exceptionMessage = String.format("MapReduce[Clean-By-Regex] task[%s] execute failed", jobName);
             throw new RuntimeException(exceptionMessage);

@@ -10,8 +10,6 @@
  */
 package com.littlehotspot.hadoop.mr.hdfs.util;
 
-import java.util.regex.Pattern;
-
 /**
  * <h1>常量 - 利用正则表达式清洗 HDFS 文件</h1>
  *
@@ -23,20 +21,26 @@ import java.util.regex.Pattern;
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class CleanByRegexConstant extends Constant {
+public class CleanByRegexConstant extends MapReduceConstant {
 
-    /**
-     * MAPPER 输入正则表达式
-     */
-    public static Pattern MAPPER_INPUT_FORMAT_REGEX;
+    public static class HadoopConfig {
 
-    /**
-     * 源数据行数
-     */
-    public static long LINE_COUNT_SOURCE_DATA;
+        public static class Key {
 
-    /**
-     * 结果行数
-     */
-    public static long LINE_COUNT_RESULT_DATA;
+            /**
+             * MAPPER 输入正则表达式
+             */
+            public static final String MAPPER_INPUT_FORMAT_REGEX_PATTERN = Key.class.getName() + ".MAPPER_INPUT_FORMAT_REGEX_PATTERN";
+
+            /**
+             * 源数据行数
+             */
+            public static final String LINE_COUNT_SOURCE_DATA = Key.class.getName() + ".LINE_COUNT_SOURCE_DATA";
+
+            /**
+             * 结果行数
+             */
+            public static final String LINE_COUNT_RESULT_DATA = Key.class.getName() + ".LINE_COUNT_RESULT_DATA";
+        }
+    }
 }

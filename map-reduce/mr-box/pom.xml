@@ -69,18 +69,13 @@
                             <classifier>clean-1</classifier>
                             <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
                             <includes>
-                                <include>**/com/littlehotspot/hadoop/mr/box/util/Argument.class</include>
-                                <include>**/com/littlehotspot/hadoop/mr/box/util/ArgumentUtil.class</include>
-                                <include>**/com/littlehotspot/hadoop/mr/box/util/Constant.class</include>
-                                <include>**/com/littlehotspot/hadoop/mr/box/util/LogClean1Constant.class</include>
-                                <include>**/com/littlehotspot/hadoop/mr/box/mapper/LogClean1Mapper.class</include>
-                                <include>**/com/littlehotspot/hadoop/mr/box/reducer/GeneralReducer.class</include>
-                                <include>**/com/littlehotspot/hadoop/mr/box/module/LogClean1Scheduler.class</include>
-                                <include>**/com/littlehotspot/hadoop/mr/box/module/LogClean1Main.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/BoxLog.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/BoxLog$*.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/Main.class</include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.box.module.LogClean1Main</mainClass>
+                                    <mainClass>com.littlehotspot.hadoop.mr.box.Main</mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
                                 </manifest>

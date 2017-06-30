@@ -11,12 +11,14 @@
 package com.littlehotspot.hadoop.mr.hdfs.mapper;
 
 import com.littlehotspot.hadoop.mr.hdfs.util.CleanByRegexConstant;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <h1>Mapper - 利用正则表达式清洗 HDFS 文件</h1>
@@ -31,6 +33,8 @@ import java.util.regex.Matcher;
  */
 public class CleanByRegexMapper extends Mapper<LongWritable, Text, Text, Text> {
 
+    private Pattern mapperInputFormatRegexPattern;
+
     /**
      * 机顶盒日志第一次清洗 Mapper
      *
@@ -43,20 +47,23 @@ public class CleanByRegexMapper extends Mapper<LongWritable, Text, Text, Text> {
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         try {
-            ++CleanByRegexConstant.LINE_COUNT_SOURCE_DATA;
-
             String msg = value.toString();
-            Matcher matcher = CleanByRegexConstant.MAPPER_INPUT_FORMAT_REGEX.matcher(msg);
+            Matcher matcher = this.mapperInputFormatRegexPattern.matcher(msg);
             if (!matcher.find()) {
                 return;
             }
-
-            ++CleanByRegexConstant.LINE_COUNT_RESULT_DATA;
-//            System.out.println("=====\t" + value);
             context.write(value, new Text());
         } catch (Exception e) {
             e.printStackTrace();
-//            System.out.println(value);
         }
+    }
+
+    @Override
+    protected void setup(Context context) throws IOException, InterruptedException {
+//        super.setup(context);
+
+        //从全局配置获取配置参数
+        Configuration conf = context.getConfiguration();
+        this.mapperInputFormatRegexPattern = conf.getPattern(CleanByRegexConstant.HadoopConfig.Key.MAPPER_INPUT_FORMAT_REGEX_PATTERN, null);
     }
 }
