@@ -17,6 +17,7 @@ import org.apache.hadoop.mapred.lib.db.DBInputFormat;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 
 /**
  * <h1> mysql读取类 </h1>
@@ -45,6 +46,7 @@ public class JdbcReader {
      * @throws URISyntaxException
      */
     public static void read(String hdfsCluster, SelectModel selectModel) throws IOException, URISyntaxException {
+        MysqlCommonVariables.modelMap = new HashMap<>();
 
         JobConf jobConf = new JobConf(JdbcReader.class);
         if(StringUtils.isNotBlank(hdfsCluster)) {

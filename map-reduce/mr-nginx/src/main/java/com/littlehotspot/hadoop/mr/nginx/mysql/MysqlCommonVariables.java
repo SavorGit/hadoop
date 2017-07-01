@@ -27,4 +27,19 @@ public class MysqlCommonVariables {
      */
     public static String[] hotelFields = {"id", "name"};
 
+    /**
+     * 酒店查询字段
+     */
+    public static String[] roomFields = {"id", "name"};
+
+    /**
+     * 酒店查询字段
+     */
+    public static String[] boxFields = {"id", "name", "mac"};
+
+    /**
+     * 酒店查询字段
+     */
+    public static String[] mediaFields = {"id", "name","oss_addr"};
+
 }
