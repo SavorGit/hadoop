@@ -12,10 +12,6 @@ import java.util.regex.Matcher;
 @Data
 @NoArgsConstructor
 public class TextSourceUserSadBean {
-    /**
-     * 记录标识
-     */
-    private String id;
 
     /**
      * 操作关联标识
@@ -92,21 +88,21 @@ public class TextSourceUserSadBean {
         if (!matcher.find()) {
             return;
         }
-        this.setId(cleanNull(matcher.group(1)));
-        this.setUuid(cleanNull(matcher.group(2)));
-        this.setHotel_id(cleanNull(matcher.group(3)));
-        this.setRoom_id(cleanNull(matcher.group(4)));
-        this.setTimestamps(cleanNull(matcher.group(5)));
-        this.setOption_type(cleanNull(matcher.group(6)));
-        this.setMedia_type(cleanNull(matcher.group(7)));
-        this.setMedia_id(cleanNull(matcher.group(8)));
-        this.setMobile_id(cleanNull(matcher.group(9)));
-        this.setApk_version(cleanNull(matcher.group(10)));
-        this.setAds_period(cleanNull(matcher.group(11)));
-        this.setDemand_period(cleanNull(matcher.group(12)));
-        this.setCommon_value(cleanNull(matcher.group(13)));
-        this.setMac(cleanNull(matcher.group(14)));
-        this.setDate_time(cleanValue(cleanNull(matcher.group(15))));
+//        this.setId(cleanNull(matcher.group(1)));
+        this.setUuid(cleanNull(matcher.group(1)));
+        this.setHotel_id(cleanNull(matcher.group(2)));
+        this.setRoom_id(cleanNull(matcher.group(3)));
+        this.setTimestamps(cleanNull(matcher.group(4)));
+        this.setOption_type(cleanNull(matcher.group(5)));
+        this.setMedia_type(cleanNull(matcher.group(6)));
+        this.setMedia_id(cleanNull(matcher.group(7)));
+        this.setMobile_id(cleanNull(matcher.group(8)));
+        this.setApk_version(cleanNull(matcher.group(9)));
+        this.setAds_period(cleanNull(matcher.group(10)));
+        this.setDemand_period(cleanNull(matcher.group(11)));
+        this.setCommon_value(cleanNull(matcher.group(12)));
+        this.setMac(cleanNull(matcher.group(13)));
+        this.setDate_time(cleanValue(cleanNull(matcher.group(14))));
     }
 
     private String cleanValue(String value) {

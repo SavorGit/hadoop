@@ -45,15 +45,15 @@ public class SadActMapper extends Mapper<LongWritable, Text, Text, Text> {
             if (!matcher.find()) {
                 return;
             }
-            String uuid = matcher.group(2);
+            String uuid = matcher.group(1);
             if (StringUtils.isBlank(uuid)) {
                 return;
             }
-            String mediaId = matcher.group(8);
+            String mediaId = matcher.group(7);
             if (StringUtils.isBlank(mediaId)) {
                 return;
             }
-            String timestamp = matcher.group(5);
+            String timestamp = matcher.group(4);
             if (StringUtils.isBlank(timestamp)) {
                 return;
             }
