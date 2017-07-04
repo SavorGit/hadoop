@@ -59,7 +59,7 @@ public class SadActMapper extends Mapper<LongWritable, Text, Text, Text> {
             }
 
             Long time;
-            if (sadActType.equals(SadActType.END_DEM) || SadActType.END_PRO.equals(sadActType)) {
+            if (sadActType.equals(SadActType.START_DEM) || SadActType.START_PRO.equals(sadActType)) {
                 time = 9999999999999L - Long.decode(timestamp);
             } else {
                 time = Long.decode(timestamp);

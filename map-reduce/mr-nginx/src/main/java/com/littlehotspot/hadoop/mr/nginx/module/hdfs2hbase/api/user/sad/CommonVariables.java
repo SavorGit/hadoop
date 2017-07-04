@@ -45,7 +45,7 @@ public class CommonVariables extends Constant.CommonVariables {
     /**
      * final regex
      */
-    public static Pattern MAPPER_INPUT_FORMAT_REGEX_FINAL = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(end|start)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
+    public static Pattern MAPPER_INPUT_FORMAT_REGEX_FINAL = Pattern.compile("^(.*),(.*),(.*),(.*),(.*),(end|start),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*)$");
 
     public static HBaseHelper hBaseHelper;
 }

@@ -7,10 +7,10 @@ import java.io.IOException;
 import java.util.Iterator;
 
 /**
- * <h1> 用户行为reducer </h1>
- * Created by Administrator on 2017-06-26 下午 5:56.
+ * <h1> title </h1>
+ * Created by Administrator on 2017-07-04 上午 11:20.
  */
-public class SadActReducer extends Reducer<Text, Text, Text, Text> {
+public class SadActCombiner extends Reducer<Text, Text, Text, Text> {
 
     @Override
     protected void reduce(Text key, Iterable<Text> value, Reducer<Text, Text, Text, Text>.Context context) throws IOException, InterruptedException {
@@ -24,8 +24,8 @@ public class SadActReducer extends Reducer<Text, Text, Text, Text> {
                     continue;
                 }
                 String rowLineContent = item.toString();
-                TextTargetSadActBean sourceUserSadBean = new TextTargetSadActBean(rowLineContent);
-                targetUserSadActBean.setRowKey(key.toString());
+                TextSourceUserSadBean sourceUserSadBean = new TextSourceUserSadBean(rowLineContent);
+                targetUserSadActBean.setRowKey(sourceUserSadBean.getUuid()+sourceUserSadBean.getMedia_id());
                 targetUserSadActBean.setUuid(sourceUserSadBean.getUuid());
                 targetUserSadActBean.setHotel_id(sourceUserSadBean.getHotel_id());
                 targetUserSadActBean.setRoom_id(sourceUserSadBean.getRoom_id());
@@ -41,7 +41,7 @@ public class SadActReducer extends Reducer<Text, Text, Text, Text> {
                 targetUserSadActBean.setMac(sourceUserSadBean.getMac());
             }
 
-            context.write(new Text(targetUserSadActBean.rowLine()), new Text());
+            context.write(new Text(targetUserSadActBean.getRowKey()), new Text(targetUserSadActBean.rowLine()));
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -1,6 +1,5 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad;
 
-import com.littlehotspot.hadoop.mr.nginx.util.Constant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -83,19 +82,19 @@ public class TextTargetSadActBean {
 
     public String rowLine() {
         StringBuffer rowLine = new StringBuffer();
-        rowLine.append(this.getRowKey() == null ? "" : this.getRowKey()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getUuid() == null ? "" : this.getUuid()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getHotel_id() == null ? "" : this.getHotel_id()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getRoom_id() == null ? "" : this.getRoom_id()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getTimestamps() == null ? "" : this.getTimestamps()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getOption_type() == null ? "" : this.getOption_type()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getMedia_type() == null ? "" : this.getMedia_type()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getMedia_id() == null ? "" : this.getMedia_id()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getMobile_id() == null ? "" : this.getMobile_id()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getApk_version() == null ? "" : this.getApk_version()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getAds_period() == null ? "" : this.getAds_period()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getDemand_period() == null ? "" : this.getDemand_period()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getCommon_value() == null ? "" : this.getCommon_value()).append(Constant.VALUE_SPLIT_CHAR);
+        rowLine.append(this.getRowKey() == null ? "" : this.getRowKey()).append(",");
+        rowLine.append(this.getUuid() == null ? "" : this.getUuid()).append(",");
+        rowLine.append(this.getHotel_id() == null ? "" : this.getHotel_id()).append(",");
+        rowLine.append(this.getRoom_id() == null ? "" : this.getRoom_id()).append(",");
+        rowLine.append(this.getTimestamps() == null ? "" : this.getTimestamps()).append(",");
+        rowLine.append(this.getOption_type() == null ? "" : this.getOption_type()).append(",");
+        rowLine.append(this.getMedia_type() == null ? "" : this.getMedia_type()).append(",");
+        rowLine.append(this.getMedia_id() == null ? "" : this.getMedia_id()).append(",");
+        rowLine.append(this.getMobile_id() == null ? "" : this.getMobile_id()).append(",");
+        rowLine.append(this.getApk_version() == null ? "" : this.getApk_version()).append(",");
+        rowLine.append(this.getAds_period() == null ? "" : this.getAds_period()).append(",");
+        rowLine.append(this.getDemand_period() == null ? "" : this.getDemand_period()).append(",");
+        rowLine.append(this.getCommon_value() == null ? "" : this.getCommon_value()).append(",");
         rowLine.append(this.getMac() == null ? "" : this.getMac());
         return rowLine.toString();
     }

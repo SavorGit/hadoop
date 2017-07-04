@@ -40,6 +40,7 @@ public class SadActScheduler extends Configured implements Tool {
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
 
+            job.setCombinerClass(SadActCombiner.class);
 
             job.setReducerClass(SadActReducer.class);
             job.setOutputKeyClass(Text.class);
