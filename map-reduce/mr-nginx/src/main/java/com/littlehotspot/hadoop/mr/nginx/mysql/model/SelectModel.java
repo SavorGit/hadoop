@@ -16,28 +16,18 @@ public class SelectModel {
     private Class<? extends DBWritable> inputClass;
 
     /**
-     * 查询表名
-     */
-    private String tableName;
-
-    /**
-     * 查询条件
-     */
-    private String conditions;
-
-    /**
-     * 排序条件
-     */
-    private String orderBy;
-
-    /**
-     * 查询返回的字段
-     */
-    private String[] fields;
-
-    /**
      * 读取的输出路径
      */
-    private String output;
+    private String outputPath;
+
+    /**
+     * sql语句
+     */
+    private String query;
+
+    /**
+     * 查询记录条数
+     */
+    private String countQuery;
 
 }

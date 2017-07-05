@@ -12,17 +12,17 @@ import org.junit.Test;
  */
 public class TestHadoopJdbc {
     @Test
-    public void testJdbc(){
+    public void testJdbcToMap(){
         System.setProperty("hadoop.home.dir", "E:\\DevpPrograms\\hadoop-2.7.3");
 
         try {
             SelectModel selectModel = new SelectModel();
             selectModel.setInputClass(Hotel.class);
-            selectModel.setTableName("savor_hotel");
-            selectModel.setFields(MysqlCommonVariables.hotelFields);
-            selectModel.setOutput("/home/data/hadoop/flume/test_hbase/mysql");
+            selectModel.setQuery("select id,name from savor_hotel");
+            selectModel.setCountQuery("select count(*) from savor_hotel");
+            selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
 
-            JdbcReader.read("hdfs://devpd1:8020",selectModel);
+            JdbcReader.readToMap("hdfs://devpd1:8020",selectModel);
             System.out.println(MysqlCommonVariables.modelMap);
         }catch (Exception e){
             e.printStackTrace();

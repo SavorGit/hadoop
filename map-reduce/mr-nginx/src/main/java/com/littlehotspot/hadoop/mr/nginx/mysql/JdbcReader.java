@@ -1,8 +1,6 @@
 package com.littlehotspot.hadoop.mr.nginx.mysql;
 
 import com.littlehotspot.hadoop.mr.nginx.mysql.model.Hotel;
-import com.littlehotspot.hadoop.mr.nginx.mysql.model.Model;
-import com.littlehotspot.hadoop.mr.nginx.mysql.model.ModelFactory;
 import com.littlehotspot.hadoop.mr.nginx.mysql.model.SelectModel;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.fs.FileSystem;
@@ -29,26 +27,63 @@ public class JdbcReader {
 
         SelectModel selectModel = new SelectModel();
         selectModel.setInputClass(Hotel.class);
-        selectModel.setTableName("savor_hotel");
-        selectModel.setFields(MysqlCommonVariables.hotelFields);
-        selectModel.setOutput("/home/data/hadoop/flume/test_hbase/mysql");
+        selectModel.setQuery("select id,name from savor_hotel");
+        selectModel.setCountQuery("select count(*) from savor_hotel");
+        selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
 
-        read("hdfs://devpd1:8020",selectModel);
+        readToMap("hdfs://devpd1:8020",selectModel);
 
         System.out.println(MysqlCommonVariables.modelMap);
     }
 
     /**
-     * 读取mysql
+     * 读取mysql到map
      * @param hdfsCluster
      * @param selectModel
      * @throws IOException
      * @throws URISyntaxException
      */
-    public static void read(String hdfsCluster, SelectModel selectModel) throws IOException, URISyntaxException {
+    public static void readToMap(String hdfsCluster, SelectModel selectModel) throws IOException, URISyntaxException {
         MysqlCommonVariables.modelMap = new HashMap<>();
 
         JobConf jobConf = new JobConf(JdbcReader.class);
+        setJdbc(jobConf,hdfsCluster,selectModel);
+
+        jobConf.setMapperClass(JdbcToMapMapper.class); // map
+        jobConf.setReducerClass(IdentityReducer.class);
+        JobClient.runJob(jobConf);
+
+//        System.out.println(MysqlCommonVariables.modelMap);
+    }
+
+
+    /**
+     * 读取mysql到hdfs
+     * @param hdfsCluster
+     * @param selectModel
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static void readToHdfs(String hdfsCluster, SelectModel selectModel) throws IOException, URISyntaxException {
+
+        JobConf jobConf = new JobConf(JdbcReader.class);
+        setJdbc(jobConf,hdfsCluster,selectModel);
+
+        jobConf.setMapperClass(JdbcToHdfsMapper.class); // hdfs
+        jobConf.setReducerClass(IdentityReducer.class);
+        JobClient.runJob(jobConf);
+
+    }
+
+    /**
+     * setjdbc各种属性
+     * @param jobConf
+     * @param hdfsCluster
+     * @param selectModel
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static void setJdbc(JobConf jobConf, String hdfsCluster, SelectModel selectModel) throws IOException, URISyntaxException{
         if(StringUtils.isNotBlank(hdfsCluster)) {
             jobConf.set("fs.defaultFS", hdfsCluster);
         }
@@ -57,7 +92,7 @@ public class JdbcReader {
 
         jobConf.setInputFormat(DBInputFormat.class);
 
-        Path outputPath = new Path(selectModel.getOutput());
+        Path outputPath = new Path(selectModel.getOutputPath());
         FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), jobConf);
         if (fileSystem.exists(outputPath)) {
             fileSystem.delete(outputPath, true);
@@ -67,29 +102,7 @@ public class JdbcReader {
         DBConfiguration.configureDB(jobConf, "com.mysql.jdbc.Driver",
                 MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
 
-        DBInputFormat.setInput(jobConf, selectModel.getInputClass(),
-                selectModel.getTableName(), selectModel.getConditions(),
-                selectModel.getOrderBy(), selectModel.getFields());
-
-        jobConf.setMapperClass(JdbcMapper.class);
-        jobConf.setReducerClass(IdentityReducer.class);
-        JobClient.runJob(jobConf);
-
-//        System.out.println(MysqlCommonVariables.modelMap);
-    }
-
-    static class JdbcMapper extends MapReduceBase implements Mapper<LongWritable, Model, LongWritable, Text> {
-
-        @Override
-        public void map(LongWritable longWritable, Model value, OutputCollector<LongWritable, Text> collector, Reporter reporter) throws IOException {
-
-            Model model = ModelFactory.getModel(value);
-
-            MysqlCommonVariables.modelMap.put(model.getId(), model);
-
-//            collector.collect(new LongWritable(value.getId()), new Text(value
-//                    .toString()));
-        }
+        DBInputFormat.setInput(jobConf, selectModel.getInputClass(),selectModel.getQuery(),selectModel.getCountQuery());
     }
 
 }

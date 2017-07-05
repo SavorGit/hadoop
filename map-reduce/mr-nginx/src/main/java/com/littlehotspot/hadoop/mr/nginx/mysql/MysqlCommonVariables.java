@@ -22,24 +22,4 @@ public class MysqlCommonVariables {
      */
     public static Map<String,Model> modelMap = new HashMap<>();
 
-    /**
-     * 酒店查询字段
-     */
-    public static String[] hotelFields = {"id", "name"};
-
-    /**
-     * 酒店查询字段
-     */
-    public static String[] roomFields = {"id", "name"};
-
-    /**
-     * 酒店查询字段
-     */
-    public static String[] boxFields = {"id", "name", "mac"};
-
-    /**
-     * 酒店查询字段
-     */
-    public static String[] mediaFields = {"id", "name","oss_addr"};
-
 }

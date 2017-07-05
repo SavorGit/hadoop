@@ -9,4 +9,6 @@ import org.apache.hadoop.mapred.lib.db.DBWritable;
  */
 public abstract class Model implements Writable, DBWritable {
     public abstract String getId();
+
+    public abstract String toString();
 }

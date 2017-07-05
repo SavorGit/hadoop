@@ -115,11 +115,11 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
     public void readMysqlHotel(String hdfsCluster) throws Exception{
         SelectModel selectModel = new SelectModel();
         selectModel.setInputClass(Hotel.class);
-        selectModel.setTableName("savor_hotel");
-        selectModel.setFields(MysqlCommonVariables.hotelFields);
-        selectModel.setOutput("/home/data/hadoop/flume/test_hbase/mysql");
+        selectModel.setQuery("select id,name from savor_hotel");
+        selectModel.setCountQuery("select count(*) from savor_hotel");
+        selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
 
-        JdbcReader.read(hdfsCluster,selectModel);
+        JdbcReader.readToMap(hdfsCluster,selectModel);
 
     }
 
@@ -131,11 +131,11 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
     public void readMysqlRoom(String hdfsCluster) throws Exception{
         SelectModel selectModel = new SelectModel();
         selectModel.setInputClass(Room.class);
-        selectModel.setTableName("savor_room");
-        selectModel.setFields(MysqlCommonVariables.roomFields);
-        selectModel.setOutput("/home/data/hadoop/flume/test_hbase/mysql");
+        selectModel.setQuery("select id,name from savor_room");
+        selectModel.setCountQuery("select count(*) from savor_room");
+        selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
 
-        JdbcReader.read(hdfsCluster,selectModel);
+        JdbcReader.readToMap(hdfsCluster,selectModel);
 
     }
 
@@ -147,11 +147,12 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
     public void readMysqlBox(String hdfsCluster) throws Exception{
         SelectModel selectModel = new SelectModel();
         selectModel.setInputClass(Box.class);
-        selectModel.setTableName("savor_box");
-        selectModel.setFields(MysqlCommonVariables.boxFields);
-        selectModel.setOutput("/home/data/hadoop/flume/test_hbase/mysql");
 
-        JdbcReader.read(hdfsCluster,selectModel);
+        selectModel.setQuery("select id,name,mac from savor_box");
+        selectModel.setCountQuery("select count(*) from savor_box");
+        selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
+
+        JdbcReader.readToMap(hdfsCluster,selectModel);
 
     }
 
@@ -163,11 +164,11 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
     public void readMysqlMedia(String hdfsCluster) throws Exception{
         SelectModel selectModel = new SelectModel();
         selectModel.setInputClass(Media.class);
-        selectModel.setTableName("savor_media");
-        selectModel.setFields(MysqlCommonVariables.mediaFields);
-        selectModel.setOutput("/home/data/hadoop/flume/test_hbase/mysql");
+        selectModel.setQuery("select id,name,oss_addr from savor_media");
+        selectModel.setCountQuery("select count(*) from savor_media");
+        selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
 
-        JdbcReader.read(hdfsCluster,selectModel);
+        JdbcReader.readToMap(hdfsCluster,selectModel);
 
     }
 }
