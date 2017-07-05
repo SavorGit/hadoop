@@ -68,7 +68,7 @@ public class UserDemaLog extends Configured implements Tool {
         }
     }
 
-    private static class MobileReduce extends Reducer<Text, Text, Text, Text> {
+    private static class Combiner extends Reducer<Text, Text, Text, Text> {
 
         @Override
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
@@ -90,12 +90,52 @@ public class UserDemaLog extends Configured implements Tool {
                     userActBean.setDeviceId(matcher.group(8));
                     if (StringUtils.isBlank(userActBean.getTime())){
                         userActBean.setTime(matcher.group(4));
-                    }else if (Long.valueOf(userActBean.getTime())>=Long.valueOf(matcher.group(1))){
+                    }else if (Long.valueOf(userActBean.getTime())>=Long.valueOf(matcher.group(4))){
                         userActBean.setTime(matcher.group(4));
                     }
                     count ++;
                 }
                 userActBean.setCount(count.toString());
+                userActBean.setType("dema");
+                context.write(new Text(userActBean.getDeviceId()), new Text(userActBean.rowLine()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static class MobileReduce extends Reducer<Text, Text, Text, Text> {
+
+        @Override
+        protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
+            try {
+                Iterator<Text> iterator = value.iterator();
+                NgxSrcUserBean sourceUserBean = null;
+                UserActBean userActBean = new UserActBean();
+                while (iterator.hasNext()){
+                    Text item = iterator.next();
+                    if (item == null) {
+                        continue;
+                    }
+                    String rowLineContent = item.toString();
+                    Matcher matcher = CommonVariables.MAPPER_USERACT_FORMAT_REGEX.matcher(rowLineContent);
+                    if (!matcher.find()) {
+                        return;
+                    }
+                    userActBean.setDeviceId(matcher.group(1));
+                    if (StringUtils.isBlank(userActBean.getTime())){
+                        userActBean.setTime(matcher.group(2));
+                    }else if (Long.valueOf(userActBean.getTime())>=Long.valueOf(matcher.group(2))){
+                        userActBean.setTime(matcher.group(2));
+                    }
+                    if (StringUtils.isBlank(userActBean.getCount())){
+                        userActBean.setCount(matcher.group(3));
+                    }else {
+                        Long count=Long.valueOf(userActBean.getCount())+Long.valueOf(matcher.group(3));
+                        userActBean.setCount(count.toString());
+                    }
+
+                }
                 context.write(new Text(sourceUserBean.rowLine()), new Text());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -123,6 +163,8 @@ public class UserDemaLog extends Configured implements Tool {
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
+
+            job.setCombinerClass(Combiner.class);
 
             /**作业输出*/
             Path outputPath = new Path(hdfsOutputPath);

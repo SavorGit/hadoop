@@ -45,6 +45,11 @@ public class UserActBean {
      */
     private String count;
 
+    /**
+     * 操作类型
+     */
+    private String type;
+
 
 
     public String rowLine() {
@@ -52,6 +57,7 @@ public class UserActBean {
         rowLine.append(this.getDeviceId() == null ? "" : this.getDeviceId()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getTime() == null ? "" : this.getTime()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getCount() == null ? "" : this.getCount()).append(Constant.VALUE_SPLIT_CHAR);
+        rowLine.append(this.getType() == null ? "" : this.getType()).append(Constant.VALUE_SPLIT_CHAR);
         return rowLine.toString();
     }
 

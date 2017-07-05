@@ -12,6 +12,7 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.BoxSrcUserBean;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.CommonVariables;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.NgxSrcUserBean;
 import org.apache.commons.lang.StringUtils;
@@ -49,15 +50,46 @@ public class BoxUser extends Configured implements Tool {
             /**数据清洗=========开始*/
             try {
                 String msg = value.toString();
-                Matcher matcher = CommonVariables.MAPPER_BOX_FORMAT_REGEX.matcher(msg);
+                Matcher matcher = CommonVariables.MAPPER_BOX_LOG_FORMAT_REGEX.matcher(msg);
                 if (!matcher.find()) {
                     return;
                 }
-                String deviceId = matcher.group(9);
-                if (StringUtils.isBlank(deviceId)||deviceId.equals(null)||deviceId.equals("null")) {
+                String deviceId = matcher.group(8);
+                if (StringUtils.isBlank(deviceId)) {
                     return;
                 }
-                context.write(new Text(deviceId), new Text(deviceId));
+                context.write(new Text(deviceId), value);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static class Combiner extends Reducer<Text, Text, Text, Text> {
+
+        @Override
+        protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
+            try {
+                Iterator<Text> iterator = value.iterator();
+                BoxSrcUserBean boxSrcUserBean = new BoxSrcUserBean();
+                while (iterator.hasNext()){
+                    Text item = iterator.next();
+                    if (item == null) {
+                        continue;
+                    }
+                    String rowLineContent = item.toString();
+                    Matcher matcher = CommonVariables.MAPPER_BOX_LOG_FORMAT_REGEX.matcher(rowLineContent);
+                    if (!matcher.find()) {
+                        return;
+                    }
+                    boxSrcUserBean.setDeviceId(matcher.group(8));
+                    if (StringUtils.isBlank(boxSrcUserBean.getFDownTime())||(!StringUtils.isBlank(matcher.group(4))&&Long.valueOf(boxSrcUserBean.getFDownTime())>Long.valueOf(matcher.group(4)))){
+                        boxSrcUserBean.setFDownTime(matcher.group(4));
+                        boxSrcUserBean.setFDownSrc("box");
+                    }
+
+                }
+                context.write(new Text(boxSrcUserBean.getDeviceId()), new Text(boxSrcUserBean.rowLine()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -70,16 +102,24 @@ public class BoxUser extends Configured implements Tool {
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
                 Iterator<Text> iterator = value.iterator();
-                String devicdId=null;
+                BoxSrcUserBean boxSrcUserBean = new BoxSrcUserBean();
                 while (iterator.hasNext()){
                     Text item = iterator.next();
                     if (item == null) {
                         continue;
                     }
                     String rowLineContent = item.toString();
-                    devicdId=rowLineContent;
+                    Matcher matcher = CommonVariables.MAPPER_USER_FORMAT_REGEX.matcher(rowLineContent);
+                    if (!matcher.find()) {
+                        return;
+                    }
+                    boxSrcUserBean.setDeviceId(matcher.group(1));
+                    if (StringUtils.isBlank(boxSrcUserBean.getFDownTime())||(!StringUtils.isBlank(matcher.group(4))&&Long.valueOf(boxSrcUserBean.getFDownTime())>Long.valueOf(matcher.group(4)))){
+                        boxSrcUserBean.setFDownTime(matcher.group(4));
+                        boxSrcUserBean.setFDownSrc("box");
+                    }
                 }
-                context.write(new Text(devicdId), new Text());
+                context.write(new Text(boxSrcUserBean.rowLine()), new Text());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -102,10 +142,12 @@ public class BoxUser extends Configured implements Tool {
 
             /**作业输入*/
             Path inputPath = new Path(hdfsInputPath);
-            FileInputFormat.addInputPath(job, inputPath);
+            FileInputFormat.setInputPaths(job, inputPath);
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
+
+            job.setCombinerClass(Combiner.class);
 
             /**作业输出*/
             Path outputPath = new Path(hdfsOutputPath);

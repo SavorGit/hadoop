@@ -111,7 +111,7 @@ public class BoxSrcUserBean {
         if (!matcher.find()) {
             return;
         }
-        this.setDeviceId(matcher.group(17));
+        this.setDeviceId(matcher.group(8));
         this.setFDownTime(matcher.group(4));
         this.setFDownSrc("box");
 
@@ -129,6 +129,8 @@ public class BoxSrcUserBean {
         rowLine.append(this.getDeviceId() == null ? "" : this.getDeviceId()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getMType() == null ? "" : this.getMType()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getMMachine() == null ? "" : this.getMMachine()).append(Constant.VALUE_SPLIT_CHAR);
+        rowLine.append(this.getFDownTime() == null ? "" : this.getFDownTime()).append(Constant.VALUE_SPLIT_CHAR);
+        rowLine.append(this.getFDownSrc() == null ? "" : this.getFDownSrc()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getToken() == null ? "" : this.getToken()).append(Constant.VALUE_SPLIT_CHAR);
         return rowLine.toString();
     }

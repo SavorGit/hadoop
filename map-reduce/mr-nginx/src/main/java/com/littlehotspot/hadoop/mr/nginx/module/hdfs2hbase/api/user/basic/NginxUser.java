@@ -55,11 +55,33 @@ public class NginxUser extends Configured implements Tool {
                     return;
                 }
                 String deviceId = matcher.group(17);
-                if (StringUtils.isBlank(deviceId)||deviceId.equals(null)||deviceId.equals("null")) {
+                if (StringUtils.isBlank(deviceId)) {
                     return;
                 }
 
                 context.write(new Text(deviceId), value);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static class Combiner extends Reducer<Text, Text, Text, Text> {
+
+        @Override
+        protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
+            try {
+                Iterator<Text> iterator = value.iterator();
+                NgxSrcUserBean ngxSrcUserBean = new NgxSrcUserBean();
+                while (iterator.hasNext()){
+                    Text item = iterator.next();
+                    if (item == null) {
+                        continue;
+                    }
+                    String rowLineContent = item.toString();
+                    ngxSrcUserBean.setValue(rowLineContent);
+                }
+                context.write(new Text(ngxSrcUserBean.getDeviceId()), new Text(ngxSrcUserBean.rowLine()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -72,14 +94,25 @@ public class NginxUser extends Configured implements Tool {
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
                 Iterator<Text> iterator = value.iterator();
-                NgxSrcUserBean sourceUserBean = null;
+                NgxSrcUserBean sourceUserBean = new NgxSrcUserBean();
                 while (iterator.hasNext()){
                     Text item = iterator.next();
                     if (item == null) {
                         continue;
                     }
                     String rowLineContent = item.toString();
-                    sourceUserBean = new NgxSrcUserBean(rowLineContent);
+                    Matcher matcher = CommonVariables.MAPPER_USER_FORMAT_REGEX.matcher(rowLineContent);
+                    if (!matcher.find()) {
+                        return;
+                    }
+                    sourceUserBean.setDeviceId(matcher.group(1));
+                    sourceUserBean.setMType(matcher.group(2));
+                    sourceUserBean.setMMachine(matcher.group(3));
+                    if (StringUtils.isBlank(sourceUserBean.getFDownTime())||(!StringUtils.isBlank(matcher.group(4))&&Long.valueOf(sourceUserBean.getFDownTime())>Long.valueOf(matcher.group(4)))){
+                        sourceUserBean.setFDownTime(matcher.group(4));
+                        sourceUserBean.setFDownSrc("ngx");
+                    }
+                    sourceUserBean.setToken(matcher.group(6));
                 }
                 context.write(new Text(sourceUserBean.rowLine()), new Text());
             } catch (Exception e) {
@@ -104,10 +137,12 @@ public class NginxUser extends Configured implements Tool {
 
             /**作业输入*/
             Path inputPath = new Path(hdfsInputPath);
-            FileInputFormat.addInputPath(job, inputPath);
+            FileInputFormat.setInputPaths(job, inputPath);
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
+
+            job.setCombinerClass(Combiner.class);
 
             /**作业输出*/
             Path outputPath = new Path(hdfsOutputPath);

@@ -13,10 +13,10 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic;
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.CommonVariables;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.NgxSrcUserBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.UserActBean;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.SrcUserBean;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.TargetUserActiBean;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.TargetUserAttrBean;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -40,7 +40,7 @@ import java.util.regex.Matcher;
 /**
  * 手机日志
  */
-public class UserReadLog extends Configured implements Tool {
+public class UserFinal extends Configured implements Tool {
 
     private static class MobileMapper extends Mapper<LongWritable, Text, Text, Text> {
 
@@ -50,55 +50,18 @@ public class UserReadLog extends Configured implements Tool {
             /**数据清洗=========开始*/
             try {
                 String msg = value.toString();
-                Matcher matcher = CommonVariables.MAPPER_MOBILE_LOG_FORMAT_REGEX.matcher(msg);
-                if (!matcher.find()) {
-                    return;
-                }
-                if (StringUtils.isBlank(matcher.group(9))) {
-                    return;
-                }
-                if (StringUtils.isBlank(matcher.group(5))||!matcher.group(5).equals("start")){
-                    return;
-                }
-                if (StringUtils.isBlank(matcher.group(6))||!matcher.group(6).equals("content")){
-                    return;
-                }
-                context.write(new Text(matcher.group(9)), value);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
+                Matcher userMatcher = CommonVariables.MAPPER_USER_FORMAT_REGEX.matcher(msg);
+                Matcher actMatcher = CommonVariables.MAPPER_ACT_FORMAT_REGEX.matcher(msg);
+                if (userMatcher.find()) {
+                    context.write(new Text(userMatcher.group(1)), value);
+                }else if (actMatcher.find()){
+                    context.write(new Text(actMatcher.group(1)), value);
 
-    private static class Combiner extends Reducer<Text, Text, Text, Text> {
-
-        @Override
-        protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
-            try {
-                Iterator<Text> iterator = value.iterator();
-                NgxSrcUserBean sourceUserBean = null;
-                UserActBean userActBean = new UserActBean();
-                Integer count=0;
-                while (iterator.hasNext()){
-                    Text item = iterator.next();
-                    if (item == null) {
-                        continue;
-                    }
-                    String rowLineContent = item.toString();
-                    Matcher matcher = CommonVariables.MAPPER_MOBILE_LOG_FORMAT_REGEX.matcher(rowLineContent);
-                    if (!matcher.find()) {
-                        return;
-                    }
-                    userActBean.setDeviceId(matcher.group(9));
-                    if (StringUtils.isBlank(userActBean.getTime())){
-                        userActBean.setTime(matcher.group(4));
-                    }else if (Long.valueOf(userActBean.getTime())>=Long.valueOf(matcher.group(4))){
-                        userActBean.setTime(matcher.group(4));
-                    }
-                    count ++;
+                }else {
+                    return;
                 }
-                userActBean.setCount(count.toString());
-                context.write(new Text(sourceUserBean.getDeviceId()), new Text(sourceUserBean.rowLine()));
+
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -111,32 +74,41 @@ public class UserReadLog extends Configured implements Tool {
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
                 Iterator<Text> iterator = value.iterator();
-                NgxSrcUserBean sourceUserBean = null;
-                UserActBean userActBean = new UserActBean();
+                SrcUserBean srcUserBean = new SrcUserBean();
+                TargetUserAttrBean targetUserAttrBean = new TargetUserAttrBean();
+                TargetUserActiBean targetUserActiBean = new TargetUserActiBean();
                 while (iterator.hasNext()){
                     Text item = iterator.next();
                     if (item == null) {
                         continue;
                     }
                     String rowLineContent = item.toString();
-                    Matcher matcher = CommonVariables.MAPPER_USERACT_FORMAT_REGEX.matcher(rowLineContent);
-                    if (!matcher.find()) {
-                        return;
+                    Matcher userMatcher = CommonVariables.MAPPER_USER_FORMAT_REGEX.matcher(rowLineContent);
+                    Matcher actMatcher = CommonVariables.MAPPER_ACT_FORMAT_REGEX.matcher(rowLineContent);
+                    if (userMatcher.find()){
+                        targetUserAttrBean.setDeviceId(userMatcher.group(1));
+                        targetUserAttrBean.setDeviceType(userMatcher.group(2));
+                        targetUserAttrBean.setMachineModel(userMatcher.group(3));
+                        targetUserAttrBean.setToken(userMatcher.group(6));
+                        targetUserActiBean.setDownloadTime(userMatcher.group(4));
+                        targetUserActiBean.setSince(userMatcher.group(5));
+                    }else if (actMatcher.find()){
+                        if (!StringUtils.isBlank(actMatcher.group(4))&&actMatcher.group(4).equals("pro")){
+                            targetUserActiBean.setProjectionTime(actMatcher.group(2));
+                            targetUserActiBean.setProjectionCount(actMatcher.group(3));
+                        }else if (!StringUtils.isBlank(actMatcher.group(4))&&actMatcher.group(4).equals("dema")){
+                            targetUserActiBean.setDemandTime(actMatcher.group(2));
+                            targetUserActiBean.setDemandCount(actMatcher.group(3));
+                        }else if (!StringUtils.isBlank(actMatcher.group(4))&&actMatcher.group(4).equals("read")){
+                            targetUserActiBean.setReadTime(actMatcher.group(2));
+                            targetUserActiBean.setReadCount(actMatcher.group(3));
+                        }
                     }
-                    userActBean.setDeviceId(matcher.group(1));
-                    if (StringUtils.isBlank(userActBean.getTime())){
-                        userActBean.setTime(matcher.group(2));
-                    }else if (Long.valueOf(userActBean.getTime())>=Long.valueOf(matcher.group(2))){
-                        userActBean.setTime(matcher.group(2));
-                    }
-                    if (StringUtils.isBlank(userActBean.getCount())){
-                        userActBean.setCount(matcher.group(3));
-                    }else {
-                        Long count=Long.valueOf(userActBean.getCount())+Long.valueOf(matcher.group(3));
-                        userActBean.setCount(count.toString());
-                    }
+
                 }
-                context.write(new Text(sourceUserBean.rowLine()), new Text());
+                CommonVariables.hBaseHelper.insert(targetUserAttrBean);
+
+                CommonVariables.hBaseHelper.insert(targetUserActiBean);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -148,23 +120,25 @@ public class UserReadLog extends Configured implements Tool {
         try {
 
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
+            CommonVariables.hBaseHelper = new HBaseHelper(this.getConf());
 
             // 获取参数
             String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
-            String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
+//            String hdfsInputPath1 = CommonVariables.getParameterValue(Argument.InputUserPath);
+//            String hdfsInputPath2 = CommonVariables.getParameterValue(Argument.InputActPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
-            Job job = Job.getInstance(this.getConf(), UserReadLog.class.getSimpleName());
-            job.setJarByClass(UserReadLog.class);
+            Job job = Job.getInstance(this.getConf(), UserFinal.class.getSimpleName());
+            job.setJarByClass(UserFinal.class);
 
             /**作业输入*/
-            Path inputPath = new Path(hdfsInputPath);
-            FileInputFormat.addInputPath(job, inputPath);
+//            Path inputPath1 = new Path(hdfsInputPath1);
+//            Path inputPath2 = new Path(hdfsInputPath2);
+//            FileInputFormat.addInputPath(job, inputPath1);
+//            FileInputFormat.addInputPath(job, inputPath2);
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
-
-            job.setCombinerClass(Combiner.class);
 
             /**作业输出*/
             Path outputPath = new Path(hdfsOutputPath);
