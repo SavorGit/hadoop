@@ -10,6 +10,10 @@
  */
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
@@ -155,14 +159,13 @@ public class HBaseHelper {
         Class<?> beanClass = object.getClass();
         HBaseTable hBaseTable = beanClass.getAnnotation(HBaseTable.class);
         String tableName = hBaseTable.tableName();
-        String familyName = hBaseTable.familyName();
 
 
 //        Map<String, Object> columnMap = new ConcurrentHashMap<>();
-        Map<String, Object> columnMap = new HashMap<>();
+        Map<String, Column> columnMap = new HashMap<>();
 
-        Object rowKeyObjectFromFields = this.getDataFromFields(object, beanClass, columnMap);
-        Object rowKeyObjectFromMethods = this.getDataFromMethods(object, beanClass, columnMap);
+        Object rowKeyObjectFromFields = this.getDataFromFields(columnMap, object, beanClass);
+        Object rowKeyObjectFromMethods = this.getDataFromMethods(columnMap, object, beanClass);
         Object rowKeyObject = rowKeyObjectFromFields == null ? rowKeyObjectFromMethods : rowKeyObjectFromFields;
         if (rowKeyObject == null) {
             return;
@@ -175,11 +178,12 @@ public class HBaseHelper {
 
         HTable table = new HTable(this.conf, tableName);// HTabel负责跟记录相关的操作如增删改查等
         Put put = new Put(Bytes.toBytes(rowKey));// 设置rowkey
-        Set<Map.Entry<String, Object>> entrySet = columnMap.entrySet();
+        Collection<Column> columns = columnMap.values();
         long version = System.currentTimeMillis();
-        for (Map.Entry<String, Object> entry : entrySet) {
-            String columnName = entry.getKey();
-            Object valueObject = entry.getValue();
+        for (Column entry : columns) {
+            String familyName = entry.getFamilyName();
+            String columnName = entry.getColumnName();
+            Object valueObject = entry.getColumnValue();
             String value = "";
             if (valueObject != null) {
                 value = valueObject.toString();
@@ -237,7 +241,7 @@ public class HBaseHelper {
     }
 
     // 从方法中获取数据
-    private Object getDataFromMethods(Object bean, Class<?> beanClass, Map<String, Object> columnMap) throws IllegalAccessException, InvocationTargetException {
+    private Object getDataFromMethods(Map<String, Column> columnMap, Object bean, Class<?> beanClass) throws IllegalAccessException, InvocationTargetException {
         if (bean == null || beanClass == null) {
             return null;
         }
@@ -249,11 +253,16 @@ public class HBaseHelper {
         Method[] methods = beanClass.getDeclaredMethods();
         for (Method method : methods) {
             HBaseRowKey hBaseRowKey = method.getAnnotation(HBaseRowKey.class);
-            HBaseColumn hBaseColumn = method.getAnnotation(HBaseColumn.class);
             if (hBaseRowKey != null) {
                 rowKeyObject = method.invoke(bean);
+                continue;
             }
+            HBaseColumn hBaseColumn = method.getAnnotation(HBaseColumn.class);
             if (hBaseColumn == null) {
+                continue;
+            }
+            String familyName = hBaseColumn.familyName();
+            if (StringUtils.isBlank(familyName)) {
                 continue;
             }
             String columnName = hBaseColumn.columnName();
@@ -261,15 +270,22 @@ public class HBaseHelper {
                 continue;
             }
             Object result = method.invoke(bean);
-            columnMap.put(columnName, result);
+
+            String key = String.format("f=%s|c=%s", familyName, columnName);
+            Column hBaseColumnValue = new Column(familyName, columnName, result);
+
+            columnMap.put(key, hBaseColumnValue);
         }
         Class<?> superclass = beanClass.getSuperclass();
-        Object rowKeyObjectFromSub = getDataFromFields(bean, superclass, columnMap);
+        Object rowKeyObjectFromSub = null;
+        if (superclass != null) {
+            rowKeyObjectFromSub = this.getDataFromMethods(columnMap, bean, superclass);
+        }
         return rowKeyObject == null ? rowKeyObjectFromSub : rowKeyObject;
     }
 
     // 从属性中获取数据
-    private Object getDataFromFields(Object bean, Class<?> beanClass, Map<String, Object> columnMap) throws IllegalAccessException {
+    private Object getDataFromFields(Map<String, Column> columnMap, Object bean, Class<?> beanClass) throws IllegalAccessException {
         if (bean == null || beanClass == null) {
             return null;
         }
@@ -281,11 +297,16 @@ public class HBaseHelper {
         Field[] fields = beanClass.getDeclaredFields();
         for (Field field : fields) {
             HBaseRowKey hBaseRowKey = field.getAnnotation(HBaseRowKey.class);
-            HBaseColumn hBaseColumn = field.getAnnotation(HBaseColumn.class);
             if (hBaseRowKey != null) {
                 rowKeyObject = this.getFieldValue(bean, field);
+                continue;
             }
+            HBaseColumn hBaseColumn = field.getAnnotation(HBaseColumn.class);
             if (hBaseColumn == null) {
+                continue;
+            }
+            String familyName = hBaseColumn.familyName();
+            if (StringUtils.isBlank(familyName)) {
                 continue;
             }
             String columnName = hBaseColumn.columnName();
@@ -294,10 +315,16 @@ public class HBaseHelper {
             }
             Object result = this.getFieldValue(bean, field);
 
-            columnMap.put(columnName, result);
+            String key = String.format("f=%s|c=%s", familyName, columnName);
+            Column hBaseColumnValue = new Column(familyName, columnName, result);
+
+            columnMap.put(key, hBaseColumnValue);
         }
         Class<?> superclass = beanClass.getSuperclass();
-        Object rowKeyObjectFromSub = getDataFromFields(bean, superclass, columnMap);
+        Object rowKeyObjectFromSub = null;
+        if (superclass != null) {
+            rowKeyObjectFromSub = this.getDataFromFields(columnMap, bean, superclass);
+        }
         return rowKeyObject == null ? rowKeyObjectFromSub : rowKeyObject;
     }
 
@@ -305,5 +332,29 @@ public class HBaseHelper {
     private Object getFieldValue(Object bean, Field field) throws IllegalAccessException {
         field.setAccessible(true);
         return field.get(bean);
+    }
+
+    /**
+     * 上下文
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    protected class Column {
+
+        /**
+         * 列族名
+         */
+        private String familyName;
+
+        /**
+         * 列名
+         */
+        private String columnName;
+
+        /**
+         * 列值
+         */
+        private Object columnValue;
     }
 }

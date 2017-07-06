@@ -28,7 +28,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HBaseTable {
 
-    String tableName() default "test";
-
-    String familyName() default "info";
+    String tableName();
 }

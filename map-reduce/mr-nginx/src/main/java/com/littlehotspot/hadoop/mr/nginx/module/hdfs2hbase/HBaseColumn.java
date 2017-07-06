@@ -28,5 +28,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HBaseColumn {
 
+    String familyName();
+
     String columnName();
 }
