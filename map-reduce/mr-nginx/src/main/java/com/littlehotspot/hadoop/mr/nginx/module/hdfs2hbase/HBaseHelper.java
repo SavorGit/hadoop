@@ -10,9 +10,7 @@
  */
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -25,7 +23,11 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <h1>工具 - HBase</h1>
@@ -158,27 +160,24 @@ public class HBaseHelper {
     public void insert(Object object) throws InvocationTargetException, IllegalAccessException, IOException {
         Class<?> beanClass = object.getClass();
         HBaseTable hBaseTable = beanClass.getAnnotation(HBaseTable.class);
-        String tableName = hBaseTable.tableName();
+        String tableName = hBaseTable.name();
+        Context hBaseContext = new Context(tableName);
 
-
-//        Map<String, Object> columnMap = new ConcurrentHashMap<>();
-        Map<String, Column> columnMap = new HashMap<>();
-
-        Object rowKeyObjectFromFields = this.getDataFromFields(columnMap, object, beanClass);
-        Object rowKeyObjectFromMethods = this.getDataFromMethods(columnMap, object, beanClass);
-        Object rowKeyObject = rowKeyObjectFromFields == null ? rowKeyObjectFromMethods : rowKeyObjectFromFields;
+        this.getDataFromTableFields(hBaseContext, object, beanClass);// 处理字段
+        this.getDataFromMethods(hBaseContext, object, beanClass);
+        Object rowKeyObject = hBaseContext.getRowKey().getValue();
         if (rowKeyObject == null) {
             return;
         }
 
         String rowKey = rowKeyObject.toString();
-        if (rowKey == null || rowKey.trim().isEmpty()) {
+        if (StringUtils.isBlank(rowKey)) {
             return;
         }
 
-        HTable table = new HTable(this.conf, tableName);// HTabel负责跟记录相关的操作如增删改查等
+        HTable table = new HTable(this.conf, hBaseContext.getTableName());// HTabel负责跟记录相关的操作如增删改查等
         Put put = new Put(Bytes.toBytes(rowKey));// 设置rowkey
-        Collection<Column> columns = columnMap.values();
+        Collection<Column> columns = hBaseContext.getColumnMap().values();
         long version = System.currentTimeMillis();
         for (Column entry : columns) {
             String familyName = entry.getFamilyName();
@@ -241,91 +240,199 @@ public class HBaseHelper {
     }
 
     // 从方法中获取数据
-    private Object getDataFromMethods(Map<String, Column> columnMap, Object bean, Class<?> beanClass) throws IllegalAccessException, InvocationTargetException {
-        if (bean == null || beanClass == null) {
-            return null;
+    private void getDataFromMethods(Context context, Object bean, Class<?> beanClass) throws IllegalAccessException, InvocationTargetException {
+        if (context == null) {
+            throw new IllegalArgumentException("HBase-Helper argument 'context' from fields is null");
         }
-        if (columnMap == null) {
-//            columnMap = new ConcurrentHashMap<>();
-            columnMap = new HashMap<>();
+        if (bean == null) {
+            throw new IllegalArgumentException("HBase-Helper argument 'bean' from fields is null");
         }
-        Object rowKeyObject = null;
+
+        // 准备工作
+        if (context.getColumnMap() == null) {
+            throw new IllegalStateException("The column-map from Family-Fields-Context is null");
+        }
+        if (beanClass == null) {
+            beanClass = bean.getClass();
+        }
+
         Method[] methods = beanClass.getDeclaredMethods();
         for (Method method : methods) {
-            HBaseRowKey hBaseRowKey = method.getAnnotation(HBaseRowKey.class);
-            if (hBaseRowKey != null) {
-                rowKeyObject = method.invoke(bean);
+
+            // RowKey 处理
+            HBaseRowKey hBaseRowKeyAnnotation = method.getAnnotation(HBaseRowKey.class);
+            if (hBaseRowKeyAnnotation != null) {
+                if (context.getRowKey() == null) {
+                    context.setRowKey(new RowKey());
+                }
+                if (context.getRowKey().getValue() == null) {
+                    Object rowKeyObject = method.invoke(bean);
+                    context.getRowKey().setValue(rowKeyObject);
+                }
                 continue;
             }
-            HBaseColumn hBaseColumn = method.getAnnotation(HBaseColumn.class);
-            if (hBaseColumn == null) {
+
+            // 获取列族名
+            HBaseFamily hBaseFamilyAnnotation = method.getAnnotation(HBaseFamily.class);
+            if (hBaseFamilyAnnotation == null) {
                 continue;
             }
-            String familyName = hBaseColumn.familyName();
+            String familyName = hBaseFamilyAnnotation.name();
             if (StringUtils.isBlank(familyName)) {
                 continue;
             }
-            String columnName = hBaseColumn.columnName();
-            if (columnMap.get(columnName) != null) {
+            context.setFamilyName(familyName);
+
+            // 获取列名
+            HBaseColumn hBaseColumnAnnotation = method.getAnnotation(HBaseColumn.class);
+            if (hBaseColumnAnnotation == null) {
                 continue;
             }
-            Object result = method.invoke(bean);
+            String columnName = hBaseColumnAnnotation.name();
+            if (StringUtils.isBlank(columnName)) {
+                continue;
+            }
+
+            // 已经有值时退出本次循环
+            if (context.getColumnMap().get(columnName) != null) {
+                continue;
+            }
+            Object methodResult = method.invoke(bean);
 
             String key = String.format("f=%s|c=%s", familyName, columnName);
-            Column hBaseColumnValue = new Column(familyName, columnName, result);
+            Column hBaseColumnValue = new Column(familyName, columnName, methodResult);
 
-            columnMap.put(key, hBaseColumnValue);
+            context.getColumnMap().put(key, hBaseColumnValue);
         }
         Class<?> superclass = beanClass.getSuperclass();
-        Object rowKeyObjectFromSub = null;
         if (superclass != null) {
-            rowKeyObjectFromSub = this.getDataFromMethods(columnMap, bean, superclass);
+            this.getDataFromMethods(context, bean, superclass);
         }
-        return rowKeyObject == null ? rowKeyObjectFromSub : rowKeyObject;
     }
 
-    // 从属性中获取数据
-    private Object getDataFromFields(Map<String, Column> columnMap, Object bean, Class<?> beanClass) throws IllegalAccessException {
-        if (bean == null || beanClass == null) {
-            return null;
+    // 从属性中获取数据 - 表对象
+    private void getDataFromTableFields(Context context, Object bean, Class<?> beanClass) throws IllegalAccessException {
+        if (context == null) {
+            throw new IllegalArgumentException("HBase-Helper argument 'context' from fields is null");
         }
-        if (columnMap == null) {
-//            columnMap = new ConcurrentHashMap<>();
-            columnMap = new HashMap<>();
+        if (bean == null) {
+            throw new IllegalArgumentException("HBase-Helper argument 'bean' from fields is null");
         }
-        Object rowKeyObject = null;
+
+        // 准备工作
+        if (context.getColumnMap() == null) {
+            throw new IllegalStateException("The column-map from Family-Fields-Context is null");
+        }
+        if (beanClass == null) {
+            beanClass = bean.getClass();
+        }
+
         Field[] fields = beanClass.getDeclaredFields();
         for (Field field : fields) {
-            HBaseRowKey hBaseRowKey = field.getAnnotation(HBaseRowKey.class);
-            if (hBaseRowKey != null) {
-                rowKeyObject = this.getFieldValue(bean, field);
+
+            // RowKey 处理
+            HBaseRowKey hBaseRowKeyAnnotation = field.getAnnotation(HBaseRowKey.class);
+            if (hBaseRowKeyAnnotation != null) {
+                if (context.getRowKey() == null) {
+                    context.setRowKey(new RowKey());
+                }
+                if (context.getRowKey().getValue() == null) {
+                    Object rowKeyObject = this.getFieldValue(bean, field);
+                    context.getRowKey().setValue(rowKeyObject);
+                }
                 continue;
             }
-            HBaseColumn hBaseColumn = field.getAnnotation(HBaseColumn.class);
-            if (hBaseColumn == null) {
+
+            // 获取列族名
+            HBaseFamily hBaseFamilyAnnotation = field.getAnnotation(HBaseFamily.class);
+            if (hBaseFamilyAnnotation == null) {
                 continue;
             }
-            String familyName = hBaseColumn.familyName();
+            String familyName = hBaseFamilyAnnotation.name();
             if (StringUtils.isBlank(familyName)) {
                 continue;
             }
-            String columnName = hBaseColumn.columnName();
-            if (columnMap.get(columnName) != null) {
+            context.setFamilyName(familyName);
+
+            // 获取列名
+            HBaseColumn hBaseColumnAnnotation = field.getAnnotation(HBaseColumn.class);
+            if (hBaseColumnAnnotation == null) {
+                this.getDataFromFamilyFields(context, bean, beanClass);
                 continue;
             }
-            Object result = this.getFieldValue(bean, field);
+            String columnName = hBaseColumnAnnotation.name();
+            if (StringUtils.isBlank(columnName)) {
+                continue;
+            }
+
+            // 已经有值时退出本次循环
+            if (context.getColumnMap().get(columnName) != null) {
+                continue;
+            }
+
+            Object fieldValue = this.getFieldValue(bean, field);
 
             String key = String.format("f=%s|c=%s", familyName, columnName);
-            Column hBaseColumnValue = new Column(familyName, columnName, result);
+            Column hBaseColumnValue = new Column(familyName, columnName, fieldValue);
 
-            columnMap.put(key, hBaseColumnValue);
+            context.getColumnMap().put(key, hBaseColumnValue);
         }
         Class<?> superclass = beanClass.getSuperclass();
-        Object rowKeyObjectFromSub = null;
         if (superclass != null) {
-            rowKeyObjectFromSub = this.getDataFromFields(columnMap, bean, superclass);
+            this.getDataFromTableFields(context, bean, superclass);
         }
-        return rowKeyObject == null ? rowKeyObjectFromSub : rowKeyObject;
+    }
+
+    // 从属性中获取数据 - 列族对象
+    private void getDataFromFamilyFields(Context context, Object bean, Class<?> beanClass) throws IllegalAccessException {
+        if (context == null) {
+            throw new IllegalArgumentException("The argument 'context' from Family-Fields is null");
+        }
+        if (bean == null) {
+            throw new IllegalArgumentException("The argument 'bean' from Family-Fields is null");
+        }
+
+        // 准备工作
+        String familyName = context.getFamilyName();
+        if (StringUtils.isBlank(familyName)) {
+            throw new IllegalStateException("The family-name from Family-Fields-Context is null");
+        }
+        if (context.getColumnMap() == null) {
+            throw new IllegalStateException("The column-map from Family-Fields-Context is null");
+        }
+        if (beanClass == null) {
+            beanClass = bean.getClass();
+        }
+
+        Field[] fields = beanClass.getDeclaredFields();
+        for (Field field : fields) {
+
+            // 获取列名
+            HBaseColumn hBaseColumnAnnotation = field.getAnnotation(HBaseColumn.class);
+            if (hBaseColumnAnnotation == null) {
+                continue;
+            }
+            String columnName = hBaseColumnAnnotation.name();
+            if (StringUtils.isBlank(columnName)) {
+                continue;
+            }
+
+            // 已经有值时退出本次循环
+            if (context.getColumnMap().get(columnName) != null) {
+                continue;
+            }
+
+            Object fieldValue = this.getFieldValue(bean, field);
+
+            String key = String.format("f=%s|c=%s", familyName, columnName);
+            Column hBaseColumnValue = new Column(familyName, columnName, fieldValue);
+
+            context.getColumnMap().put(key, hBaseColumnValue);
+        }
+        Class<?> superclass = beanClass.getSuperclass();
+        if (superclass != null) {
+            this.getDataFromFamilyFields(context, bean, superclass);
+        }
     }
 
     // 设置属性权限
@@ -337,10 +444,68 @@ public class HBaseHelper {
     /**
      * 上下文
      */
+    private class Context {
+
+        /**
+         * 表名
+         */
+        @Setter
+        @Getter
+        private String tableName;
+
+        /**
+         * 列族名
+         */
+        @Setter
+        @Getter
+        private String familyName;
+
+        /**
+         * 行键
+         */
+        @Setter
+        @Getter
+        private RowKey rowKey;
+
+        /**
+         * 列字典
+         */
+        @Getter
+        Map<String, Column> columnMap;
+
+        /**
+         * 无参构造
+         */
+        public Context() {
+            super();
+            this.columnMap = new ConcurrentHashMap<>();
+            this.rowKey = new RowKey();
+        }
+
+        public Context(String tableName) {
+            this();
+            this.tableName = tableName;
+        }
+    }
+
+    /**
+     * 行键
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    protected class Column {
+    private class RowKey {
+
+        private Object value;
+    }
+
+    /**
+     * 列对象
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private class Column {
 
         /**
          * 列族名

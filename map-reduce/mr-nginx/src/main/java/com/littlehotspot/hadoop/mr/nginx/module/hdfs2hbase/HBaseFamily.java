@@ -3,23 +3,24 @@
  * STUPID BIRD PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  * @Project : hadoop
- * @Package : com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user
+ * @Package : com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
- * @Time : 16:23
+ * @Time : 16:22
  */
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase;
 
 import java.lang.annotation.*;
 
 /**
- * <h1>注解 - HBase 列</h1>
- * 1、必须注解到最外层类的成员（属性/方法）上
- * 2、必须注解到列族类的成员（属性/方法）上
+ * <h1>注解 - HBase 列族</h1>
+ * 1、必须注解到最外层类的属性上
+ * 2、必须注解到最外层类的方法上，此时必须配合注解 {@link HBaseColumn}
  *
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
- * @notes Created on 2017年06月02日<br>
+ * @EMAIL 404644381@qq.com
+ * @notes Created on 2017年07月06日<br>
  * Revision of last commit:$Revision$<br>
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
@@ -28,7 +29,7 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HBaseColumn {
+public @interface HBaseFamily {
 
     String name();
 }
