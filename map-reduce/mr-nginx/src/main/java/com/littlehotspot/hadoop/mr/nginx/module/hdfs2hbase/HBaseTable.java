@@ -14,6 +14,7 @@ import java.lang.annotation.*;
 
 /**
  * <h1>注解 - HBase 表</h1>
+ * 必须注解到最外层类上。
  *
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
@@ -28,7 +29,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HBaseTable {
 
-    String tableName() default "test";
-
-    String familyName() default "info";
+    String name();
 }

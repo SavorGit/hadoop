@@ -93,8 +93,10 @@ public class TestUserSadScheduler {
                 "hdfsOut=/home/data/hadoop/flume/test_hbase/user_projection",
                 "sadType=DEMAND"
         };
-        System.setProperty("hadoop.home.dir", "E:\\DevpPrograms\\hadoop-2.7.3");
+        System.setProperty("hadoop.home.dir", "D:\\GreenProfram\\hadoop-2.7.3");
         Configuration conf = new Configuration();
+        conf.set("hbase.rootdir","hdfs://devpd1:8020/hbase");
+        conf.set("hbase.zookeeper.quorum","devpd1");
         try {
             ToolRunner.run(conf, new UserSadScheduler(), args);
         } catch (Exception e) {
