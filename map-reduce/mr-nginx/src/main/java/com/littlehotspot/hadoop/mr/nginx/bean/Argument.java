@@ -48,6 +48,8 @@ public enum Argument {
 
     SadActType("sadActType", ""),// 投屏点播类型
     SadType("sadType", ""),// 用户行为类型
+
+    ResourceType("resourceType",""),// 资源类型
     ;
 
     @Getter

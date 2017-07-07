@@ -1,6 +1,5 @@
 package com.littlehotspot.hadoop.mr.nginx.mysql.model;
 
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.CommonVariables;
 import com.littlehotspot.hadoop.mr.nginx.util.Constant;
 import lombok.Data;
 import org.apache.hadoop.io.Text;
@@ -11,7 +10,6 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.regex.Matcher;
 
 /**
  * <h1> title </h1>
