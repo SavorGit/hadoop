@@ -35,7 +35,7 @@ public class SadMonthReducer extends Reducer<Text, Text, Text, Text> {
     protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
         try {
             Iterator<Text> textIterator = value.iterator();
-            TargetSadMonthBean targetSadBean = new TargetSadMonthBean(key.toString());
+            TargetSadMonthBean targetSadBean = new TargetSadMonthBean();
             while (textIterator.hasNext()) {
                 Text item = textIterator.next();
                 if (item == null) {

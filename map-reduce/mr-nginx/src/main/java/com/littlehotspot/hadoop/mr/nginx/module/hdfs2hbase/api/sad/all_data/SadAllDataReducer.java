@@ -33,7 +33,7 @@ public class SadAllDataReducer extends Reducer<Text, Text, Text, Text> {
     protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
         try {
             Iterator<Text> textIterator = value.iterator();
-            TargetSadAllDataBean targetSadBean = new TargetSadAllDataBean(key.toString());
+            TargetSadAllDataBean targetSadBean = new TargetSadAllDataBean();
             while (textIterator.hasNext()) {
                 Text item = textIterator.next();
                 if (item == null) {

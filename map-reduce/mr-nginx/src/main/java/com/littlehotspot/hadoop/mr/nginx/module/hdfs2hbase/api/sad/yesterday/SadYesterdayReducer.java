@@ -34,7 +34,7 @@ public class SadYesterdayReducer extends Reducer<Text, Text, Text, Text> {
     protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
         try {
             Iterator<Text> textIterator = value.iterator();
-            TargetSadYesterdayBean targetSadBean = new TargetSadYesterdayBean(key.toString());
+            TargetSadYesterdayBean targetSadBean = new TargetSadYesterdayBean();
             while (textIterator.hasNext()) {
                 Text item = textIterator.next();
                 if (item == null) {

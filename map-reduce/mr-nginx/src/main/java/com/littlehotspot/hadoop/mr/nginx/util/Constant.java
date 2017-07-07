@@ -59,6 +59,17 @@ public class Constant {
             if (StringUtils.isNotBlank(hdfsCluster)) {
                 configuration.set("fs.defaultFS", hdfsCluster);
             }
+
+            String hbaseRoot = getParameterValue(Argument.HbaseRoot);
+            if (StringUtils.isNotBlank(hbaseRoot)) {
+                configuration.set("hbase.rootdir", hbaseRoot);
+            }
+
+            String hbaseZoo = getParameterValue(Argument.HbaseZookeeper);
+            if (StringUtils.isNotBlank(hbaseZoo)) {
+                configuration.set("hbase.zookeeper.quorum", hbaseZoo);
+            }
+
         }
     }
 }

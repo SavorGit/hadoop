@@ -163,8 +163,7 @@ public class HBaseHelper {
         String tableName = hBaseTable.name();
         Context hBaseContext = new Context(tableName);
 
-        this.getDataFromTableFields(hBaseContext, object, beanClass);// 处理字段
-        this.getDataFromMethods(hBaseContext, object, beanClass);
+        this.analysisHBaseData(object, beanClass, hBaseContext);
         Object rowKeyObject = hBaseContext.getRowKey().getValue();
         if (rowKeyObject == null) {
             return;
@@ -237,6 +236,12 @@ public class HBaseHelper {
         }
         scanner.close();
         return list;
+    }
+
+    // 解析 HBase 数据
+    private void analysisHBaseData(Object object, Class<?> beanClass, Context hBaseContext) throws IllegalAccessException, InvocationTargetException {
+        this.getDataFromTableFields(hBaseContext, object, beanClass);// 处理字段
+        this.getDataFromMethods(hBaseContext, object, beanClass);// 处理方法
     }
 
     // 从方法中获取数据
@@ -357,7 +362,8 @@ public class HBaseHelper {
             // 获取列名
             HBaseColumn hBaseColumnAnnotation = field.getAnnotation(HBaseColumn.class);
             if (hBaseColumnAnnotation == null) {
-                this.getDataFromFamilyFields(context, bean, beanClass);
+                Object family = this.getFieldValue(bean, field);
+                this.getDataFromFamilyFields(context, family, null);
                 continue;
             }
             String columnName = hBaseColumnAnnotation.name();
