@@ -15,14 +15,15 @@ import java.io.IOException;
  * <h1> title </h1>
  * Created by Administrator on 2017-07-04 下午 5:35.
  */
-public class JdbcToMapMapper extends MapReduceBase implements Mapper<LongWritable, Model, LongWritable, Text> {
+public class JdbcToMapMapper extends MapReduceBase implements Mapper<LongWritable, Model, Text, Text> {
 
     @Override
-    public void map(LongWritable longWritable, Model value, OutputCollector<LongWritable, Text> collector, Reporter reporter) throws IOException {
+    public void map(LongWritable longWritable, Model value, OutputCollector<Text, Text> collector, Reporter reporter) throws IOException {
 
         Model model = ModelFactory.getModel(value);
 
         MysqlCommonVariables.modelMap.put(model.getId(), model);
+
 
     }
 }

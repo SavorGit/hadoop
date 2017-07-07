@@ -10,18 +10,14 @@ import lombok.Data;
  * Created by Administrator on 2017-06-19 上午 10:56.
  */
 @Data
-@HBaseTable(tableName = "sad_allday_export", familyName = "basic")
+@HBaseTable(name = "sad_allday_export")
 public class TargetSadAllDayBean extends TargetSadBaseBean {
 
     /**
      * 时间（天YYYY-mm-dd,月YYYY-mm,年YYYY,所有天没有这个字段）
      */
-    @HBaseColumn(columnName = "time")
+    @HBaseColumn(name = "time")
     private String time;
-
-    public TargetSadAllDayBean(String key) {
-        this.setRowKey(key);
-    }
 
     public String rowLine() {
         StringBuffer rowLine = new StringBuffer(super.rowLine());

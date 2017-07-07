@@ -30,7 +30,8 @@ public enum Argument {
     InputPathEnd("hdfsInEnd", null),
     OutputPath("hdfsOut", null),
     HbaseTable("table", null),
-
+    HbaseRoot("hbaseRoot", null),
+    HbaseZookeeper("hbaseZookeeper", null),
 
     VersionName("versionname", ""),// 版本名称
     VersionCode("versioncode", ""),// 版本号

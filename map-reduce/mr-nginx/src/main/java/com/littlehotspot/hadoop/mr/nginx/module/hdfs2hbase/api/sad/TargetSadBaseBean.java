@@ -13,87 +13,80 @@ import lombok.Data;
 public class TargetSadBaseBean {
 
     /**
-     * rowKey
-     */
-//    @HBaseColumn(columnName = "rowKey")
-    @HBaseRowKey
-    private String rowKey;
-
-    /**
      * 区域id
      */
-    @HBaseColumn(columnName = "areaId")
+    @HBaseColumn(name = "areaId")
     private String areaId;
 
     /**
      * 区域名称
      */
-    @HBaseColumn(columnName = "areaName")
+    @HBaseColumn(name = "areaName")
     private String areaName;
 
     /**
      * 酒店id
      */
-    @HBaseColumn(columnName = "hotelId")
+    @HBaseColumn(name = "hotelId")
     private String hotelId;
 
     /**
      * 酒店名称
      */
-    @HBaseColumn(columnName = "hotelName")
+    @HBaseColumn(name = "hotelName")
     private String hotelName;
 
     /**
      * 包间id
      */
-    @HBaseColumn(columnName = "roomId")
+    @HBaseColumn(name = "roomId")
     private String roomId;
 
     /**
      * 包间名称
      */
-    @HBaseColumn(columnName = "roomName")
+    @HBaseColumn(name = "roomName")
     private String roomName;
 
     /**
      * 盒子id
      */
-    @HBaseColumn(columnName = "boxId")
+    @HBaseColumn(name = "boxId")
     private String boxId;
 
     /**
      * 盒子名称
      */
-    @HBaseColumn(columnName = "boxName")
+    @HBaseColumn(name = "boxName")
     private String boxName;
 
     /**
      * 盒子mac
      */
-    @HBaseColumn(columnName = "boxMac")
+    @HBaseColumn(name = "boxMac")
     private String boxMac;
 
     /**
      * 手机标识
      */
-    @HBaseColumn(columnName = "mobileId")
+    @HBaseColumn(name = "mobileId")
     private String mobileId;
 
     /**
      * 投屏数量
      */
-    @HBaseColumn(columnName = "projectCount")
+    @HBaseColumn(name = "projectCount")
     private String projectCount;
 
     /**
      * 点播数量
      */
-    @HBaseColumn(columnName = "demandCount")
+    @HBaseColumn(name = "demandCount")
     private String demandCount;
 
     public String rowLine() {
         StringBuffer rowLine = new StringBuffer();
-        rowLine.append(this.getRowKey() == null ? "" : this.getRowKey()).append(Constant.VALUE_SPLIT_CHAR);
+//        rowLine.append(this.getRowKey() == null ? "" : this.getRowKey()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getAreaId() == null ? "" : this.getAreaId()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getAreaName() == null ? "" : this.getAreaName()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getHotelId() == null ? "" : this.getHotelId()).append(Constant.VALUE_SPLIT_CHAR);

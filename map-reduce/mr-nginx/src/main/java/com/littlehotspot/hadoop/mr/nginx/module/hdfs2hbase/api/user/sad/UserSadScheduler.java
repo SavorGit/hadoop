@@ -25,14 +25,19 @@ public class UserSadScheduler extends Configured implements Tool {
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
             CommonVariables.hBaseHelper = new HBaseHelper(this.getConf());
             // 获取参数
-            String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
+            String hdfsInputStart = CommonVariables.getParameterValue(Argument.InputPathStart);
+            String hdfsInputEnd = CommonVariables.getParameterValue(Argument.InputPathEnd);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
-            String sadType = CommonVariables.getParameterValue(Argument.SadType);
-            this.getConf().set("sadType", sadType);
 
-            String[] inpath = hdfsInputPath.split(";");
-            Path inputPath = new Path(inpath[0]);
-            Path inputPath1 = new Path(inpath[1]);
+            String sadType = CommonVariables.getParameterValue(Argument.SadType);
+            String hbaseRoot = CommonVariables.getParameterValue(Argument.HbaseRoot);
+            String hbaseZoo = CommonVariables.getParameterValue(Argument.HbaseZookeeper);
+            this.getConf().set("sadType", sadType);
+            this.getConf().set("hbase.rootdir", hbaseRoot);
+            this.getConf().set("hbase.zookeeper.quorum", hbaseZoo);
+
+            Path inputPath = new Path(hdfsInputStart);
+            Path inputPath1 = new Path(hdfsInputEnd);
             Path outputPath = new Path(hdfsOutputPath);
 
             Job job = Job.getInstance(this.getConf(), this.getClass().getName());

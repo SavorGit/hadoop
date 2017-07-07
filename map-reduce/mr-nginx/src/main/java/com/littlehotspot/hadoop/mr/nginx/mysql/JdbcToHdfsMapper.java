@@ -14,12 +14,14 @@ import java.io.IOException;
  * <h1> title </h1>
  * Created by Administrator on 2017-07-04 下午 5:36.
  */
-public class JdbcToHdfsMapper extends MapReduceBase implements Mapper<LongWritable, Model, LongWritable, Text> {
+public class JdbcToHdfsMapper extends MapReduceBase implements Mapper<LongWritable, Model, Text, Text> {
 
     @Override
-    public void map(LongWritable longWritable, Model value, OutputCollector<LongWritable, Text> collector, Reporter reporter) throws IOException {
+    public void map(LongWritable longWritable, Model value, OutputCollector<Text, Text> collector, Reporter reporter) throws IOException {
 
-            collector.collect(new LongWritable(Long.valueOf(value.getId())), new Text(value
-                    .toString()));
+//        System.out.println(value.toString());
+        String s = (value).toString();
+        collector.collect(new Text(), new Text(s));
+
     }
 }

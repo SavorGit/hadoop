@@ -52,7 +52,7 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
     }
 
     private void setPropertiesForAttrBean(TextTargetSadAttrBean bean, TextTargetSadActBean source) {
-        bean.setRowKey(source.getMobile_id() + source.getTimestamps());
+//        bean.setRowKey(source.getMobile_id() + source.getTimestamps());
         bean.setDevice_id(source.getMobile_id());
         bean.setType(source.getMedia_type());
         if ("start".equals(source.getOption_type())) {
@@ -63,7 +63,7 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
     }
 
     private void setPropertiesForRelaBean(Configuration conf, TextTargetSadRelaBean bean, TextTargetSadActBean source) throws Exception {
-        bean.setRowKey(source.getMobile_id() + source.getTimestamps());
+//        bean.setRowKey(source.getMobile_id() + source.getTimestamps());
 
         String hotelId = source.getHotel_id();
         bean.setHotel(hotelId);

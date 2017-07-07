@@ -1,10 +1,5 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad;
 
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.demand.TextTargetUserDemandAttrBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.demand.TextTargetUserDemandRelaBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.projection.TextTargetUserProjectionAttrBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.projection.TextTargetUserProjectionRelaBean;
-
 /**
  * <h1> 创建target类 </h1>
  * Created by Administrator on 2017-06-26 下午 6:29.
@@ -19,9 +14,9 @@ public class TargetBeanFactory {
     public static TextTargetSadAttrBean getTargetSadAttrBean(SadType sadType){
         switch (sadType) {
             case PROJECTION:
-                return new TextTargetUserProjectionAttrBean();
+                return new TextTargetSadAttrBean();
             case DEMAND:
-                return new TextTargetUserDemandAttrBean();
+                return new TextTargetSadAttrBean();
 
         }
         return null;
@@ -32,9 +27,9 @@ public class TargetBeanFactory {
     public static TextTargetSadRelaBean getTargetSadRelaBean(SadType sadType){
         switch (sadType) {
             case PROJECTION:
-                return new TextTargetUserProjectionRelaBean();
+                return new TextTargetSadRelaBean();
             case DEMAND:
-                return new TextTargetUserDemandRelaBean();
+                return new TextTargetSadRelaBean();
         }
         return null;
 

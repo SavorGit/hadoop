@@ -35,7 +35,8 @@ public class SadYearReducer extends Reducer<Text, Text, Text, Text> {
     protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
         try {
             Iterator<Text> textIterator = value.iterator();
-            TargetSadYearBean targetSadBean = new TargetSadYearBean(key.toString());
+            SadYear sadYear = new SadYear();
+            TargetSadYearBean targetSadBean = new TargetSadYearBean();
             while (textIterator.hasNext()) {
                 Text item = textIterator.next();
                 if (item == null) {
@@ -56,9 +57,12 @@ public class SadYearReducer extends Reducer<Text, Text, Text, Text> {
                 targetSadBean.setProjectCount(sourceSadBean.getProjectCount());
                 targetSadBean.setDemandCount(sourceSadBean.getDemandCount());
                 targetSadBean.setTime(sourceSadBean.getTime());
+
+                sadYear.setBasicBean(targetSadBean);
+                sadYear.setRowKey(key.toString());
             }
 
-            CommonVariables.hBaseHelper.insert(targetSadBean);
+            CommonVariables.hBaseHelper.insert(sadYear);
 
             context.write(new Text(targetSadBean.rowLine()), new Text());
         } catch (Exception e) {
