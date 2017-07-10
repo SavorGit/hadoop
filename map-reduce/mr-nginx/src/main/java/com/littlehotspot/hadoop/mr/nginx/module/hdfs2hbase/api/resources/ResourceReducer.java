@@ -49,7 +49,21 @@ public class ResourceReducer extends Reducer<Text, Text, Text, Text> {
     private TargetResourcesAttrBean setAttr(TextSourceResources source, ResourceType resourceType) {
 
         TargetResourcesAttrBean attrBean = new TargetResourcesAttrBean();
-        attrBean.setResource_type(resourceType.getValue());
+        if(resourceType != null && ResourceType.CON.equals(resourceType)) {
+            attrBean.setResource_type(resourceType.getValue());
+        }else{
+            switch (source.getType()){
+                case "1":
+                    attrBean.setResource_type(ResourceType.ADS.getValue());
+                    break;
+                case "2":
+                    attrBean.setResource_type(ResourceType.PRO.getValue());
+                    break;
+                case "3":
+                    attrBean.setResource_type(ResourceType.ADV.getValue());
+                    break;
+            }
+        }
         attrBean.setId(source.getId());
         attrBean.setName(source.getName());
         attrBean.setCreator_id(source.getCreator_id());
