@@ -283,7 +283,7 @@
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.resources.JdbcToHdfsMain
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.mysql.JdbcToHdfsMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>

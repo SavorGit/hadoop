@@ -1,4 +1,4 @@
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.resources;
+package com.littlehotspot.hadoop.mr.nginx.mysql;
 
 import com.littlehotspot.hadoop.mr.nginx.mysql.JdbcReader;
 import com.littlehotspot.hadoop.mr.nginx.mysql.model.HdfsStringModel;
