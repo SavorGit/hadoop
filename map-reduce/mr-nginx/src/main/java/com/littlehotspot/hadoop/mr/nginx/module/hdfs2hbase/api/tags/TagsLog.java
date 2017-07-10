@@ -81,6 +81,7 @@ public class TagsLog extends Configured implements Tool {
 
                 Configuration conf = context.getConfiguration();
                 Iterator<Text> textIterator = value.iterator();
+                TargetTagBean targetTagBean = new TargetTagBean();
                 TargetTagAttrBean targetTagAttrBean = new TargetTagAttrBean();
                 List<TagSourceBean> list = new ArrayList<>();
                 while (textIterator.hasNext()) {
@@ -93,7 +94,7 @@ public class TagsLog extends Configured implements Tool {
                     Matcher tagMatcher = CommonVariables.MAPPER_TAG_LOG_FORMAT_REGEX.matcher(rowLineContent);
                     Matcher taglistMatcher = CommonVariables.MAPPER_TAGLIST_LOG_FORMAT_REGEX.matcher(rowLineContent);
                     if (taglistMatcher.find()) {
-                        targetTagAttrBean.setRowKey(taglistMatcher.group(1));
+                        targetTagBean.setRowKey(taglistMatcher.group(1));
                         targetTagAttrBean.setName(taglistMatcher.group(2));
                     }else if (tagMatcher.find()){
                         if (!StringUtils.isBlank(tagMatcher.group(1))){
@@ -115,8 +116,8 @@ public class TagsLog extends Configured implements Tool {
                 if (list.size()>0){
                     targetTagAttrBean.setResources(JSON.toString(list));
                 }
-
-                CommonVariables.hBaseHelper.insert(targetTagAttrBean);
+                targetTagBean.setTargetTagAttrBean(targetTagAttrBean);
+                CommonVariables.hBaseHelper.insert(targetTagBean);
 
             } catch (Exception e) {
                 e.printStackTrace();

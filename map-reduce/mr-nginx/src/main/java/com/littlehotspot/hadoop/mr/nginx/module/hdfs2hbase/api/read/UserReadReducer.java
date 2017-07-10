@@ -32,6 +32,7 @@ public class UserReadReducer extends Reducer<Text, Text, Text, Text> {
     protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
         try {
             Iterator<Text> textIterator = value.iterator();
+            TargetUserReadBean targetUserReadBean = new TargetUserReadBean();
             TargetUserReadAttrBean targetReadBean = new TargetUserReadAttrBean();
             TargetUserReadRelaBean targetReadRelaBean = new TargetUserReadRelaBean();
             while (textIterator.hasNext()) {
@@ -42,7 +43,7 @@ public class UserReadReducer extends Reducer<Text, Text, Text, Text> {
                 String rowLineContent = item.toString();
                 SourceUserReadBean sourceReadBean = new SourceUserReadBean(rowLineContent);
                 StringBuffer rowLine = new StringBuffer();
-                targetReadBean.setRowKey(sourceReadBean.getMobileId()+sourceReadBean.getStartTime().substring(0,10));
+                targetUserReadBean.setRowKey(sourceReadBean.getMobileId()+sourceReadBean.getStartTime().substring(0,10));
                 targetReadBean.setDeviceId(sourceReadBean.getMobileId());
                 targetReadBean.setStart(sourceReadBean.getStartTime());
                 targetReadBean.setEnd(sourceReadBean.getEndTime());
@@ -53,7 +54,6 @@ public class UserReadReducer extends Reducer<Text, Text, Text, Text> {
                 targetReadBean.setLatitude(sourceReadBean.getLatitude());
                 targetReadBean.setOsType(sourceReadBean.getOsType());
 
-                targetReadRelaBean.setRowKey(sourceReadBean.getMobileId()+sourceReadBean.getStartTime().substring(0,10));
                 targetReadRelaBean.setDeviceId(sourceReadBean.getMobileId());
                 targetReadRelaBean.setStart(sourceReadBean.getStartTime());
                 targetReadRelaBean.setCatId(sourceReadBean.getCategoryId());
@@ -66,6 +66,8 @@ public class UserReadReducer extends Reducer<Text, Text, Text, Text> {
                 this.setDownloadTime(sourceReadBean, targetReadBean);
             }
 
+            targetUserReadBean.setTargetUserReadAttrBean(targetReadBean);
+            targetUserReadBean.setTargetUserReadRelaBean(targetReadRelaBean);
             CommonVariables.hBaseHelper.insert(targetReadBean);
 
             CommonVariables.hBaseHelper.insert(targetReadRelaBean);

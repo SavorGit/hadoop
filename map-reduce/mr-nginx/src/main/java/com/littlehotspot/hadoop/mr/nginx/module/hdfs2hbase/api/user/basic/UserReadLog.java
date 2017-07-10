@@ -76,7 +76,6 @@ public class UserReadLog extends Configured implements Tool {
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
                 Iterator<Text> iterator = value.iterator();
-                NgxSrcUserBean sourceUserBean = null;
                 UserActBean userActBean = new UserActBean();
                 Integer count=0;
                 while (iterator.hasNext()){
@@ -98,7 +97,7 @@ public class UserReadLog extends Configured implements Tool {
                     count ++;
                 }
                 userActBean.setCount(count.toString());
-                context.write(new Text(sourceUserBean.getDeviceId()), new Text(sourceUserBean.rowLine()));
+                context.write(new Text(userActBean.getDeviceId()), new Text(userActBean.rowLine()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -111,7 +110,6 @@ public class UserReadLog extends Configured implements Tool {
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
                 Iterator<Text> iterator = value.iterator();
-                NgxSrcUserBean sourceUserBean = null;
                 UserActBean userActBean = new UserActBean();
                 while (iterator.hasNext()){
                     Text item = iterator.next();
@@ -136,7 +134,7 @@ public class UserReadLog extends Configured implements Tool {
                         userActBean.setCount(count.toString());
                     }
                 }
-                context.write(new Text(sourceUserBean.rowLine()), new Text());
+                context.write(new Text(userActBean.rowLine()), new Text());
             } catch (Exception e) {
                 e.printStackTrace();
             }

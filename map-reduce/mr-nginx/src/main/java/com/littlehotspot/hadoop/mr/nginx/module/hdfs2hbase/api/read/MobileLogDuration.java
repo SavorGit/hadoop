@@ -111,6 +111,7 @@ public class MobileLogDuration extends Configured implements Tool {
 
                 Configuration conf = context.getConfiguration();
                 Iterator<Text> textIterator = value.iterator();
+                TargetUserReadBean targetUserReadBean = new TargetUserReadBean();
                 TargetUserReadAttrBean targetReadBean = new TargetUserReadAttrBean();
                 TargetUserReadRelaBean targetReadRelaBean = new TargetUserReadRelaBean();
                 String timestemps =null;
@@ -121,13 +122,16 @@ public class MobileLogDuration extends Configured implements Tool {
                     }
                     String rowLineContent = item.toString();
                     SourceMobileBean sourceMobileBean = new SourceMobileBean(rowLineContent);
+                    targetUserReadBean.setRowKey(sourceMobileBean.getMobileId()+sourceMobileBean.getUuid().substring(0,10));
                     this.setForAttrBean(conf,targetReadBean, sourceMobileBean);
                     this.setForRelaBean(conf,targetReadRelaBean, sourceMobileBean);
 
                 }
-                CommonVariables.hBaseHelper.insert(targetReadBean);
 
-                CommonVariables.hBaseHelper.insert(targetReadRelaBean);
+                targetUserReadBean.setTargetUserReadRelaBean(targetReadRelaBean);
+                targetUserReadBean.setTargetUserReadAttrBean(targetReadBean);
+                CommonVariables.hBaseHelper.insert(targetUserReadBean);
+
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -135,7 +139,6 @@ public class MobileLogDuration extends Configured implements Tool {
         }
 
         private void setForAttrBean(Configuration conf, TargetUserReadAttrBean bean, SourceMobileBean source) throws Exception {
-            bean.setRowKey(source.getMobileId()+source.getUuid().substring(0,10));
             bean.setDeviceId(source.getMobileId());
             if (StringUtils.isBlank(bean.getStart())){
                 bean.setStart(source.getTimestamps());
@@ -167,7 +170,7 @@ public class MobileLogDuration extends Configured implements Tool {
         }
 
         private void setForRelaBean(Configuration conf, TargetUserReadRelaBean bean, SourceMobileBean source) throws Exception {
-            bean.setRowKey(source.getMobileId()+source.getUuid().substring(0,10));
+
             bean.setDeviceId(source.getMobileId());
             bean.setCatId(source.getCategoryId());
                 if (source.getCategoryId().equals("-1")){

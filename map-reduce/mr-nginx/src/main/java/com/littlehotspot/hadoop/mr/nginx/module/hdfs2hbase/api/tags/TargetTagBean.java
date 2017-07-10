@@ -11,6 +11,7 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.tags;
 
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseColumn;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseFamily;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseRowKey;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseTable;
 import com.littlehotspot.hadoop.mr.nginx.util.Constant;
@@ -27,29 +28,16 @@ import lombok.Data;
  * Date of last commit:$Date$<br>
  */
 @Data
-public class TargetTagAttrBean {
+@HBaseTable(name = "tags")
+public class TargetTagBean {
 
-
+    @HBaseRowKey
+    private String rowKey;
     /**
      * 设备标识
      */
-    @HBaseColumn(name = "name")
-    private String name;
-
-    /**
-     * 设备类型
-     */
-    @HBaseColumn(name = "resources")
-    private String resources;
+    @HBaseFamily(name = "attr")
+    private TargetTagAttrBean targetTagAttrBean;
 
 
-
-
-    public String rowLine() {
-        StringBuffer rowLine = new StringBuffer();
-        rowLine.append(this.getName() == null ? "" : this.getName()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getResources() == null ? "" : this.getResources()).append(Constant.VALUE_SPLIT_CHAR);
-
-        return rowLine.toString();
-    }
 }

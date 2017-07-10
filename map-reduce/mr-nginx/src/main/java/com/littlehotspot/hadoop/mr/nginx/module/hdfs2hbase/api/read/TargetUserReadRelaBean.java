@@ -27,11 +27,8 @@ import lombok.Data;
  * Date of last commit:$Date$<br>
  */
 @Data
-@HBaseTable(tableName = "user_read", familyName = "rela")
 public class TargetUserReadRelaBean {
 
-    @HBaseRowKey
-    private String rowKey;
 
     /**
      * 设备标识
@@ -45,44 +42,43 @@ public class TargetUserReadRelaBean {
     /**
      * 来源
      */
-    @HBaseColumn(columnName = "cat_id")
+    @HBaseColumn(name = "cat_id")
     private String catId;
 
     /**
      * 下载时间戳
      */
-    @HBaseColumn(columnName = "cat_name")
+    @HBaseColumn(name = "cat_name")
     private String catName;
 
     /**
      * 首次投屏时间戳
      */
-    @HBaseColumn(columnName = "hotel")
+    @HBaseColumn(name = "hotel")
     private String hotel;
 
     /**
      * 首次点播时间戳
      */
-    @HBaseColumn(columnName = "hotel_name")
+    @HBaseColumn(name = "hotel_name")
     private String hotelName;
 
     /**
      * 首次阅读时间
      */
-    @HBaseColumn(columnName = "room")
+    @HBaseColumn(name = "room")
     private String room;
 
     /**
      * 点播总次数
      */
-    @HBaseColumn(columnName = "room_name")
+    @HBaseColumn(name = "room_name")
     private String roomName;
 
 
 
     public String rowLine() {
         StringBuffer rowLine = new StringBuffer();
-        rowLine.append(this.getRowKey() == null ? "" : this.getRowKey()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getCatId() == null ? "" : this.getCatId()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getCatName() == null ? "" : this.getCatName()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getHotel() == null ? "" : this.getHotel()).append(Constant.VALUE_SPLIT_CHAR);

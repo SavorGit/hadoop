@@ -112,9 +112,9 @@ public class MobileSrcUserBean {
         if (!matcher.find()) {
             return;
         }
-        this.setDeviceId(matcher.group(16));
-        if (StringUtils.isBlank(this.getFDownTime())||(!StringUtils.isBlank(matcher.group(5))&&Long.valueOf(this.getFDownTime())>Long.valueOf(matcher.group(5)))){
-            this.setFDownTime(matcher.group(5));
+        this.setDeviceId(matcher.group(9));
+        if (StringUtils.isBlank(this.getFDownTime())||(!StringUtils.isBlank(matcher.group(4))&&Long.valueOf(this.getFDownTime())>Long.valueOf(matcher.group(4)))){
+            this.setFDownTime(matcher.group(4));
             this.setFDownSrc("mob");
         }
 
