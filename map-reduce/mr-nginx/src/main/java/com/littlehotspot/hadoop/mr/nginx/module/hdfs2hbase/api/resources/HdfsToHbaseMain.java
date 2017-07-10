@@ -11,16 +11,12 @@ import java.io.IOException;
  */
 public class HdfsToHbaseMain {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         if (args.length < 3) {
             throw new IOException("please write input path and output path...");
         }
         Configuration conf = new Configuration();
 
-        try {
-            ToolRunner.run(conf, new ResourceScheduler(), args);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ToolRunner.run(conf, new ResourceScheduler(), args);
     }
 }
