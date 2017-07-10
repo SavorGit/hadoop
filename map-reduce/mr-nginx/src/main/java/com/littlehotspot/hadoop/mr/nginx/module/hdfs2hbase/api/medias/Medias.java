@@ -13,7 +13,7 @@ import lombok.NonNull;
  */
 @Data
 @NoArgsConstructor
-@HBaseTable(name = "media")
+@HBaseTable(name = "medias")
 public class Medias {
 
     /**
