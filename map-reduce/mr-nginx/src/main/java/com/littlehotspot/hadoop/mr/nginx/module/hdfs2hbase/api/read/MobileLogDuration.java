@@ -14,10 +14,16 @@ import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.SourceUserBean;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.TargetUserAttrBean;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.TextTargetSadActBean;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.TextTargetSadAttrBean;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.TextTargetSadRelaBean;
+import com.littlehotspot.hadoop.mr.nginx.mysql.JdbcReader;
+import com.littlehotspot.hadoop.mr.nginx.mysql.MysqlCommonVariables;
 import com.littlehotspot.hadoop.mr.nginx.mysql.mapper.ICategoryMapper;
 import com.littlehotspot.hadoop.mr.nginx.mysql.mapper.IContentMapper;
 import com.littlehotspot.hadoop.mr.nginx.mysql.mapper.IHotelMapper;
 import com.littlehotspot.hadoop.mr.nginx.mysql.mapper.IRoomMapper;
+import com.littlehotspot.hadoop.mr.nginx.mysql.model.*;
 import com.littlehotspot.hadoop.mr.nginx.mysql.service.CategoryService;
 import com.littlehotspot.hadoop.mr.nginx.mysql.service.ContentService;
 import com.littlehotspot.hadoop.mr.nginx.mysql.service.HotelService;
@@ -102,6 +108,8 @@ public class MobileLogDuration extends Configured implements Tool {
         @Override
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
+
+                Configuration conf = context.getConfiguration();
                 Iterator<Text> textIterator = value.iterator();
                 TargetUserReadAttrBean targetReadBean = new TargetUserReadAttrBean();
                 TargetUserReadRelaBean targetReadRelaBean = new TargetUserReadRelaBean();
@@ -113,78 +121,161 @@ public class MobileLogDuration extends Configured implements Tool {
                     }
                     String rowLineContent = item.toString();
                     SourceMobileBean sourceMobileBean = new SourceMobileBean(rowLineContent);
+                    this.setForAttrBean(conf,targetReadBean, sourceMobileBean);
+                    this.setForRelaBean(conf,targetReadRelaBean, sourceMobileBean);
 
-                    targetReadBean.setRowKey(sourceMobileBean.getMobileId()+sourceMobileBean.getUuid().substring(0,10));
-                    targetReadBean.setDeviceId(sourceMobileBean.getMobileId());
-                    if (StringUtils.isBlank(timestemps)){
-                        targetReadBean.setStart(sourceMobileBean.getTimestamps());
-                        timestemps=sourceMobileBean.getTimestamps();
-                    }else if (Long.valueOf(timestemps)<Long.valueOf(sourceMobileBean.getTimestamps())){
-                        targetReadBean.setEnd(sourceMobileBean.getTimestamps());
-                    }else if (Long.valueOf(timestemps)>Long.valueOf(sourceMobileBean.getTimestamps())){
-                        targetReadBean.setStart(sourceMobileBean.getTimestamps());
-                        targetReadBean.setEnd(timestemps);
-                    }
-                    targetReadBean.setConId(sourceMobileBean.getContentId());
-                        for (HashMap<String, Object> content : contents) {
-                            if (content.get("id").toString().equals(sourceMobileBean.getContentId())){
-                                targetReadBean.setConNam(content.get("title").toString());
-                                targetReadBean.setContent(content.get("content").toString());
-                            }
-                        }
-                    if (!(StringUtils.isBlank(targetReadBean.getStart())||StringUtils.isBlank(targetReadBean.getEnd()))){
-                        Long duration = Long.valueOf(targetReadBean.getEnd()) - Long.valueOf(targetReadBean.getStart());
-                        targetReadBean.setVTime(duration.toString());
-                    }
-
-                    targetReadBean.setLongitude(sourceMobileBean.getLongitude());
-                    targetReadBean.setLatitude(sourceMobileBean.getLatitude());
-                    targetReadBean.setOsType(sourceMobileBean.getOsType());
-
-                    targetReadRelaBean.setRowKey(sourceMobileBean.getMobileId()+sourceMobileBean.getUuid().substring(0,10));
-                    targetReadRelaBean.setDeviceId(sourceMobileBean.getMobileId());
-                    targetReadRelaBean.setCatId(sourceMobileBean.getCategoryId());
-                    for (HashMap<String, Object> cate : cates) {
-                        if (sourceMobileBean.getCategoryId().equals("-1")){
-                            targetReadRelaBean.setCatName("热点");
-                        }
-                        else if (sourceMobileBean.getCategoryId().equals("-2")){
-                            targetReadRelaBean.setCatName("点播");
-                        }
-                        else if (cate.get("id").toString().equals(sourceMobileBean.getCategoryId())){
-                            targetReadRelaBean.setCatName(cate.get("name").toString());
-                        }
-                    }
-                    String reg = "[0-9]+";
-                    if (!sourceMobileBean.getHotelId().matches(reg)){
-                        targetReadRelaBean.setHotel("");
-                    }else {
-                        targetReadRelaBean.setHotel(sourceMobileBean.getHotelId());
-                    }
-
-                    for (HashMap<String, Object> hotel : hotels) {
-                        if (hotel.get("id").toString().equals(sourceMobileBean.getHotelId())){
-                            targetReadRelaBean.setHotelName(hotel.get("name").toString());
-                        }
-                    }
-                    if (!sourceMobileBean.getRoomId().matches(reg)){
-                        targetReadRelaBean.setRoom("");
-                    }else {
-                        targetReadRelaBean.setRoom(sourceMobileBean.getRoomId());
-                    }
-                    for (HashMap<String, Object> room : rooms) {
-                        if (room.get("id").toString().equals(sourceMobileBean.getRoomId())){
-                            targetReadRelaBean.setRoomName(room.get("name").toString());
-                        }
-                    }
-                    CommonVariables.hBaseHelper.insert(targetReadBean);
-
-                    CommonVariables.hBaseHelper.insert(targetReadRelaBean);
                 }
+                CommonVariables.hBaseHelper.insert(targetReadBean);
+
+                CommonVariables.hBaseHelper.insert(targetReadRelaBean);
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        private void setForAttrBean(Configuration conf, TargetUserReadAttrBean bean, SourceMobileBean source) throws Exception {
+            bean.setRowKey(source.getMobileId()+source.getUuid().substring(0,10));
+            bean.setDeviceId(source.getMobileId());
+            if (StringUtils.isBlank(bean.getStart())){
+                bean.setStart(source.getTimestamps());
+            }else if (Long.valueOf(bean.getStart())<Long.valueOf(source.getTimestamps())){
+                bean.setEnd(source.getTimestamps());
+            }else if (Long.valueOf(bean.getStart())>Long.valueOf(source.getTimestamps())){
+                bean.setEnd(bean.getStart());
+                bean.setStart(source.getTimestamps());
+
+            }
+            bean.setConId(source.getContentId());
+
+            //读取mysql
+            readMysqlContent(conf.get("hdfsCluster"));
+            Content content = (Content) MysqlCommonVariables.modelMap.get(source.getContentId());
+            if (null!=content){
+                bean.setConNam(content.getTitle());
+                bean.setContent(content.getContent());
+            }
+
+            if (!(StringUtils.isBlank(bean.getStart())||StringUtils.isBlank(bean.getEnd()))){
+                Long duration = Long.valueOf(bean.getEnd()) - Long.valueOf(bean.getStart());
+                bean.setVTime(duration.toString());
+            }
+
+            bean.setLongitude(source.getLongitude());
+            bean.setLatitude(source.getLatitude());
+            bean.setOsType(source.getOsType());
+        }
+
+        private void setForRelaBean(Configuration conf, TargetUserReadRelaBean bean, SourceMobileBean source) throws Exception {
+            bean.setRowKey(source.getMobileId()+source.getUuid().substring(0,10));
+            bean.setDeviceId(source.getMobileId());
+            bean.setCatId(source.getCategoryId());
+                if (source.getCategoryId().equals("-1")){
+                    bean.setCatName("热点");
+                }
+                else if (source.getCategoryId().equals("-2")){
+                    bean.setCatName("点播");
+                }
+                else {
+
+                    //读取mysql
+                    readMysqlCategory(conf.get("hdfsCluster"));
+                    Category category = (Category) MysqlCommonVariables.modelMap.get(source.getCategoryId());
+                    if (null!=category){
+                        bean.setCatName(category.getName());
+                    }
+
+                }
+            String reg = "[0-9]+";
+            if (!source.getHotelId().matches(reg)){
+                bean.setHotel("");
+            }else {
+                bean.setHotel(source.getHotelId());
+            }
+
+            //读取mysql
+            readMysqlHotel(conf.get("hdfsCluster"));
+            Hotel hotel = (Hotel) MysqlCommonVariables.modelMap.get(source.getHotelId());
+            if(hotel != null) {
+                bean.setHotelName(hotel.getName());
+            }
+
+            if (!source.getRoomId().matches(reg)){
+                bean.setRoom("");
+            }else {
+                bean.setRoom(source.getRoomId());
+            }
+            //读取mysql
+            readMysqlRoom(conf.get("hdfsCluster"));
+            Room room = (Room) MysqlCommonVariables.modelMap.get(source.getHotelId());
+            if (null!=room){
+                bean.setRoomName(room.getName());
+            }
+
+        }
+
+        /**
+         * 查询酒店信息
+         * @param hdfsCluster
+         * @throws Exception
+         */
+        public void readMysqlHotel(String hdfsCluster) throws Exception{
+            SelectModel selectModel = new SelectModel();
+            selectModel.setInputClass(Hotel.class);
+            selectModel.setQuery("select id,name from savor_hotel");
+            selectModel.setCountQuery("select count(*) from savor_hotel");
+            selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
+
+            JdbcReader.readToMap(hdfsCluster,selectModel);
+
+        }
+
+        /**
+         * 查询包间信息
+         * @param hdfsCluster
+         * @throws Exception
+         */
+        public void readMysqlRoom(String hdfsCluster) throws Exception{
+            SelectModel selectModel = new SelectModel();
+            selectModel.setInputClass(Room.class);
+            selectModel.setQuery("select id,name from savor_room");
+            selectModel.setCountQuery("select count(*) from savor_room");
+            selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
+
+            JdbcReader.readToMap(hdfsCluster,selectModel);
+
+        }
+
+        /**
+         * 查询包间信息
+         * @param hdfsCluster
+         * @throws Exception
+         */
+        public void readMysqlContent(String hdfsCluster) throws Exception{
+            SelectModel selectModel = new SelectModel();
+            selectModel.setInputClass(Content.class);
+            selectModel.setQuery("select id,title,content from savor_mb_content");
+            selectModel.setCountQuery("select count(*) from savor_mb_content");
+            selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
+
+            JdbcReader.readToMap(hdfsCluster,selectModel);
+
+        }
+
+        /**
+         * 查询包间信息
+         * @param hdfsCluster
+         * @throws Exception
+         */
+        public void readMysqlCategory(String hdfsCluster) throws Exception{
+            SelectModel selectModel = new SelectModel();
+            selectModel.setInputClass(Category.class);
+            selectModel.setQuery("select id,name from savor_mb_category");
+            selectModel.setCountQuery("select count(*) from savor_mb_category");
+            selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
+
+            JdbcReader.readToMap(hdfsCluster,selectModel);
+
         }
     }
 

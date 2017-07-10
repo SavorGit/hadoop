@@ -124,18 +124,22 @@ public class UserFinal extends Configured implements Tool {
 
             // 获取参数
             String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
-//            String hdfsInputPath1 = CommonVariables.getParameterValue(Argument.InputUserPath);
-//            String hdfsInputPath2 = CommonVariables.getParameterValue(Argument.InputActPath);
+            String hdfsInputPath1 = CommonVariables.getParameterValue(Argument.InputReadPath);
+            String hdfsInputPath2 = CommonVariables.getParameterValue(Argument.InputProPath);
+            String hdfsInputPath3 = CommonVariables.getParameterValue(Argument.InputDemaPath);
+            String hdfsInputPath4 = CommonVariables.getParameterValue(Argument.InputUserPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
             Job job = Job.getInstance(this.getConf(), UserFinal.class.getSimpleName());
             job.setJarByClass(UserFinal.class);
 
             /**作业输入*/
-//            Path inputPath1 = new Path(hdfsInputPath1);
-//            Path inputPath2 = new Path(hdfsInputPath2);
-//            FileInputFormat.addInputPath(job, inputPath1);
-//            FileInputFormat.addInputPath(job, inputPath2);
+            Path inputPath1 = new Path(hdfsInputPath1);
+            Path inputPath2 = new Path(hdfsInputPath2);
+            Path inputPath3 = new Path(hdfsInputPath3);
+            Path inputPath4 = new Path(hdfsInputPath4);
+            FileInputFormat.addInputPath(job, inputPath1);
+            FileInputFormat.addInputPath(job, inputPath2);
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);

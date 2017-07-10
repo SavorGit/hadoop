@@ -8,13 +8,21 @@
  * @EMAIL 404644381@qq.com
  * @Time : 15:38
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.tags;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.CommonVariables;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.NgxSrcUserBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.SrcUserBean;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.TargetUserReadAttrBean;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.TargetUserReadRelaBean;
+import com.littlehotspot.hadoop.mr.nginx.mysql.JdbcReader;
+import com.littlehotspot.hadoop.mr.nginx.mysql.MysqlCommonVariables;
+import com.littlehotspot.hadoop.mr.nginx.mysql.model.*;
+import com.littlehotspot.hadoop.mr.nginx.mysql.service.CategoryService;
+import com.littlehotspot.hadoop.mr.nginx.mysql.service.ContentService;
+import com.littlehotspot.hadoop.mr.nginx.mysql.service.HotelService;
+import com.littlehotspot.hadoop.mr.nginx.mysql.service.RoomService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -26,60 +34,38 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
+import org.mortbay.util.ajax.JSON;
 
 import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.*;
 import java.util.regex.Matcher;
 
 /**
  * 手机日志
  */
-public class AllUser extends Configured implements Tool {
+public class TagsLog extends Configured implements Tool {
+
 
     private static class MobileMapper extends Mapper<LongWritable, Text, Text, Text> {
-
 
         @Override
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
             /**数据清洗=========开始*/
             try {
                 String msg = value.toString();
-                Matcher matcher = CommonVariables.MAPPER_USER_FORMAT_REGEX.matcher(msg);
-                if (!matcher.find()) {
+                Matcher tagMatcher = CommonVariables.MAPPER_TAG_LOG_FORMAT_REGEX.matcher(msg);
+                Matcher taglistMatcher = CommonVariables.MAPPER_TAGLIST_LOG_FORMAT_REGEX.matcher(msg);
+                if (tagMatcher.find()) {
+                    context.write(new Text(tagMatcher.group(1)), value);
+                }else if (taglistMatcher.find()){
+                    context.write(new Text(taglistMatcher.group(1)), value);
+                }else {
                     return;
                 }
 
-                if (StringUtils.isBlank(matcher.group(1))) {
-                    return;
-                }
-
-                context.write(new Text(matcher.group(1)), value);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private static class Combiner extends Reducer<Text, Text, Text, Text> {
-
-        @Override
-        protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
-            try {
-                Iterator<Text> iterator = value.iterator();
-                SrcUserBean srcUserBean = new SrcUserBean();
-                while (iterator.hasNext()){
-                    Text item = iterator.next();
-                    if (item == null) {
-                        continue;
-                    }
-                    String rowLineContent = item.toString();
-                    srcUserBean.setValue(rowLineContent);
-                }
-                context.write(new Text(srcUserBean.getDeviceId()), new Text(srcUserBean.rowLine()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -88,41 +74,55 @@ public class AllUser extends Configured implements Tool {
 
     private static class MobileReduce extends Reducer<Text, Text, Text, Text> {
 
+
         @Override
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
-                Iterator<Text> iterator = value.iterator();
-                SrcUserBean srcUserBean = new SrcUserBean();
-                while (iterator.hasNext()){
-                    Text item = iterator.next();
+
+                Configuration conf = context.getConfiguration();
+                Iterator<Text> textIterator = value.iterator();
+                TargetTagAttrBean targetTagAttrBean = new TargetTagAttrBean();
+                List<TagSourceBean> list = new ArrayList<>();
+                while (textIterator.hasNext()) {
+                    TagSourceBean tagSourceBean = new TagSourceBean();
+                    Text item = textIterator.next();
                     if (item == null) {
                         continue;
                     }
                     String rowLineContent = item.toString();
-                    Matcher matcher = CommonVariables.MAPPER_USER_FORMAT_REGEX.matcher(rowLineContent);
-                    if (!matcher.find()) {
-                        return;
+                    Matcher tagMatcher = CommonVariables.MAPPER_TAG_LOG_FORMAT_REGEX.matcher(rowLineContent);
+                    Matcher taglistMatcher = CommonVariables.MAPPER_TAGLIST_LOG_FORMAT_REGEX.matcher(rowLineContent);
+                    if (taglistMatcher.find()) {
+                        targetTagAttrBean.setRowKey(taglistMatcher.group(1));
+                        targetTagAttrBean.setName(taglistMatcher.group(2));
+                    }else if (tagMatcher.find()){
+                        if (!StringUtils.isBlank(tagMatcher.group(1))){
+                            tagSourceBean.setResource_id(tagMatcher.group(1));
+                        }
+
+                        if (!StringUtils.isBlank(tagMatcher.group(1))){
+                            tagSourceBean.setResource_type("0x0001");
+                        }
+
+
+
                     }
-                    srcUserBean.setDeviceId(matcher.group(1));
-                    if (!StringUtils.isBlank(matcher.group(2))){
-                        srcUserBean.setMType(matcher.group(2));
+                    if (null!=tagSourceBean.getResource_id()||null!=tagSourceBean.getResource_type()){
+                        list.add(tagSourceBean);
                     }
 
-                    if (!StringUtils.isBlank(matcher.group(3))){
-                        srcUserBean.setMMachine(matcher.group(3));
-                    }
-
-                    if (StringUtils.isBlank(srcUserBean.getFDownTime())||(!StringUtils.isBlank(matcher.group(4))&&Long.valueOf(srcUserBean.getFDownTime())>Long.valueOf(matcher.group(4)))){
-                        srcUserBean.setFDownTime(matcher.group(4));
-                        srcUserBean.setFDownSrc("ngx");
-                    }
-                    srcUserBean.setValue(rowLineContent);
                 }
-                context.write(new Text(srcUserBean.rowLine()), new Text());
+                if (list.size()>0){
+                    targetTagAttrBean.setResources(JSON.toString(list));
+                }
+
+                CommonVariables.hBaseHelper.insert(targetTagAttrBean);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
     }
 
     @Override
@@ -130,34 +130,33 @@ public class AllUser extends Configured implements Tool {
         try {
 
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
+            CommonVariables.hBaseHelper = new HBaseHelper(this.getConf());
 
             // 获取参数
             String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
-            String hdfsInputPath1 = CommonVariables.getParameterValue(Argument.InputBoxPath);
-            String hdfsInputPath2 = CommonVariables.getParameterValue(Argument.InputMobPath);
-            String hdfsInputPath3 = CommonVariables.getParameterValue(Argument.InputNgxPath);
+            String hdfsInputStart = CommonVariables.getParameterValue(Argument.InputPathStart);
+            String hdfsInputEnd = CommonVariables.getParameterValue(Argument.InputPathEnd);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
-            Job job = Job.getInstance(this.getConf(), AllUser.class.getSimpleName());
-            job.setJarByClass(AllUser.class);
+            Job job = Job.getInstance(this.getConf(), TagsLog.class.getSimpleName());
+            job.setJarByClass(TagsLog.class);
 
             /**作业输入*/
-            Path inputPath1 = new Path(hdfsInputPath1);
-            Path inputPath2 = new Path(hdfsInputPath2);
-            Path inputPath3 = new Path(hdfsInputPath3);
+            Path inputPath1 = new Path(hdfsInputStart);
             FileInputFormat.addInputPath(job, inputPath1);
+            Path inputPath2 = new Path(hdfsInputEnd);
             FileInputFormat.addInputPath(job, inputPath2);
-            FileInputFormat.addInputPath(job, inputPath3);
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
 
             /**作业输出*/
             Path outputPath = new Path(hdfsOutputPath);
-            FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());
+            FileSystem fileSystem = FileSystem.get(URI.create(outputPath.toString()), this.getConf());
             if (fileSystem.exists(outputPath)) {
                 fileSystem.delete(outputPath, true);
             }
+
             FileOutputFormat.setOutputPath(job, outputPath);
             job.setReducerClass(MobileReduce.class);
             job.setOutputKeyClass(Text.class);
