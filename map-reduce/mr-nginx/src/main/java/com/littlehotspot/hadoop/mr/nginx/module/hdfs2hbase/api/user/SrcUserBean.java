@@ -14,6 +14,7 @@ import com.littlehotspot.hadoop.mr.nginx.util.Constant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
+import sun.nio.cs.ext.MacThai;
 
 import java.util.regex.Matcher;
 
@@ -29,7 +30,7 @@ import java.util.regex.Matcher;
  */
 @Data
 @NoArgsConstructor
-public class MobileSrcUserBean {
+public class SrcUserBean {
 
     /**
      * 设备id
@@ -108,17 +109,24 @@ public class MobileSrcUserBean {
 
 
     public void setValue(String text) {
-        Matcher matcher = CommonVariables.MAPPER_MOBILE_LOG_FORMAT_REGEX.matcher(text);
+        Matcher matcher = CommonVariables.MAPPER_USER_FORMAT_REGEX.matcher(text);
         if (!matcher.find()) {
             return;
         }
-        this.setDeviceId(matcher.group(9));
-        if (StringUtils.isBlank(this.getFDownTime())||(!StringUtils.isBlank(matcher.group(4))&&Long.valueOf(this.getFDownTime())>Long.valueOf(matcher.group(4)))){
+        this.setDeviceId(matcher.group(1));
+        this.setMType(matcher.group(2));
+        this.setMMachine(matcher.group(3));
+
+        if (StringUtils.isBlank(this.getFDownTime())){
             this.setFDownTime(matcher.group(4));
-            this.setFDownSrc("mob");
+            this.setFDownSrc(matcher.group(5));
+        }else if (!StringUtils.isBlank(matcher.group(4))||Long.valueOf(this.getFDownTime())>Long.valueOf(matcher.group(4))){
+            this.setFDownTime(matcher.group(4));
+            this.setFDownSrc(matcher.group(5));
         }
-
-
+        if (!StringUtils.isBlank(matcher.group(6))){
+            this.setToken(matcher.group(6));
+        }
 
     }
 

@@ -13,6 +13,7 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
 import com.littlehotspot.hadoop.mr.nginx.util.Constant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.regex.Matcher;
 
@@ -106,7 +107,7 @@ public class NgxSrcUserBean {
 
 
 
-    public NgxSrcUserBean(String text) {
+    public void setValue(String text) {
         Matcher matcher = CommonVariables.MAPPER_NGINX_LOG_FORMAT_REGEX.matcher(text);
         if (!matcher.find()) {
             return;
@@ -114,10 +115,16 @@ public class NgxSrcUserBean {
         this.setDeviceId(matcher.group(17));
         this.setMType(matcher.group(14));
         this.setMMachine(matcher.group(12));
-        this.setFDownTime(matcher.group(2));
-        this.setFDownSrc("ngx");
+        if (StringUtils.isBlank(this.getFDownTime())||(!StringUtils.isBlank(matcher.group(2))&&Long.valueOf(this.getFDownTime())>Long.valueOf(matcher.group(2)))){
+            this.setFDownTime(matcher.group(2));
+            this.setFDownSrc("ngx");
+        }
+
         String url = matcher.group(5);
-        this.setToken(url.substring(url.indexOf("deviceToken=")+12));
+        if (!StringUtils.isBlank(url)){
+            this.setToken(url.substring(url.indexOf("deviceToken=")+12,url.indexOf("")-1));
+        }
+
 
     }
 
@@ -133,6 +140,8 @@ public class NgxSrcUserBean {
         rowLine.append(this.getDeviceId() == null ? "" : this.getDeviceId()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getMType() == null ? "" : this.getMType()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getMMachine() == null ? "" : this.getMMachine()).append(Constant.VALUE_SPLIT_CHAR);
+        rowLine.append(this.getFDownTime() == null ? "" : this.getFDownTime()).append(Constant.VALUE_SPLIT_CHAR);
+        rowLine.append(this.getFDownSrc() == null ? "" : this.getFDownSrc()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getToken() == null ? "" : this.getToken()).append(Constant.VALUE_SPLIT_CHAR);
         return rowLine.toString();
     }

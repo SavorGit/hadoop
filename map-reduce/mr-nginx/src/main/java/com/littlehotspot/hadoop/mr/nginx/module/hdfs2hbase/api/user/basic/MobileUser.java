@@ -11,12 +11,10 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.BoxSrcUserBean;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.CommonVariables;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.NgxSrcUserBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.UserActBean;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.MobileSrcUserBean;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -40,7 +38,7 @@ import java.util.regex.Matcher;
 /**
  * 手机日志
  */
-public class UserReadLog extends Configured implements Tool {
+public class MobileUser extends Configured implements Tool {
 
     private static class MobileMapper extends Mapper<LongWritable, Text, Text, Text> {
 
@@ -57,12 +55,6 @@ public class UserReadLog extends Configured implements Tool {
                 if (StringUtils.isBlank(matcher.group(9))) {
                     return;
                 }
-                if (StringUtils.isBlank(matcher.group(5))||!matcher.group(5).equals("start")){
-                    return;
-                }
-                if (StringUtils.isBlank(matcher.group(6))||!matcher.group(6).equals("content")){
-                    return;
-                }
                 context.write(new Text(matcher.group(9)), value);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -76,28 +68,16 @@ public class UserReadLog extends Configured implements Tool {
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
                 Iterator<Text> iterator = value.iterator();
-                UserActBean userActBean = new UserActBean();
-                Integer count=0;
+                MobileSrcUserBean mobileSrcUserBean = new MobileSrcUserBean();
                 while (iterator.hasNext()){
                     Text item = iterator.next();
                     if (item == null) {
                         continue;
                     }
                     String rowLineContent = item.toString();
-                    Matcher matcher = CommonVariables.MAPPER_MOBILE_LOG_FORMAT_REGEX.matcher(rowLineContent);
-                    if (!matcher.find()) {
-                        return;
-                    }
-                    userActBean.setDeviceId(matcher.group(9));
-                    if (StringUtils.isBlank(userActBean.getTime())){
-                        userActBean.setTime(matcher.group(4));
-                    }else if (Long.valueOf(userActBean.getTime())>=Long.valueOf(matcher.group(4))){
-                        userActBean.setTime(matcher.group(4));
-                    }
-                    count ++;
+                    mobileSrcUserBean.setValue(rowLineContent);
                 }
-                userActBean.setCount(count.toString());
-                context.write(new Text(userActBean.getDeviceId()), new Text(userActBean.rowLine()));
+                context.write(new Text(mobileSrcUserBean.getDeviceId()), new Text(mobileSrcUserBean.rowLine()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -110,31 +90,24 @@ public class UserReadLog extends Configured implements Tool {
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
                 Iterator<Text> iterator = value.iterator();
-                UserActBean userActBean = new UserActBean();
+                MobileSrcUserBean mobileSrcUserBean = new MobileSrcUserBean();
                 while (iterator.hasNext()){
                     Text item = iterator.next();
                     if (item == null) {
                         continue;
                     }
                     String rowLineContent = item.toString();
-                    Matcher matcher = CommonVariables.MAPPER_USERACT_FORMAT_REGEX.matcher(rowLineContent);
+                    Matcher matcher = CommonVariables.MAPPER_USER_FORMAT_REGEX.matcher(rowLineContent);
                     if (!matcher.find()) {
                         return;
                     }
-                    userActBean.setDeviceId(matcher.group(1));
-                    if (StringUtils.isBlank(userActBean.getTime())){
-                        userActBean.setTime(matcher.group(2));
-                    }else if (Long.valueOf(userActBean.getTime())>=Long.valueOf(matcher.group(2))){
-                        userActBean.setTime(matcher.group(2));
-                    }
-                    if (StringUtils.isBlank(userActBean.getCount())){
-                        userActBean.setCount(matcher.group(3));
-                    }else {
-                        Long count=Long.valueOf(userActBean.getCount())+Long.valueOf(matcher.group(3));
-                        userActBean.setCount(count.toString());
+                    mobileSrcUserBean.setDeviceId(matcher.group(1));
+                    if (StringUtils.isBlank(mobileSrcUserBean.getFDownTime())||(!StringUtils.isBlank(matcher.group(4))&&Long.valueOf(mobileSrcUserBean.getFDownTime())>Long.valueOf(matcher.group(4)))){
+                        mobileSrcUserBean.setFDownTime(matcher.group(4));
+                        mobileSrcUserBean.setFDownSrc("box");
                     }
                 }
-                context.write(new Text(userActBean.rowLine()), new Text());
+                context.write(new Text(mobileSrcUserBean.rowLine()), new Text());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -152,12 +125,12 @@ public class UserReadLog extends Configured implements Tool {
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
-            Job job = Job.getInstance(this.getConf(), UserReadLog.class.getSimpleName());
-            job.setJarByClass(UserReadLog.class);
+            Job job = Job.getInstance(this.getConf(), MobileUser.class.getSimpleName());
+            job.setJarByClass(MobileUser.class);
 
             /**作业输入*/
             Path inputPath = new Path(hdfsInputPath);
-            FileInputFormat.addInputPath(job, inputPath);
+            FileInputFormat.setInputPaths(job, inputPath);
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);

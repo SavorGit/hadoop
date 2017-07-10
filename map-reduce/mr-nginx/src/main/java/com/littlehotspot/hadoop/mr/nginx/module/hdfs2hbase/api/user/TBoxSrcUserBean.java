@@ -13,7 +13,6 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
 import com.littlehotspot.hadoop.mr.nginx.util.Constant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang.StringUtils;
 
 import java.util.regex.Matcher;
 
@@ -29,7 +28,7 @@ import java.util.regex.Matcher;
  */
 @Data
 @NoArgsConstructor
-public class MobileSrcUserBean {
+public class TBoxSrcUserBean {
 
     /**
      * 设备id
@@ -107,18 +106,14 @@ public class MobileSrcUserBean {
 
 
 
-    public void setValue(String text) {
-        Matcher matcher = CommonVariables.MAPPER_MOBILE_LOG_FORMAT_REGEX.matcher(text);
+    public TBoxSrcUserBean(String text) {
+        Matcher matcher = CommonVariables.MAPPER_BOX_LOG_FORMAT_REGEX.matcher(text);
         if (!matcher.find()) {
             return;
         }
-        this.setDeviceId(matcher.group(9));
-        if (StringUtils.isBlank(this.getFDownTime())||(!StringUtils.isBlank(matcher.group(4))&&Long.valueOf(this.getFDownTime())>Long.valueOf(matcher.group(4)))){
-            this.setFDownTime(matcher.group(4));
-            this.setFDownSrc("mob");
-        }
-
-
+        this.setDeviceId(matcher.group(17));
+        this.setFDownTime(matcher.group(4));
+        this.setFDownSrc("box");
 
     }
 
@@ -134,8 +129,6 @@ public class MobileSrcUserBean {
         rowLine.append(this.getDeviceId() == null ? "" : this.getDeviceId()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getMType() == null ? "" : this.getMType()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getMMachine() == null ? "" : this.getMMachine()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getFDownTime() == null ? "" : this.getFDownTime()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getFDownSrc() == null ? "" : this.getFDownSrc()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getToken() == null ? "" : this.getToken()).append(Constant.VALUE_SPLIT_CHAR);
         return rowLine.toString();
     }

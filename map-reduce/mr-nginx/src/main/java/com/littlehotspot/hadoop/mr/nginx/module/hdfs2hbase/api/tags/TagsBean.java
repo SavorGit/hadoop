@@ -8,9 +8,8 @@
  * @EMAIL 404644381@qq.com
  * @Time : 09:43
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.tags;
 
-import com.littlehotspot.hadoop.mr.nginx.util.Constant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -28,37 +27,23 @@ import java.util.regex.Matcher;
  */
 @Data
 @NoArgsConstructor
-public class UserActBean {
+public class TagsBean {
 
     /**
-     * 用户Id
      */
-    private String deviceId;
+    private String id;
 
     /**
-     * 首次操作时间
+     * Access-Timestamp
      */
-    private String time;
-
-    /**
-     * 操作次数
-     */
-    private String count;
-
-    /**
-     * 操作类型
-     */
-    private String type;
+    private String tagname;
 
 
 
-    public String rowLine() {
-        StringBuffer rowLine = new StringBuffer();
-        rowLine.append(this.getDeviceId() == null ? "" : this.getDeviceId()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getTime() == null ? "" : this.getTime()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getCount() == null ? "" : this.getCount()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getType() == null ? "" : this.getType()).append(Constant.VALUE_SPLIT_CHAR);
-        return rowLine.toString();
+
+
+    public TagsBean(String text) {
+
     }
 
     private String cleanValue(String value) {

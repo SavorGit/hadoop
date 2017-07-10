@@ -27,76 +27,73 @@ import lombok.Data;
  * Date of last commit:$Date$<br>
  */
 @Data
-@HBaseTable(tableName = "user_read", familyName = "attr")
 public class TargetUserReadAttrBean {
 
-    @HBaseRowKey
-    private String rowKey;
+
     /**
      * 设备标识
      */
-    @HBaseColumn(columnName = "device_id")
+    @HBaseColumn(name = "device_id")
     private String deviceId;
 
     /**
      * 设备类型
      */
-    @HBaseColumn(columnName = "start")
+    @HBaseColumn(name = "start")
     private String start;
 
     /**
      * 机型
      */
-    @HBaseColumn(columnName = "end")
+    @HBaseColumn(name = "end")
     private String end;
 
     /**
      * TOKEN
      */
-    @HBaseColumn(columnName = "con_id")
+    @HBaseColumn(name = "con_id")
     private String conId;
 
     /**
      * 设备类型
      */
-    @HBaseColumn(columnName = "con_nam")
+    @HBaseColumn(name = "con_nam")
     private String conNam;
 
     /**
      * 设备类型
      */
-    @HBaseColumn(columnName = "content")
+    @HBaseColumn(name = "content")
     private String content;
 
     /**
      * 机型
      */
-    @HBaseColumn(columnName = "v_time")
+    @HBaseColumn(name = "v_time")
     private String vTime;
 
     /**
      * TOKEN
      */
-    @HBaseColumn(columnName = "longitude")
+    @HBaseColumn(name = "longitude")
     private String longitude;
 
     /**
      * 机型
      */
-    @HBaseColumn(columnName = "latitude")
+    @HBaseColumn(name = "latitude")
     private String latitude;
 
     /**
      * TOKEN
      */
-    @HBaseColumn(columnName = "os_type")
+    @HBaseColumn(name = "os_type")
     private String osType;
 
 
 
     public String rowLine() {
         StringBuffer rowLine = new StringBuffer();
-        rowLine.append(this.getRowKey() == null ? "" : this.getRowKey()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getDeviceId() == null ? "" : this.getDeviceId()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getStart() == null ? "" : this.getStart()).append(Constant.VALUE_SPLIT_CHAR);
         rowLine.append(this.getEnd() == null ? "" : this.getEnd()).append(Constant.VALUE_SPLIT_CHAR);

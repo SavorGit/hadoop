@@ -83,6 +83,42 @@ public class JdbcReader {
     }
 
     /**
+     * 读取mysql到hdfs
+     * @param hdfsCluster
+     * @param selectModel
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static void readTagListToHdfs(String hdfsCluster, SelectModel selectModel) throws IOException, URISyntaxException {
+
+        JobConf jobConf = new JobConf(JdbcReader.class);
+        setJdbc(jobConf,hdfsCluster,selectModel);
+
+        jobConf.setMapperClass(JdbcTagListToHdfsMapper.class); // hdfs
+        jobConf.setReducerClass(IdentityReducer.class);
+        JobClient.runJob(jobConf);
+
+    }
+
+    /**
+     * 读取mysql到hdfs
+     * @param hdfsCluster
+     * @param selectModel
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static void readTagToHdfs(String hdfsCluster, SelectModel selectModel) throws IOException, URISyntaxException {
+
+        JobConf jobConf = new JobConf(JdbcReader.class);
+        setJdbc(jobConf,hdfsCluster,selectModel);
+
+        jobConf.setMapperClass(JdbcTagToHdfsMapper.class); // hdfs
+        jobConf.setReducerClass(IdentityReducer.class);
+        JobClient.runJob(jobConf);
+
+    }
+
+    /**
      * setjdbc各种属性
      *
      * @param jobConf

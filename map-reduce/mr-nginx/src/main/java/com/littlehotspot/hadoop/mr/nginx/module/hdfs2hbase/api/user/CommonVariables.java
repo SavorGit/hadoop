@@ -42,5 +42,11 @@ public class CommonVariables extends Constant.CommonVariables {
 
     public static Pattern MAPPER_MOBILE_LOG_FORMAT_REGEX = Pattern.compile("^(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*)$");
 
+    public static Pattern MAPPER_USER_FORMAT_REGEX = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
+
+    public static Pattern MAPPER_ACT_FORMAT_REGEX = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
+
+    public static Pattern MAPPER_USERACT_FORMAT_REGEX = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
+
     public static HBaseHelper hBaseHelper;
 }

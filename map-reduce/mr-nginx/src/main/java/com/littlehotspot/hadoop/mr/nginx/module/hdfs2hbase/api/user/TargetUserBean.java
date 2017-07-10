@@ -11,6 +11,7 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
 
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseColumn;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseFamily;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseRowKey;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseTable;
 import com.littlehotspot.hadoop.mr.nginx.util.Constant;
@@ -27,40 +28,16 @@ import lombok.Data;
  * Date of last commit:$Date$<br>
  */
 @Data
-public class TargetUserAttrBean {
+@HBaseTable(name = "user_basic")
+public class TargetUserBean {
 
-    /**
-     * 设备标识
-     */
-    @HBaseColumn(name = "device_id")
-    private String deviceId;
+    @HBaseRowKey
+    private String rowKey;
 
-    /**
-     * 设备类型
-     */
-    @HBaseColumn(name = "m_type")
-    private String deviceType;
+    @HBaseFamily(name = "attr")
+    private  TargetUserAttrBean targetUserAttrBean;
 
-    /**
-     * 机型
-     */
-    @HBaseColumn(name = "m_ machine")
-    private String machineModel;
+    @HBaseFamily(name = "acti")
+    private  TargetUserActiBean targetUserActiBean;
 
-    /**
-     * TOKEN
-     */
-    @HBaseColumn(name = "token")
-    private String token;
-
-
-
-    public String rowLine() {
-        StringBuffer rowLine = new StringBuffer();
-        rowLine.append(this.getDeviceId() == null ? "" : this.getDeviceId()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getDeviceType() == null ? "" : this.getDeviceType()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getMachineModel() == null ? "" : this.getMachineModel()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getToken() == null ? "" : this.getToken()).append(Constant.VALUE_SPLIT_CHAR);
-        return rowLine.toString();
-    }
 }

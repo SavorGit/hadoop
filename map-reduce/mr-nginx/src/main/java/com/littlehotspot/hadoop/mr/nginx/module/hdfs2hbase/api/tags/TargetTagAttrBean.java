@@ -8,7 +8,7 @@
  * @EMAIL 404644381@qq.com
  * @Time : 09:40
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.tags;
 
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseColumn;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseRowKey;
@@ -27,40 +27,29 @@ import lombok.Data;
  * Date of last commit:$Date$<br>
  */
 @Data
-public class TargetUserAttrBean {
+public class TargetTagAttrBean {
+
 
     /**
      * 设备标识
      */
-    @HBaseColumn(name = "device_id")
-    private String deviceId;
+    @HBaseColumn(name = "name")
+    private String name;
 
     /**
      * 设备类型
      */
-    @HBaseColumn(name = "m_type")
-    private String deviceType;
+    @HBaseColumn(name = "resources")
+    private String resources;
 
-    /**
-     * 机型
-     */
-    @HBaseColumn(name = "m_ machine")
-    private String machineModel;
-
-    /**
-     * TOKEN
-     */
-    @HBaseColumn(name = "token")
-    private String token;
 
 
 
     public String rowLine() {
         StringBuffer rowLine = new StringBuffer();
-        rowLine.append(this.getDeviceId() == null ? "" : this.getDeviceId()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getDeviceType() == null ? "" : this.getDeviceType()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getMachineModel() == null ? "" : this.getMachineModel()).append(Constant.VALUE_SPLIT_CHAR);
-        rowLine.append(this.getToken() == null ? "" : this.getToken()).append(Constant.VALUE_SPLIT_CHAR);
+        rowLine.append(this.getName() == null ? "" : this.getName()).append(Constant.VALUE_SPLIT_CHAR);
+        rowLine.append(this.getResources() == null ? "" : this.getResources()).append(Constant.VALUE_SPLIT_CHAR);
+
         return rowLine.toString();
     }
 }

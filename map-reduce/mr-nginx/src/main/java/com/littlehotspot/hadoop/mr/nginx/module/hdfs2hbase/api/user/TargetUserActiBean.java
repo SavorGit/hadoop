@@ -27,55 +27,54 @@ import lombok.Data;
  * Date of last commit:$Date$<br>
  */
 @Data
-@HBaseTable(tableName = "user_basic", familyName = "acti")
 public class TargetUserActiBean {
 
     /**
      * 来源
      */
-    @HBaseColumn(columnName = "since")
+    @HBaseColumn(name = "since")
     private String since;
 
     /**
      * 下载时间戳
      */
-    @HBaseColumn(columnName = "f_down_time")
+    @HBaseColumn(name = "f_down_time")
     private String downloadTime;
 
     /**
      * 首次投屏时间戳
      */
-    @HBaseColumn(columnName = "f_proje_time")
+    @HBaseColumn(name = "f_proje_time")
     private String projectionTime;
 
     /**
      * 首次点播时间戳
      */
-    @HBaseColumn(columnName = "f_dema_time")
+    @HBaseColumn(name = "f_dema_time")
     private String demandTime;
 
     /**
      * 首次阅读时间
      */
-    @HBaseColumn(columnName = "f_read_time")
+    @HBaseColumn(name = "f_read_time")
     private String readTime;
 
     /**
      * 点播总次数
      */
-    @HBaseColumn(columnName = "dema_count")
+    @HBaseColumn(name = "dema_count")
     private String demandCount;
 
     /**
      * 投屏总次数
      */
-    @HBaseColumn(columnName = "proje_count")
+    @HBaseColumn(name = "proje_count")
     private String projectionCount;
 
     /**
      * 阅读总次数
      */
-    @HBaseColumn(columnName = "read_count")
+    @HBaseColumn(name = "read_count")
     private String readCount;
 
     public String rowLine() {

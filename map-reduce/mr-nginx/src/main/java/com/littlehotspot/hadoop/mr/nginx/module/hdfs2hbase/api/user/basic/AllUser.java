@@ -11,12 +11,10 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.CommonVariables;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.NgxSrcUserBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.UserActBean;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.SrcUserBean;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -40,7 +38,7 @@ import java.util.regex.Matcher;
 /**
  * 手机日志
  */
-public class UserReadLog extends Configured implements Tool {
+public class AllUser extends Configured implements Tool {
 
     private static class MobileMapper extends Mapper<LongWritable, Text, Text, Text> {
 
@@ -50,20 +48,16 @@ public class UserReadLog extends Configured implements Tool {
             /**数据清洗=========开始*/
             try {
                 String msg = value.toString();
-                Matcher matcher = CommonVariables.MAPPER_MOBILE_LOG_FORMAT_REGEX.matcher(msg);
+                Matcher matcher = CommonVariables.MAPPER_USER_FORMAT_REGEX.matcher(msg);
                 if (!matcher.find()) {
                     return;
                 }
-                if (StringUtils.isBlank(matcher.group(9))) {
+
+                if (StringUtils.isBlank(matcher.group(1))) {
                     return;
                 }
-                if (StringUtils.isBlank(matcher.group(5))||!matcher.group(5).equals("start")){
-                    return;
-                }
-                if (StringUtils.isBlank(matcher.group(6))||!matcher.group(6).equals("content")){
-                    return;
-                }
-                context.write(new Text(matcher.group(9)), value);
+
+                context.write(new Text(matcher.group(1)), value);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -76,28 +70,16 @@ public class UserReadLog extends Configured implements Tool {
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
                 Iterator<Text> iterator = value.iterator();
-                UserActBean userActBean = new UserActBean();
-                Integer count=0;
+                SrcUserBean srcUserBean = new SrcUserBean();
                 while (iterator.hasNext()){
                     Text item = iterator.next();
                     if (item == null) {
                         continue;
                     }
                     String rowLineContent = item.toString();
-                    Matcher matcher = CommonVariables.MAPPER_MOBILE_LOG_FORMAT_REGEX.matcher(rowLineContent);
-                    if (!matcher.find()) {
-                        return;
-                    }
-                    userActBean.setDeviceId(matcher.group(9));
-                    if (StringUtils.isBlank(userActBean.getTime())){
-                        userActBean.setTime(matcher.group(4));
-                    }else if (Long.valueOf(userActBean.getTime())>=Long.valueOf(matcher.group(4))){
-                        userActBean.setTime(matcher.group(4));
-                    }
-                    count ++;
+                    srcUserBean.setValue(rowLineContent);
                 }
-                userActBean.setCount(count.toString());
-                context.write(new Text(userActBean.getDeviceId()), new Text(userActBean.rowLine()));
+                context.write(new Text(srcUserBean.getDeviceId()), new Text(srcUserBean.rowLine()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -110,31 +92,33 @@ public class UserReadLog extends Configured implements Tool {
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
                 Iterator<Text> iterator = value.iterator();
-                UserActBean userActBean = new UserActBean();
+                SrcUserBean srcUserBean = new SrcUserBean();
                 while (iterator.hasNext()){
                     Text item = iterator.next();
                     if (item == null) {
                         continue;
                     }
                     String rowLineContent = item.toString();
-                    Matcher matcher = CommonVariables.MAPPER_USERACT_FORMAT_REGEX.matcher(rowLineContent);
+                    Matcher matcher = CommonVariables.MAPPER_USER_FORMAT_REGEX.matcher(rowLineContent);
                     if (!matcher.find()) {
                         return;
                     }
-                    userActBean.setDeviceId(matcher.group(1));
-                    if (StringUtils.isBlank(userActBean.getTime())){
-                        userActBean.setTime(matcher.group(2));
-                    }else if (Long.valueOf(userActBean.getTime())>=Long.valueOf(matcher.group(2))){
-                        userActBean.setTime(matcher.group(2));
+                    srcUserBean.setDeviceId(matcher.group(1));
+                    if (!StringUtils.isBlank(matcher.group(2))){
+                        srcUserBean.setMType(matcher.group(2));
                     }
-                    if (StringUtils.isBlank(userActBean.getCount())){
-                        userActBean.setCount(matcher.group(3));
-                    }else {
-                        Long count=Long.valueOf(userActBean.getCount())+Long.valueOf(matcher.group(3));
-                        userActBean.setCount(count.toString());
+
+                    if (!StringUtils.isBlank(matcher.group(3))){
+                        srcUserBean.setMMachine(matcher.group(3));
                     }
+
+                    if (StringUtils.isBlank(srcUserBean.getFDownTime())||(!StringUtils.isBlank(matcher.group(4))&&Long.valueOf(srcUserBean.getFDownTime())>Long.valueOf(matcher.group(4)))){
+                        srcUserBean.setFDownTime(matcher.group(4));
+                        srcUserBean.setFDownSrc("ngx");
+                    }
+                    srcUserBean.setValue(rowLineContent);
                 }
-                context.write(new Text(userActBean.rowLine()), new Text());
+                context.write(new Text(srcUserBean.rowLine()), new Text());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -149,20 +133,24 @@ public class UserReadLog extends Configured implements Tool {
 
             // 获取参数
             String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
-            String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
+//            String hdfsInputPath1 = CommonVariables.getParameterValue(Argument.InputBoxPath);
+//            String hdfsInputPath2 = CommonVariables.getParameterValue(Argument.InputMobPath);
+//            String hdfsInputPath3 = CommonVariables.getParameterValue(Argument.InputNgxPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
-            Job job = Job.getInstance(this.getConf(), UserReadLog.class.getSimpleName());
-            job.setJarByClass(UserReadLog.class);
+            Job job = Job.getInstance(this.getConf(), AllUser.class.getSimpleName());
+            job.setJarByClass(AllUser.class);
 
             /**作业输入*/
-            Path inputPath = new Path(hdfsInputPath);
-            FileInputFormat.addInputPath(job, inputPath);
+//            Path inputPath1 = new Path(hdfsInputPath1);
+//            Path inputPath2 = new Path(hdfsInputPath2);
+//            Path inputPath3 = new Path(hdfsInputPath3);
+//            FileInputFormat.addInputPath(job, inputPath1);
+//            FileInputFormat.addInputPath(job, inputPath2);
+//            FileInputFormat.addInputPath(job, inputPath3);
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
-
-            job.setCombinerClass(Combiner.class);
 
             /**作业输出*/
             Path outputPath = new Path(hdfsOutputPath);
