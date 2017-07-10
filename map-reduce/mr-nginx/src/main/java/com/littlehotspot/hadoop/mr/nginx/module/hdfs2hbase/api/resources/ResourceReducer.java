@@ -1,6 +1,5 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.resources;
 
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.TargetUserAttrBean;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -34,7 +33,7 @@ public class ResourceReducer extends Reducer<Text, Text, Text, Text> {
                 TextSourceResources source = new TextSourceResources(rowLineContent);
 
                 targetResource.setRowKey(source.getId() + resourceType.getValue());
-                targetResource.setAttrBean(setAttr(source));
+                targetResource.setAttrBean(setAttr(source, resourceType));
                 targetResource.setAdatBean(setAdat(source));
 
             }
@@ -47,9 +46,10 @@ public class ResourceReducer extends Reducer<Text, Text, Text, Text> {
     }
 
 
-    private TargetResourcesAttrBean setAttr(TextSourceResources source) {
+    private TargetResourcesAttrBean setAttr(TextSourceResources source, ResourceType resourceType) {
 
         TargetResourcesAttrBean attrBean = new TargetResourcesAttrBean();
+        attrBean.setResource_type(resourceType.getValue());
         attrBean.setId(source.getId());
         attrBean.setName(source.getName());
         attrBean.setCreator_id(source.getCreator_id());

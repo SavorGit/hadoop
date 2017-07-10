@@ -6,7 +6,7 @@ import org.apache.hadoop.util.ToolRunner;
 import java.io.IOException;
 
 /**
- * <h1> title </h1>
+ * <h1> 从hdfs读取文件到hbase表 </h1>
  * Created by Administrator on 2017-07-07 下午 6:10.
  */
 public class HdfsToHbaseMain {

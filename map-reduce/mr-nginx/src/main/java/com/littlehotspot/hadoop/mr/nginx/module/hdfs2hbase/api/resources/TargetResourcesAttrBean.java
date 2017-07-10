@@ -12,7 +12,7 @@ import lombok.NonNull;
  */
 @Data
 @HBaseTable(name = "resources")
-public class TargetResourcesAttrBean {
+class TargetResourcesAttrBean {
 
     /**
      * 类型
@@ -22,8 +22,7 @@ public class TargetResourcesAttrBean {
      * 0x0103：节目
      */
     @HBaseColumn(name = "rety")
-    private String resource_type;
-
+    private int resource_type;
 
     /**
      * 标识
