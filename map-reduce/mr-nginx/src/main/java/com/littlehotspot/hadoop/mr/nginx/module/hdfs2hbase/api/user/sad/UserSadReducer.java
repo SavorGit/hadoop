@@ -23,8 +23,10 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
             Configuration conf = context.getConfiguration();
             SadType sadType = SadType.valueOf(conf.get("sadType"));
 
-            TextTargetSadAttrBean targetSadAttrBean = TargetBeanFactory.getTargetSadAttrBean(sadType);
-            TextTargetSadRelaBean targetSadRelaBean = TargetBeanFactory.getTargetSadRelaBean(sadType);
+            UserSad userSad = TargetBeanFactory.getTargetUserSadBean(sadType);
+            String rowKey = null;
+            TextTargetSadAttrBean targetSadAttrBean = new TextTargetSadAttrBean();
+            TextTargetSadRelaBean targetSadRelaBean = new TextTargetSadRelaBean();
 
             Iterator<Text> textIterator = value.iterator();
             while (textIterator.hasNext()) {
@@ -38,11 +40,14 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
                 this.setPropertiesForAttrBean(targetSadAttrBean, sourceUserSadBean);
                 this.setPropertiesForRelaBean(conf, targetSadRelaBean, sourceUserSadBean);
 
+                rowKey=sourceUserSadBean.getMobile_id()+sourceUserSadBean.getTimestamps();
             }
 
             if(targetSadAttrBean.getStart() != 0 && targetSadAttrBean.getEnd() != 0) {
-                CommonVariables.hBaseHelper.insert(targetSadAttrBean);
-                CommonVariables.hBaseHelper.insert(targetSadRelaBean);
+                userSad.setRowKey(rowKey);
+                userSad.setAttrBean(targetSadAttrBean);
+                userSad.setRelaBean(targetSadRelaBean);
+                CommonVariables.hBaseHelper.insert(userSad);
             }
 
 //            context.write(new Text(value.toString()), new Text());
@@ -52,7 +57,6 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
     }
 
     private void setPropertiesForAttrBean(TextTargetSadAttrBean bean, TextTargetSadActBean source) {
-        bean.setRowKey(source.getMobile_id() + source.getTimestamps());
         bean.setDevice_id(source.getMobile_id());
         bean.setType(source.getMedia_type());
         if ("start".equals(source.getOption_type())) {
@@ -63,8 +67,6 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
     }
 
     private void setPropertiesForRelaBean(Configuration conf, TextTargetSadRelaBean bean, TextTargetSadActBean source) throws Exception {
-        bean.setRowKey(source.getMobile_id() + source.getTimestamps());
-
         String hotelId = source.getHotel_id();
         bean.setHotel(hotelId);
 

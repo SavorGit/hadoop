@@ -1,4 +1,4 @@
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.resources;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
@@ -14,45 +14,38 @@ import org.apache.hadoop.util.Tool;
 import java.net.URI;
 
 /**
- * <h1> 用户行为最终处理 </h1>
- * Created by Administrator on 2017-06-27 下午 3:05.
+ * <h1> title </h1>
+ * Created by Administrator on 2017-07-06 下午 4:02.
  */
-public class UserSadScheduler extends Configured implements Tool {
+public class ResourceScheduler extends Configured implements Tool {
 
     @Override
     public int run(String[] args) throws Exception {
         try {
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
             CommonVariables.hBaseHelper = new HBaseHelper(this.getConf());
+
             // 获取参数
-            String hdfsInputStart = CommonVariables.getParameterValue(Argument.InputPathStart);
-            String hdfsInputEnd = CommonVariables.getParameterValue(Argument.InputPathEnd);
+            String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
+            String resourceType = CommonVariables.getParameterValue(Argument.ResourceType);
+            this.getConf().set("resourceType", resourceType);
 
-            String sadType = CommonVariables.getParameterValue(Argument.SadType);
-            String hbaseRoot = CommonVariables.getParameterValue(Argument.HbaseRoot);
-            String hbaseZoo = CommonVariables.getParameterValue(Argument.HbaseZookeeper);
-            this.getConf().set("sadType", sadType);
-            this.getConf().set("hbase.rootdir", hbaseRoot);
-            this.getConf().set("hbase.zookeeper.quorum", hbaseZoo);
-
-            Path inputPath = new Path(hdfsInputStart);
-            Path inputPath1 = new Path(hdfsInputEnd);
+            Path inputPath = new Path(hdfsInputPath);
             Path outputPath = new Path(hdfsOutputPath);
 
             Job job = Job.getInstance(this.getConf(), this.getClass().getName());
             job.setJarByClass(this.getClass());
 
-            job.setMapperClass(UserSadMapper.class);
+            job.setMapperClass(ResourceMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
 
-            job.setReducerClass(UserSadReducer.class);
+            job.setReducerClass(ResourceReducer.class);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(Text.class);
 
             FileInputFormat.addInputPath(job, inputPath);
-            FileInputFormat.addInputPath(job, inputPath1);
             FileOutputFormat.setOutputPath(job, outputPath);
 
             FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());

@@ -39,7 +39,7 @@ public class TestUserSadScheduler {
     public void testStart_Dem() {
         String[] args = {
                 "hdfsCluster=hdfs://devpd1:8020",
-                "hdfsIn=/home/data/hadoop/flume/test_hbase/source/box_log_distinct",
+                "hdfsIn=/home/data/hadoop/flume/box_export/2017-07-03",
                 "hdfsOut=/home/data/hadoop/flume/test_hbase/user_demand_start",
                 "sadActType=START_DEM"
         };
@@ -50,7 +50,7 @@ public class TestUserSadScheduler {
     public void testEnd_Dem() {
         String[] args = {
                 "hdfsCluster=hdfs://devpd1:8020",
-                "hdfsIn=/home/data/hadoop/flume/test_hbase/source/box_log_distinct",
+                "hdfsIn=/home/data/hadoop/flume/box_export/2017-07-03",
                 "hdfsOut=/home/data/hadoop/flume/test_hbase/user_demand_end",
                 "sadActType=END_DEM"
         };
@@ -72,9 +72,13 @@ public class TestUserSadScheduler {
     public void user_project() throws IOException {
         String[] args = {
                 "hdfsCluster=hdfs://devpd1:8020",
-                "hdfsIn=/home/data/hadoop/flume/test_hbase/user_projection_start;/home/data/hadoop/flume/test_hbase/user_projection_end",
+                "hdfsInStart=/home/data/hadoop/flume/test_hbase/user_projection_start",
+                "hdfsInEnd=/home/data/hadoop/flume/test_hbase/user_projection_end",
                 "hdfsOut=/home/data/hadoop/flume/test_hbase/user_projection",
-                "sadType=PROJECTION"
+                "sadType=PROJECTION",
+
+                "hbaseRoot=hdfs://devpd1:8020/hbase",
+                "hbaseZookeeper=devpd1"
         };
         System.setProperty("hadoop.home.dir", "E:\\DevpPrograms\\hadoop-2.7.3");
         Configuration conf = new Configuration();
@@ -89,9 +93,13 @@ public class TestUserSadScheduler {
     public void user_demand() throws IOException {
         String[] args = {
                 "hdfsCluster=hdfs://devpd1:8020",
-                "hdfsIn=/home/data/hadoop/flume/test_hbase/user_demand_start;/home/data/hadoop/flume/test_hbase/user_demand_end",
+                "hdfsInStart=/home/data/hadoop/flume/test_hbase/user_demand_start",
+                "hdfsInEnd=/home/data/hadoop/flume/test_hbase/user_demand_end",
                 "hdfsOut=/home/data/hadoop/flume/test_hbase/user_projection",
-                "sadType=DEMAND"
+                "sadType=DEMAND",
+
+                "hbaseRoot=hdfs://devpd1:8020/hbase",
+                "hbaseZookeeper=devpd1"
         };
         System.setProperty("hadoop.home.dir", "E:\\DevpPrograms\\hadoop-2.7.3");
         Configuration conf = new Configuration();

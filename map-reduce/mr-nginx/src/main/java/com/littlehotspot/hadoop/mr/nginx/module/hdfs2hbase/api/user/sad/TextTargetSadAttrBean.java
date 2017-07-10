@@ -11,22 +11,19 @@ import lombok.Data;
 @Data
 public class TextTargetSadAttrBean {
 
-    @HBaseRowKey
-    private String rowKey;
-
-    @HBaseColumn(columnName = "device_id")
+    @HBaseColumn(name = "device_id")
     private String device_id;
 
-    @HBaseColumn(columnName = "start")
+    @HBaseColumn(name = "start")
     private long start;
 
-    @HBaseColumn(columnName = "end")
+    @HBaseColumn(name = "end")
     private long end;
 
-    @HBaseColumn(columnName = "type")
+    @HBaseColumn(name = "type")
     private String type;
 
-    @HBaseColumn(columnName = "p_time")
+    @HBaseColumn(name = "p_time")
     private long p_time;
 
     public void setP_time() {

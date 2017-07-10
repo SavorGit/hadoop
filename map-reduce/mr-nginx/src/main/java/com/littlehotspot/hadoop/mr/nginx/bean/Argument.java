@@ -30,7 +30,8 @@ public enum Argument {
     InputPathEnd("hdfsInEnd", null),
     OutputPath("hdfsOut", null),
     HbaseTable("table", null),
-
+    HbaseRoot("hbaseRoot", null),
+    HbaseZookeeper("hbaseZookeeper", null),
 
     VersionName("versionname", ""),// 版本名称
     VersionCode("versioncode", ""),// 版本号
@@ -47,6 +48,8 @@ public enum Argument {
 
     SadActType("sadActType", ""),// 投屏点播类型
     SadType("sadType", ""),// 用户行为类型
+
+    ResourceType("resourceType",""),// 资源类型
     ;
 
     @Getter

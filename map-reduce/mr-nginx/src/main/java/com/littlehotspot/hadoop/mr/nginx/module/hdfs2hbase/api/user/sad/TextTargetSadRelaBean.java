@@ -10,42 +10,40 @@ import lombok.Data;
  */
 @Data
 public class TextTargetSadRelaBean {
-    @HBaseRowKey
-    private String rowKey;
 
-    @HBaseColumn(columnName = "hotel")
+    @HBaseColumn(name = "hotel")
     private String hotel;
 
-    @HBaseColumn(columnName = "hotel_name")
+    @HBaseColumn(name = "hotel_name")
     private String hotel_name;
 
-    @HBaseColumn(columnName = "room")
+    @HBaseColumn(name = "room")
     private String room;
 
-    @HBaseColumn(columnName = "room_name")
+    @HBaseColumn(name = "room_name")
     private String room_name;
 
-    @HBaseColumn(columnName = "box_mac")
+    @HBaseColumn(name = "box_mac")
     private String box_mac;
 
-    @HBaseColumn(columnName = "box_name")
+    @HBaseColumn(name = "box_name")
     private String box_name;
 
-    @HBaseColumn(columnName = "media")
+    @HBaseColumn(name = "media")
     private String media;
 
-    @HBaseColumn(columnName = "media_name")
+    @HBaseColumn(name = "media_name")
     private String media_name;
 
-    @HBaseColumn(columnName = "media_down_url")
+    @HBaseColumn(name = "media_down_url")
     private String media_down_url;
 
-    @HBaseColumn(columnName = "apk_version")
+    @HBaseColumn(name = "apk_version")
     private String apk_version;
 
-    @HBaseColumn(columnName = "ads_version")
+    @HBaseColumn(name = "ads_version")
     private String ads_version;
 
-    @HBaseColumn(columnName = "dema_version")
+    @HBaseColumn(name = "dema_version")
     private String dema_version;
 }
