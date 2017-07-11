@@ -1,5 +1,6 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.resources;
 
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -12,6 +13,8 @@ import java.util.Iterator;
  * Created by Administrator on 2017-07-06 下午 4:02.
  */
 public class ResourceReducer extends Reducer<Text, Text, Text, Text> {
+
+    private HBaseHelper hBaseHelper;
 
     @Override
     protected void reduce(Text key, Iterable<Text> value, Reducer<Text, Text, Text, Text>.Context context) throws IOException, InterruptedException {
@@ -38,21 +41,26 @@ public class ResourceReducer extends Reducer<Text, Text, Text, Text> {
 
             }
 
-            CommonVariables.hBaseHelper.insert(targetResource);
+            this.hBaseHelper.insert(targetResource);
 
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
+    @Override
+    protected void setup(Context context) throws IOException, InterruptedException {
+        super.setup(context);
+        Configuration conf = context.getConfiguration();
+        this.hBaseHelper = new HBaseHelper(conf);
+    }
 
     private TargetResourcesAttrBean setAttr(TextSourceResources source, ResourceType resourceType) {
 
         TargetResourcesAttrBean attrBean = new TargetResourcesAttrBean();
-        if(resourceType != null && ResourceType.CON.equals(resourceType)) {
+        if (resourceType != null && ResourceType.CON.equals(resourceType)) {
             attrBean.setResource_type(resourceType.getValue());
-        }else{
-            switch (source.getType()){
+        } else {
+            switch (source.getType()) {
                 case "1":
                     attrBean.setResource_type(ResourceType.ADS.getValue());
                     break;
