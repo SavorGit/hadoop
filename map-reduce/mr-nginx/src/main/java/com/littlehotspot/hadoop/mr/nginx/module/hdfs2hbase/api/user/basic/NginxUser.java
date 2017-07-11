@@ -50,11 +50,11 @@ public class NginxUser extends Configured implements Tool {
             /**数据清洗=========开始*/
             try {
                 String msg = value.toString();
-                Matcher matcher = CommonVariables.MAPPER_NGINX_FORMAT_REGEX.matcher(msg);
+                Matcher matcher = CommonVariables.MAPPER_NGINX_LOG_FORMAT_REGEX.matcher(msg);
                 if (!matcher.find()) {
                     return;
                 }
-                String deviceId = matcher.group(17);
+                String deviceId = matcher.group(16);
                 if (StringUtils.isBlank(deviceId)) {
                     return;
                 }

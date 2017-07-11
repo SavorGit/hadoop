@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <h1>模型 - [源] 用户</h1>
@@ -112,17 +113,18 @@ public class NgxSrcUserBean {
         if (!matcher.find()) {
             return;
         }
-        this.setDeviceId(matcher.group(17));
-        this.setMType(matcher.group(14));
-        this.setMMachine(matcher.group(12));
+        this.setDeviceId(matcher.group(16));
+        this.setMType(matcher.group(15));
+        this.setMMachine(matcher.group(13));
         if (StringUtils.isBlank(this.getFDownTime())||(!StringUtils.isBlank(matcher.group(2))&&Long.valueOf(this.getFDownTime())>Long.valueOf(matcher.group(2)))){
             this.setFDownTime(matcher.group(2));
             this.setFDownSrc("ngx");
         }
 
-        String url = matcher.group(5);
-        if (!StringUtils.isBlank(url)){
-            this.setToken(url.substring(url.indexOf("deviceToken=")+12,url.indexOf("")-1));
+        String url = matcher.group(4);
+        if (!StringUtils.isBlank(url)&&url.contains("deviceToken=")){
+            Matcher m = Pattern.compile("deviceToken=(\\d*?)&").matcher(url);
+            this.setToken(m.group(1));
         }
 
 
