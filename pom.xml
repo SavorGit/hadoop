@@ -578,6 +578,7 @@
     <modules>
         <module>map-reduce</module>
         <module>storm</module>
+        <module>util</module>
     </modules>
 
 </project>
