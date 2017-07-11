@@ -15,13 +15,11 @@ import java.util.Iterator;
 public class ResourceReducer extends Reducer<Text, Text, Text, Text> {
 
     private HBaseHelper hBaseHelper;
+    private ResourceType resourceType;
 
     @Override
     protected void reduce(Text key, Iterable<Text> value, Reducer<Text, Text, Text, Text>.Context context) throws IOException, InterruptedException {
         try {
-
-            Configuration conf = context.getConfiguration();
-            ResourceType resourceType = ResourceType.valueOf(conf.get("resourceType"));
 
             Resources targetResource = new Resources();
 
@@ -38,20 +36,20 @@ public class ResourceReducer extends Reducer<Text, Text, Text, Text> {
                 targetResource.setRowKey(source.getId() + resourceType.getValue());
                 targetResource.setAttrBean(setAttr(source, resourceType));
                 targetResource.setAdatBean(setAdat(source));
-
             }
 
             this.hBaseHelper.insert(targetResource);
 
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
-        super.setup(context);
         Configuration conf = context.getConfiguration();
         this.hBaseHelper = new HBaseHelper(conf);
+        this.resourceType = ResourceType.valueOf(conf.get("resourceType"));
     }
 
     private TargetResourcesAttrBean setAttr(TextSourceResources source, ResourceType resourceType) {
