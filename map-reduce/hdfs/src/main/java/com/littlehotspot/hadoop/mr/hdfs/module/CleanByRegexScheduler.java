@@ -11,9 +11,9 @@
 package com.littlehotspot.hadoop.mr.hdfs.module;
 
 import com.littlehotspot.hadoop.mr.hdfs.mapper.CleanByRegexMapper;
-import com.littlehotspot.hadoop.mr.hdfs.util.Argument;
-import com.littlehotspot.hadoop.mr.hdfs.util.ArgumentFactory;
 import com.littlehotspot.hadoop.mr.hdfs.util.CleanByRegexConstant;
+import com.littlehotspot.util.argument.model.Argument;
+import net.lizhaoweb.common.util.argument.ArgumentFactory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -69,9 +69,9 @@ public class CleanByRegexScheduler extends Configured implements Tool {
         }
 
         // Hdfs 读取路径
-        String hdfsInputPath = ArgumentFactory.getParameterValue(Argument.InputPath);
-        System.out.println("\tInput[HDFS-Input-Path]    : " + hdfsInputPath);
-        if (hdfsInputPath == null) {
+        String[] hdfsInputPathArray = ArgumentFactory.getParameterValues(Argument.InputPath);
+        System.out.println("\tInput[HDFS-Input-Path]    : " + hdfsInputPathArray);
+        if (hdfsInputPathArray == null) {
             throw new IllegalArgumentException("The argument['hdfsIn'] for this program is null");
         }
 
@@ -93,8 +93,10 @@ public class CleanByRegexScheduler extends Configured implements Tool {
 
 
         // 作业输入
-        Path inputPath = new Path(hdfsInputPath);
-        FileInputFormat.addInputPath(job, inputPath);
+        for (String hdfsInputPath : hdfsInputPathArray) {
+            Path inputPath = new Path(hdfsInputPath);
+            FileInputFormat.addInputPath(job, inputPath);
+        }
         job.setMapperClass(CleanByRegexMapper.class);
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);

@@ -43,9 +43,9 @@
 
         <!-- 自定义插件 -->
         <dependency>
-            <groupId>net.lizhaoweb.common.util.data</groupId>
-            <artifactId>convert</artifactId>
-            <version>1.0.0.0.1</version>
+            <groupId>com.littlehotspot.util</groupId>
+            <artifactId>hadoop-util-argument</artifactId>
+            <version>1.0.0.0.1-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
