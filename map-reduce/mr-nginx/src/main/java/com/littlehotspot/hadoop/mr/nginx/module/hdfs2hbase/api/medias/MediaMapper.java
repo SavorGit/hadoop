@@ -15,15 +15,12 @@ public class MediaMapper extends Mapper<LongWritable, Text, Text, Text> {
 
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-        try {
 
-            if(StringUtils.isBlank(value.toString().trim())) {
-                return;
-            }
-
-            context.write(new Text(key.toString()), value);
-        } catch (Exception e) {
-            e.printStackTrace();
+        String rowLineContent = value.toString();
+        if (StringUtils.isBlank(rowLineContent.trim()) && "null".equals(rowLineContent)) {
+            return;
         }
+
+        context.write(new Text(key.toString()), value);
     }
 }

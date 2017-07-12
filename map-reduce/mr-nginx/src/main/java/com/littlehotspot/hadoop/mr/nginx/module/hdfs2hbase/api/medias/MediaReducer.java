@@ -40,7 +40,7 @@ public class MediaReducer extends Reducer<Text, Text, Text, Text> {
             hBaseHelper.insert(targetResource);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new IOException("MediaReducer Hbase Insert Error");
         }
     }
 

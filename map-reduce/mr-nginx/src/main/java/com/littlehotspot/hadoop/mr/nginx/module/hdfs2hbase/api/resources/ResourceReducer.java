@@ -41,7 +41,7 @@ public class ResourceReducer extends Reducer<Text, Text, Text, Text> {
             this.hBaseHelper.insert(targetResource);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new IOException("ResourceReducer Hbase Insert Error");
         }
     }
 

@@ -19,7 +19,9 @@ public class TestMedia {
                 "hdfsOut=/home/data/hadoop/flume/test_hbase/mysql1",
 
                 "hbaseRoot=hdfs://devpd1:8020/hbase",
-                "hbaseZookeeper=devpd1"
+                "hbaseZookeeper=devpd1",
+
+                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase"
         };
         System.setProperty("hadoop.home.dir", "E:\\DevpPrograms\\hadoop-2.7.3");
         Configuration conf = new Configuration();
