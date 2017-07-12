@@ -1,4 +1,4 @@
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.resources;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.medias;
 
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseFamily;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseRowKey;
@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 /**
- * <h1> 资源信息表 </h1>
- * Created by Administrator on 2017-07-07 上午 10:14.
+ * <h1> 媒体信息表 </h1>
+ * Created by Administrator on 2017-07-10 下午 2:35.
  */
 @Data
 @NoArgsConstructor
-@HBaseTable(name = "resources")
-public class Resources {
+@HBaseTable(name = "medias")
+public class Medias {
 
     /**
      * id + rety
@@ -24,9 +24,6 @@ public class Resources {
     private String rowKey;
 
     @HBaseFamily(name = "attr")
-    private TargetResourcesAttrBean attrBean;
-
-    @HBaseFamily(name = "adat")
-    private TargetResourcesAdatBean adatBean;
+    private TargetMediasAttrBean attrBean;
 
 }

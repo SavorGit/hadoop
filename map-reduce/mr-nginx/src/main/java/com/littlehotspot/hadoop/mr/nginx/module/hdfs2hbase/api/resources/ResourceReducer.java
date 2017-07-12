@@ -1,6 +1,6 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.resources;
 
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.TargetUserAttrBean;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -14,12 +14,12 @@ import java.util.Iterator;
  */
 public class ResourceReducer extends Reducer<Text, Text, Text, Text> {
 
+    private HBaseHelper hBaseHelper;
+    private ResourceType resourceType;
+
     @Override
     protected void reduce(Text key, Iterable<Text> value, Reducer<Text, Text, Text, Text>.Context context) throws IOException, InterruptedException {
         try {
-
-            Configuration conf = context.getConfiguration();
-            ResourceType resourceType = ResourceType.valueOf(conf.get("resourceType"));
 
             Resources targetResource = new Resources();
 
@@ -34,22 +34,42 @@ public class ResourceReducer extends Reducer<Text, Text, Text, Text> {
                 TextSourceResources source = new TextSourceResources(rowLineContent);
 
                 targetResource.setRowKey(source.getId() + resourceType.getValue());
-                targetResource.setAttrBean(setAttr(source));
+                targetResource.setAttrBean(setAttr(source, resourceType));
                 targetResource.setAdatBean(setAdat(source));
-
             }
 
-            CommonVariables.hBaseHelper.insert(targetResource);
+            this.hBaseHelper.insert(targetResource);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    @Override
+    protected void setup(Context context) throws IOException, InterruptedException {
+        Configuration conf = context.getConfiguration();
+        this.hBaseHelper = new HBaseHelper(conf);
+        this.resourceType = ResourceType.valueOf(conf.get("resourceType"));
+    }
 
-    private TargetResourcesAttrBean setAttr(TextSourceResources source) {
+    private TargetResourcesAttrBean setAttr(TextSourceResources source, ResourceType resourceType) {
 
         TargetResourcesAttrBean attrBean = new TargetResourcesAttrBean();
+        if (resourceType != null && ResourceType.CON.equals(resourceType)) {
+            attrBean.setResource_type(resourceType.getValue());
+        } else {
+            switch (source.getType()) {
+                case "1":
+                    attrBean.setResource_type(ResourceType.ADS.getValue());
+                    break;
+                case "2":
+                    attrBean.setResource_type(ResourceType.PRO.getValue());
+                    break;
+                case "3":
+                    attrBean.setResource_type(ResourceType.ADV.getValue());
+                    break;
+            }
+        }
         attrBean.setId(source.getId());
         attrBean.setName(source.getName());
         attrBean.setCreator_id(source.getCreator_id());

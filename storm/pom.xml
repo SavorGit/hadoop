@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>hadoop</artifactId>
+        <groupId>com.littlehotspot</groupId>
+        <version>1.0.0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.littlehotspot.storm</groupId>
+    <artifactId>parent</artifactId>
+
+    <name>Hadoop Storm</name>
+    <packaging>pom</packaging>
+
+    <properties>
+        <storm.version>1.0.2</storm.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- Storm Dependency -->
+            <dependency>
+                <groupId>org.apache.storm</groupId>
+                <artifactId>storm-core</artifactId>
+                <version>${storm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.storm</groupId>
+                <artifactId>storm-rename-hack</artifactId>
+                <version>${storm.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <modules>
+        <module>demo</module>
+    </modules>
+
+</project>

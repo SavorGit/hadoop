@@ -8,8 +8,10 @@
  * @EMAIL 404644381@qq.com
  * @Time : 11:05
  */
-package com.littlehotspot.hadoop.mr.hdfs.util;
+package com.littlehotspot.util.argument;
 
+import com.littlehotspot.util.argument.model.Argument;
+import net.lizhaoweb.common.util.argument.ArgumentFactory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 

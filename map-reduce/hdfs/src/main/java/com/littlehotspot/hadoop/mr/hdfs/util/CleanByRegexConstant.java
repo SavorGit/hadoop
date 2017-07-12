@@ -10,6 +10,8 @@
  */
 package com.littlehotspot.hadoop.mr.hdfs.util;
 
+import com.littlehotspot.util.argument.MapReduceConstant;
+
 /**
  * <h1>常量 - 利用正则表达式清洗 HDFS 文件</h1>
  *

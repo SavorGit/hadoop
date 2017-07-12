@@ -12,7 +12,7 @@ import lombok.NonNull;
  */
 @Data
 @HBaseTable(name = "resources")
-public class TargetResourcesAdatBean {
+class TargetResourcesAdatBean {
 
 
     /**
