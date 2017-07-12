@@ -1,6 +1,7 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.medias;
 
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.resources.CommonVariables;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
@@ -12,6 +13,8 @@ import java.util.Iterator;
  * Created by Administrator on 2017-07-10 下午 6:12.
  */
 public class MediaReducer extends Reducer<Text, Text, Text, Text> {
+
+    private HBaseHelper hBaseHelper;
 
     @Override
     protected void reduce(Text key, Iterable<Text> value, Reducer<Text, Text, Text, Text>.Context context) throws IOException, InterruptedException {
@@ -34,11 +37,17 @@ public class MediaReducer extends Reducer<Text, Text, Text, Text> {
 
             }
 
-            CommonVariables.hBaseHelper.insert(targetResource);
+            hBaseHelper.insert(targetResource);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void setup(Context context) throws IOException, InterruptedException {
+        Configuration conf = context.getConfiguration();
+        this.hBaseHelper = new HBaseHelper(conf);
     }
 
     private TargetMediasAttrBean setAttr(TextSourceMedias source) {
