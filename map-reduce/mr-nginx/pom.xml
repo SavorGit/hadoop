@@ -519,10 +519,42 @@
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/read/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/mysql/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/mysql/model/*</include>
                             </includes>
                             <archive>
                                 <manifest>
                                     <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.ReadDurationMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <!-- 机顶盒用户索引表 -->
+                    <execution>
+                        <id>user_box-index</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>user_box-index</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/boxindex/*</include>
+
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.boxindex.BoxUserIndexMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
