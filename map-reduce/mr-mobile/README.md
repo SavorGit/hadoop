@@ -1,7 +1,7 @@
-# HADOOP
-JAVA 组 HADOOP 仓库
+# HADOOP MAP-REDUCE MOBILE
 
-**模块 ID 为 ：** _HADOOP.0.0.0.0_
+
+**模块 ID 为 ：** _HADOOP.2.3.0.0_
 
 **版本规则：** ID.L1.L2.L3.L4.L5.VF.VM.VFT[-SNAPSHOT]
 <pre><code>

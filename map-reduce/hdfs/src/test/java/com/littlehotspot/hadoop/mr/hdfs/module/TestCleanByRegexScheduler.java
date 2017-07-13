@@ -36,7 +36,7 @@ public class TestCleanByRegexScheduler {
                     "hdfsCluster=hdfs://devpd1:8020",
                     "hdfsIn=/home/data/hadoop/flume/box_source/2017-06-28",
                     "hdfsOut=/home/data/hadoop/flume/box_export/2017-06-28",
-                    "inRegex=^.+,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.+,.*,?$"
+                    "inMapperRegex=^.+,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.+,.*,?$"
             };
             ToolRunner.run(null, new CleanByRegexScheduler(), args);
         } catch (Exception e) {

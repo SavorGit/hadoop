@@ -6,11 +6,12 @@
     <parent>
         <groupId>com.littlehotspot</groupId>
         <artifactId>hadoop</artifactId>
-        <version>1.0.0.0.1-SNAPSHOT</version>
+        <version>LHS.HADOOP.0.0.0.0.1.0.0-SNAPSHOT</version>
     </parent>
 
     <groupId>com.littlehotspot.hadoop</groupId>
     <artifactId>map-reduce</artifactId>
+    <version>LHS.HADOOP.2.0.0.0.1.0.0-SNAPSHOT</version>
 
     <name>Hadoop Map-Reduce</name>
     <packaging>pom</packaging>

@@ -4,13 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>map-reduce</artifactId>
         <groupId>com.littlehotspot.hadoop</groupId>
-        <version>1.0.0.0.1-SNAPSHOT</version>
+        <artifactId>map-reduce</artifactId>
+        <version>LHS.HADOOP.2.0.0.0.1.0.0-SNAPSHOT</version>
     </parent>
 
     <groupId>com.littlehotspot.hadoop.mr</groupId>
     <artifactId>mr-box</artifactId>
+    <version>LHS.HADOOP.2.2.0.0.1.0.0-SNAPSHOT</version>
 
     <name>Hadoop Map-Reduce [Box]</name>
     <packaging>jar</packaging>
@@ -43,9 +44,9 @@
 
         <!-- 自定义插件 -->
         <dependency>
-            <groupId>net.lizhaoweb.common.util.data</groupId>
-            <artifactId>convert</artifactId>
-            <version>1.0.0.0.1</version>
+            <groupId>com.littlehotspot.hadoop.util</groupId>
+            <artifactId>argument</artifactId>
+            <version>LHS.HADOOP.1.1.0.0.1.0.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
