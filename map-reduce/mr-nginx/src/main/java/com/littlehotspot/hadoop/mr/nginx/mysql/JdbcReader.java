@@ -119,6 +119,24 @@ public class JdbcReader {
     }
 
     /**
+     * 读取mysql到hdfs
+     * @param hdfsCluster
+     * @param selectModel
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static void readRquserToHdfs(String hdfsCluster, SelectModel selectModel) throws IOException, URISyntaxException {
+
+        JobConf jobConf = new JobConf(JdbcReader.class);
+        setJdbc(jobConf,hdfsCluster,selectModel);
+
+        jobConf.setMapperClass(JdbcRqUserToHdfsMapper.class); // hdfs
+        jobConf.setReducerClass(IdentityReducer.class);
+        JobClient.runJob(jobConf);
+
+    }
+
+    /**
      * setjdbc各种属性
      *
      * @param jobConf

@@ -117,27 +117,26 @@ public class SourceMobileBean {
 
 
     public SourceMobileBean(String text) {
-        Matcher matcher = CommonVariables.MAPPER_INPUT_FORMAT_REGEX.matcher(text);
+        Matcher matcher = CommonVariables.MAPPER_LOG_FORMAT_REGEX.matcher(text);
         if (!matcher.find()) {
             return;
         }
-        this.setId(matcher.group(1));
-        this.setUuid(matcher.group(2));
-        this.setHotelId(matcher.group(3));
-        this.setRoomId(matcher.group(4));
-        this.setTimestamps(matcher.group(5));
-        this.setOptionType(matcher.group(6));
-        this.setMediaType(matcher.group(7));
-        this.setContentId(matcher.group(8));
-        this.setCategoryId(matcher.group(9));
-        this.setMobileId(matcher.group(10));
-        this.setMediaId(matcher.group(11));
-        this.setOsType(matcher.group(12));
-        this.setLongitude(matcher.group(13));
-        this.setLatitude(matcher.group(14));
-        this.setSerialnumber(matcher.group(15));
-        this.setAreaId(matcher.group(16));
-        this.setCommonValue(matcher.group(17));
+        this.setUuid(matcher.group(1));
+        this.setHotelId(matcher.group(2));
+        this.setRoomId(matcher.group(3));
+        this.setTimestamps(matcher.group(4));
+        this.setOptionType(matcher.group(5));
+        this.setMediaType(matcher.group(6));
+        this.setContentId(matcher.group(7));
+        this.setCategoryId(matcher.group(8));
+        this.setMobileId(matcher.group(9));
+        this.setMediaId(matcher.group(10));
+        this.setOsType(matcher.group(11));
+        this.setLongitude(matcher.group(12));
+        this.setLatitude(matcher.group(13));
+        this.setSerialnumber(matcher.group(14));
+        this.setAreaId(matcher.group(15));
+        this.setCommonValue(matcher.group(16));
     }
 
     private String cleanValue(String value) {

@@ -11,17 +11,17 @@ import java.util.Map;
  */
 public class MysqlCommonVariables {
 
-//    public static String dbUrl = "jdbc:mysql://rr-2zevja6lfg5718e3ko.mysql.rds.aliyuncs.com:3306/cloud?useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&zeroDateTimeBehavior=convertToNull";
+    public static String dbUrl = "jdbc:mysql://rr-2zevja6lfg5718e3ko.mysql.rds.aliyuncs.com:3306/cloud?useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&zeroDateTimeBehavior=convertToNull";
+
+    public static String userName = "java_api_read";
+
+    public static String passwd = "KESs23DRZVX7hrqe";
+
+//    public static String dbUrl = "jdbc:mysql://192.168.2.145:3306/cloud?useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&zeroDateTimeBehavior=convertToNull";
 //
-//    public static String userName = "java_api_read";
+//    public static String userName = "javaweb";
 //
-//    public static String passwd = "KESs23DRZVX7hrqe";
-
-    public static String dbUrl = "jdbc:mysql://192.168.2.145:3306/cloud?useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&zeroDateTimeBehavior=convertToNull";
-
-    public static String userName = "javaweb";
-
-    public static String passwd = "123456";
+//    public static String passwd = "123456";
 
     /**
      * 查询结果

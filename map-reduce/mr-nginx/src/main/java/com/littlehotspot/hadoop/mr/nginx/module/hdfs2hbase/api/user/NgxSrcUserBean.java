@@ -123,8 +123,14 @@ public class NgxSrcUserBean {
 
         String url = matcher.group(4);
         if (!StringUtils.isBlank(url)&&url.contains("deviceToken=")){
-            Matcher m = Pattern.compile("deviceToken=(\\d*?)&").matcher(url);
-            this.setToken(m.group(1));
+            String[] split = url.split("&");
+            for (String s : split) {
+                if (s.contains("deviceToken=")){
+                    this.setToken(s.substring(s.indexOf("deviceToken=")+12,s.length()));
+                }
+            }
+//            Matcher m = Pattern.compile("deviceToken=(\\d*?)&").matcher(url);
+
         }
 
 

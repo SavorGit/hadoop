@@ -48,19 +48,14 @@ public class UserProjectLog extends Configured implements Tool {
             /**数据清洗=========开始*/
             try {
                 String msg = value.toString();
-                Matcher matcher = CommonVariables.MAPPER_BOX_LOG_FORMAT_REGEX.matcher(msg);
+                Matcher matcher = CommonVariables.MAPPER_PROJECTION_FORMAT_REGEX.matcher(msg);
                 if (!matcher.find()) {
                     return;
                 }
                 if (StringUtils.isBlank(matcher.group(8))) {
                     return;
                 }
-                if (StringUtils.isBlank(matcher.group(5))||!matcher.group(5).equals("start")){
-                    return;
-                }
-                if (StringUtils.isBlank(matcher.group(6))||!matcher.group(6).equals("projection")){
-                    return;
-                }
+
                 context.write(new Text(matcher.group(8)), value);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -132,6 +127,7 @@ public class UserProjectLog extends Configured implements Tool {
                         userActBean.setCount(count.toString());
                     }
                 }
+                userActBean.setType("pro");
                 context.write(new Text(userActBean.rowLine()), new Text());
             } catch (Exception e) {
                 e.printStackTrace();

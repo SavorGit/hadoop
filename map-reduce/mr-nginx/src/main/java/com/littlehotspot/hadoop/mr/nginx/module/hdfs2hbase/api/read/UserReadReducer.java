@@ -70,8 +70,6 @@ public class UserReadReducer extends Reducer<Text, Text, Text, Text> {
             targetUserReadBean.setTargetUserReadRelaBean(targetReadRelaBean);
             CommonVariables.hBaseHelper.insert(targetReadBean);
 
-            CommonVariables.hBaseHelper.insert(targetReadRelaBean);
-
             context.write(new Text(targetReadBean.rowLine()), new Text());
         } catch (Exception e) {
             e.printStackTrace();

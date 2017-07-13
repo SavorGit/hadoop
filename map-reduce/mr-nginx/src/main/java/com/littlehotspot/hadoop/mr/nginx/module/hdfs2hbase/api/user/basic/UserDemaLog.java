@@ -48,19 +48,14 @@ public class UserDemaLog extends Configured implements Tool {
             /**数据清洗=========开始*/
             try {
                 String msg = value.toString();
-                Matcher matcher = CommonVariables.MAPPER_BOX_LOG_FORMAT_REGEX.matcher(msg);
+                Matcher matcher = CommonVariables.MAPPER_DEMAND_FORMAT_REGEX.matcher(msg);
                 if (!matcher.find()) {
                     return;
                 }
                 if (StringUtils.isBlank(matcher.group(8))) {
                     return;
                 }
-                if (StringUtils.isBlank(matcher.group(5))||!matcher.group(5).equals("start")){
-                    return;
-                }
-                if (StringUtils.isBlank(matcher.group(6))||!matcher.group(6).equals("vod")){
-                    return;
-                }
+
                 context.write(new Text(matcher.group(8)), value);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -134,6 +129,7 @@ public class UserDemaLog extends Configured implements Tool {
                     }
 
                 }
+                userActBean.setType("dema");
                 context.write(new Text(userActBean.rowLine()), new Text());
             } catch (Exception e) {
                 e.printStackTrace();

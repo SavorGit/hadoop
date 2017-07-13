@@ -112,8 +112,8 @@ public class MobileLogDuration extends Configured implements Tool {
                 Configuration conf = context.getConfiguration();
                 Iterator<Text> textIterator = value.iterator();
                 TargetUserReadBean targetUserReadBean = new TargetUserReadBean();
-                TargetUserReadAttrBean targetReadBean = new TargetUserReadAttrBean();
-                TargetUserReadRelaBean targetReadRelaBean = new TargetUserReadRelaBean();
+                TargetUserReadAttrBean targetUserReadAttrBean = new TargetUserReadAttrBean();
+                TargetUserReadRelaBean targetUserReadRelaBean = new TargetUserReadRelaBean();
                 String timestemps =null;
                 while (textIterator.hasNext()) {
                     Text item = textIterator.next();
@@ -123,13 +123,13 @@ public class MobileLogDuration extends Configured implements Tool {
                     String rowLineContent = item.toString();
                     SourceMobileBean sourceMobileBean = new SourceMobileBean(rowLineContent);
                     targetUserReadBean.setRowKey(sourceMobileBean.getMobileId()+sourceMobileBean.getUuid().substring(0,10));
-                    this.setForAttrBean(conf,targetReadBean, sourceMobileBean);
-                    this.setForRelaBean(conf,targetReadRelaBean, sourceMobileBean);
+                    this.setForAttrBean(conf,targetUserReadAttrBean, sourceMobileBean);
+                    this.setForRelaBean(conf,targetUserReadRelaBean, sourceMobileBean);
 
                 }
 
-                targetUserReadBean.setTargetUserReadRelaBean(targetReadRelaBean);
-                targetUserReadBean.setTargetUserReadAttrBean(targetReadBean);
+                targetUserReadBean.setTargetUserReadRelaBean(targetUserReadRelaBean);
+                targetUserReadBean.setTargetUserReadAttrBean(targetUserReadAttrBean);
                 CommonVariables.hBaseHelper.insert(targetUserReadBean);
 
 
