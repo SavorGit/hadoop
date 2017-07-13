@@ -32,6 +32,7 @@ public enum Argument {
     HbaseTable("table", null),
     HbaseRoot("hbaseRoot", null),
     HbaseZookeeper("hbaseZookeeper", null),
+    HBaseSharePath("hbaseSharePath", null),
 
     VersionName("versionname", ""),// 版本名称
     VersionCode("versioncode", ""),// 版本号

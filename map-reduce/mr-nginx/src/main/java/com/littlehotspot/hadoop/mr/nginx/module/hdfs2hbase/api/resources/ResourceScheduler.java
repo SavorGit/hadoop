@@ -26,11 +26,11 @@ public class ResourceScheduler extends Configured implements Tool {
     public int run(String[] args) throws Exception {
         try {
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
-//            CommonVariables.hBaseHelper = new HBaseHelper(this.getConf());
-
-            String[] newArgs = new GenericOptionsParser(this.getConf(), args).getRemainingArgs();
 
             // 获取参数
+            String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);
+            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
+
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
             String resourceType = CommonVariables.getParameterValue(Argument.ResourceType);
@@ -42,11 +42,10 @@ public class ResourceScheduler extends Configured implements Tool {
             Job job = Job.getInstance(this.getConf(), this.getClass().getName());
             job.setJarByClass(this.getClass());
 
+            // 避免报错：ClassNotFoundError hbaseConfiguration
             Configuration jobConf = job.getConfiguration();
-
-
-            FileSystem hdfs = FileSystem.get(new URI("hdfs://devpd1:8020"), jobConf);
-            Path hBaseSharePath = new Path("/user/oozie/share/lib/lib_20170601134717/hbase");
+            FileSystem hdfs = FileSystem.get(new URI(hdfsCluster), jobConf);
+            Path hBaseSharePath = new Path(hbaseSharePath);
             FileStatus[] hBaseShareJars = hdfs.listStatus(hBaseSharePath);
             for (FileStatus fileStatus : hBaseShareJars) {
                 if (!fileStatus.isFile()) {
@@ -55,7 +54,7 @@ public class ResourceScheduler extends Configured implements Tool {
                 Path archive = fileStatus.getPath();
                 FileSystem fs = archive.getFileSystem(jobConf);
                 DistributedCache.addArchiveToClassPath(archive, jobConf, fs);
-            }
+            }//
 
             job.setMapperClass(ResourceMapper.class);
             job.setMapOutputKeyClass(Text.class);
