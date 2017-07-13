@@ -576,9 +576,9 @@
     </build>
 
     <modules>
+        <module>util</module>
         <module>map-reduce</module>
         <module>storm</module>
-        <module>util</module>
     </modules>
 
 </project>
