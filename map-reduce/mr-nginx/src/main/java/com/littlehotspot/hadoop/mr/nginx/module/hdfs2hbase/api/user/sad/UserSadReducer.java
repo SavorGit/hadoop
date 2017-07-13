@@ -1,5 +1,6 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad;
 
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
 import com.littlehotspot.hadoop.mr.nginx.mysql.JdbcReader;
 import com.littlehotspot.hadoop.mr.nginx.mysql.MysqlCommonVariables;
 import com.littlehotspot.hadoop.mr.nginx.mysql.model.*;
@@ -16,6 +17,8 @@ import java.util.Map;
  * Created by Administrator on 2017-06-27 下午 3:05.
  */
 public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
+
+    private HBaseHelper hBaseHelper;
 
     @Override
     protected void reduce(Text key, Iterable<Text> value, Reducer<Text, Text, Text, Text>.Context context) throws IOException, InterruptedException {
@@ -47,13 +50,19 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
                 userSad.setRowKey(rowKey);
                 userSad.setAttrBean(targetSadAttrBean);
                 userSad.setRelaBean(targetSadRelaBean);
-                CommonVariables.hBaseHelper.insert(userSad);
+                hBaseHelper.insert(userSad);
             }
 
 //            context.write(new Text(value.toString()), new Text());
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void setup(Context context) throws IOException, InterruptedException {
+        Configuration conf = context.getConfiguration();
+        this.hBaseHelper = new HBaseHelper(conf);
     }
 
     private void setPropertiesForAttrBean(TextTargetSadAttrBean bean, TextTargetSadActBean source) {
