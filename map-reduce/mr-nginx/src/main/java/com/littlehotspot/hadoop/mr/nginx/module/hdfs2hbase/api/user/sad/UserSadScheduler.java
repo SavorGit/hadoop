@@ -26,7 +26,7 @@ public class UserSadScheduler extends Configured implements Tool {
     public int run(String[] args) throws Exception {
         try {
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
-            CommonVariables.hBaseHelper = new HBaseHelper(this.getConf());
+
             // 获取参数
             String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);
             String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
@@ -92,5 +92,7 @@ public class UserSadScheduler extends Configured implements Tool {
             return 1;
         }
     }
+
+
 
 }
