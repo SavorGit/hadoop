@@ -2,11 +2,14 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.filecache.DistributedCache;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
@@ -25,6 +28,9 @@ public class UserSadScheduler extends Configured implements Tool {
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
             CommonVariables.hBaseHelper = new HBaseHelper(this.getConf());
             // 获取参数
+            String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);
+            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
+
             String hdfsInputStart = CommonVariables.getParameterValue(Argument.InputPathStart);
             String hdfsInputEnd = CommonVariables.getParameterValue(Argument.InputPathEnd);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
@@ -42,6 +48,20 @@ public class UserSadScheduler extends Configured implements Tool {
 
             Job job = Job.getInstance(this.getConf(), this.getClass().getName());
             job.setJarByClass(this.getClass());
+
+            // 避免报错：ClassNotFoundError hbaseConfiguration
+            Configuration jobConf = job.getConfiguration();
+            FileSystem hdfs = FileSystem.get(new URI(hdfsCluster), jobConf);
+            Path hBaseSharePath = new Path(hbaseSharePath);
+            FileStatus[] hBaseShareJars = hdfs.listStatus(hBaseSharePath);
+            for (FileStatus fileStatus : hBaseShareJars) {
+                if (!fileStatus.isFile()) {
+                    continue;
+                }
+                Path archive = fileStatus.getPath();
+                FileSystem fs = archive.getFileSystem(jobConf);
+                DistributedCache.addArchiveToClassPath(archive, jobConf, fs);
+            }//
 
             job.setMapperClass(UserSadMapper.class);
             job.setMapOutputKeyClass(Text.class);
