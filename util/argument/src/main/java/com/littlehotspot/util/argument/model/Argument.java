@@ -33,7 +33,7 @@ public class Argument extends AbstractArgument {
     public static final Argument ReduceInputFormatRegex = new Argument("inReduceRegex", null, null);// 输入 Reduce 时的正则匹配
 
     public static final Argument HBaseCluster = new Argument("hBaseCluster", null, null);// HBase 集群地址
-    public static final Argument HbaseTable = new Argument("tBaseTable", null, null);// HBASE 表名
+    public static final Argument HbaseTable = new Argument("hBaseTable", null, null);// HBASE 表名
 
     public static final Argument HiveCluster = new Argument("hiveCluster", null, null);// Hive 集群地址
 
