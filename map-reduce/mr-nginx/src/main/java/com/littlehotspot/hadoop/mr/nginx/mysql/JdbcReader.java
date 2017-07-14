@@ -44,7 +44,6 @@ public class JdbcReader {
      * @param selectModel
      */
     public static void readToMap(String hdfsCluster, SelectModel selectModel) {
-        MysqlCommonVariables.modelMap = new HashMap<>();
 
         JobConf jobConf = new JobConf(JdbcReader.class);
         setJdbc(jobConf, hdfsCluster, selectModel);

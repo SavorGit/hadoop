@@ -12,11 +12,6 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.SourceUserBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.TargetUserAttrBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.TextTargetSadActBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.TextTargetSadAttrBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.TextTargetSadRelaBean;
 import com.littlehotspot.hadoop.mr.nginx.mysql.JdbcReader;
 import com.littlehotspot.hadoop.mr.nginx.mysql.MysqlCommonVariables;
 import com.littlehotspot.hadoop.mr.nginx.mysql.model.*;
@@ -35,13 +30,13 @@ import org.apache.hadoop.mapreduce.filecache.DistributedCache;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 
 /**

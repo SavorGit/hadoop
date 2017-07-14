@@ -43,10 +43,10 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
                 this.setPropertiesForAttrBean(targetSadAttrBean, sourceUserSadBean);
                 this.setPropertiesForRelaBean(conf, targetSadRelaBean, sourceUserSadBean);
 
-                rowKey=sourceUserSadBean.getMobile_id()+sourceUserSadBean.getTimestamps();
+                rowKey = sourceUserSadBean.getMobile_id() + sourceUserSadBean.getTimestamps();
             }
 
-            if(targetSadAttrBean.getStart() != 0 && targetSadAttrBean.getEnd() != 0) {
+            if (targetSadAttrBean.getStart() != 0 && targetSadAttrBean.getEnd() != 0) {
                 userSad.setRowKey(rowKey);
                 userSad.setAttrBean(targetSadAttrBean);
                 userSad.setRelaBean(targetSadRelaBean);
@@ -80,33 +80,30 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
         bean.setHotel(hotelId);
 
         //读取mysql
-        readMysqlHotel(conf.get("hdfsCluster"));
-        Hotel hotel = (Hotel) MysqlCommonVariables.modelMap.get(hotelId);
-        if(hotel != null) {
+        Hotel hotel = readMysqlHotel(conf.get("hdfsCluster"), Hotel.class.getName() + hotelId);
+        if (hotel != null) {
             bean.setHotel_name(hotel.getName());
         }
 
-        readMysqlRoom(conf.get("hdfsCluster"));
         String roomId = source.getRoom_id();
         bean.setRoom(roomId);
-        Room room = (Room) MysqlCommonVariables.modelMap.get(roomId);
-        if(room != null) {
+        Room room = readMysqlRoom(conf.get("hdfsCluster"), roomId);
+        if (room != null) {
             bean.setRoom_name(room.getName());
         }
 
-        readMysqlBox(conf.get("hdfsCluster"));
-        bean.setBox_mac(source.getMac());
-        Map<String,Model> boxMap = MysqlCommonVariables.modelMap;
-        for (Map.Entry<String, Model> modelEntry : boxMap.entrySet()) {
-            Box box = (Box) modelEntry.getValue();
-            if(box != null && source.getMac().equals(box.getMac())){
-                bean.setBox_name(box.getName());
-            }
+
+        String mac = source.getMac();
+        bean.setBox_mac(mac);
+        Box box = readMysqlBox(conf.get("hdfsCluster"), mac);
+        if (box != null && mac.equals(box.getMac())) {
+            bean.setBox_name(box.getName());
         }
 
-        readMysqlMedia(conf.get("hdfsCluster"));
-        bean.setMedia(source.getMedia_id());
-        Media media = (Media) MysqlCommonVariables.modelMap.get(source.getMedia_id());
+
+        String mediaId = source.getMedia_id();
+        bean.setMedia(mediaId);
+        Media media = readMysqlMedia(conf.get("hdfsCluster"), mediaId);
         if(media != null) {
             bean.setMedia_name(media.getName());
             bean.setMedia_down_url(media.getDownloadUrl());
@@ -120,66 +117,112 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
 
     /**
      * 查询酒店信息
+     *
      * @param hdfsCluster
      * @throws Exception
      */
-    public void readMysqlHotel(String hdfsCluster) throws Exception{
+    public Hotel readMysqlHotel(String hdfsCluster, String hid) throws Exception {
+        Map<String, Model> map = MysqlCommonVariables.modelMap;
+        if (map.get(hid) != null) {
+            return (Hotel) map.get(hid);
+        }
+
         SelectModel selectModel = new SelectModel();
         selectModel.setInputClass(Hotel.class);
         selectModel.setQuery("select id,name from savor_hotel");
         selectModel.setCountQuery("select count(*) from savor_hotel");
         selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
 
-        JdbcReader.readToMap(hdfsCluster,selectModel);
+        JdbcReader.readToMap(hdfsCluster, selectModel);
+
+        return (Hotel) MysqlCommonVariables.modelMap.get(hid);
 
     }
 
     /**
      * 查询包间信息
+     *
      * @param hdfsCluster
      * @throws Exception
      */
-    public void readMysqlRoom(String hdfsCluster) throws Exception{
+    public Room readMysqlRoom(String hdfsCluster, String rid) throws Exception {
+        Map<String, Model> map = MysqlCommonVariables.modelMap;
+        if (map.get(rid) != null) {
+            return (Room) map.get(rid);
+        }
+
         SelectModel selectModel = new SelectModel();
         selectModel.setInputClass(Room.class);
         selectModel.setQuery("select id,name from savor_room");
         selectModel.setCountQuery("select count(*) from savor_room");
         selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
 
-        JdbcReader.readToMap(hdfsCluster,selectModel);
+        JdbcReader.readToMap(hdfsCluster, selectModel);
+
+        return (Room) MysqlCommonVariables.modelMap.get(rid);
 
     }
 
     /**
      * 查询机顶盒信息
+     *
      * @param hdfsCluster
      * @throws Exception
      */
-    public void readMysqlBox(String hdfsCluster) throws Exception{
-        SelectModel selectModel = new SelectModel();
-        selectModel.setInputClass(Box.class);
+    public Box readMysqlBox(String hdfsCluster, String mac) throws Exception {
+        if (findBox(mac) == null) {
+            SelectModel selectModel = new SelectModel();
+            selectModel.setInputClass(Box.class);
 
-        selectModel.setQuery("select id,name,mac from savor_box");
-        selectModel.setCountQuery("select count(*) from savor_box");
-        selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
+            selectModel.setQuery("select id,name,mac from savor_box");
+            selectModel.setCountQuery("select count(*) from savor_box");
+            selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
 
-        JdbcReader.readToMap(hdfsCluster,selectModel);
+            JdbcReader.readToMap(hdfsCluster, selectModel);
 
+            return findBox(mac);
+        }
+
+        return findBox(mac);
+
+    }
+
+    public Box findBox(String mac) {
+        Map<String, Model> boxMap = MysqlCommonVariables.modelMap;
+
+        for (Map.Entry<String, Model> modelEntry : boxMap.entrySet()) {
+            if(modelEntry.getKey().contains(Box.class.getName())) {
+                Box box = (Box) modelEntry.getValue();
+                if (box != null && mac.equals(box.getMac())) {
+                    return box;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
      * 查询机顶盒信息
+     *
      * @param hdfsCluster
      * @throws Exception
      */
-    public void readMysqlMedia(String hdfsCluster) throws Exception{
+    public Media readMysqlMedia(String hdfsCluster, String mid) throws Exception {
+        Map<String, Model> map = MysqlCommonVariables.modelMap;
+        if (map.get(mid) != null) {
+            return (Media) map.get(mid);
+        }
+
         SelectModel selectModel = new SelectModel();
         selectModel.setInputClass(Media.class);
         selectModel.setQuery("select id,name,oss_addr from savor_media");
         selectModel.setCountQuery("select count(*) from savor_media");
         selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
 
-        JdbcReader.readToMap(hdfsCluster,selectModel);
+        JdbcReader.readToMap(hdfsCluster, selectModel);
+
+        return (Media) MysqlCommonVariables.modelMap.get(mid);
 
     }
 }
