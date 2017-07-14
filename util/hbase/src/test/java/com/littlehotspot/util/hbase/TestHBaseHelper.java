@@ -3,21 +3,19 @@
  * STUPID BIRD PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  * @Project : hadoop
- * @Package : com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user
+ * @Package : com.littlehotspot.util.hbase
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
  * @Time : 09:53
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user;
+package com.littlehotspot.util.hbase;
 
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Result;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
@@ -37,8 +35,14 @@ public class TestHBaseHelper {
     @Before
     public void init() throws IOException {
         System.setProperty("hadoop.home.dir", "D:\\GreenProfram\\hadoop-2.7.3");
-        hBaseHelper = new HBaseHelper();
-        tableName = "user";
+
+        Configuration configuration = new Configuration();
+        configuration.set("fs.defaultFS", "hdfs://devpd1:8020");
+        configuration.set("hbase.rootdir", "hdfs://devpd1:8020/hbase");
+        configuration.set("hbase.zookeeper.quorum", "devpd1");
+
+        hBaseHelper = new HBaseHelper(configuration);
+        tableName = "test-aaa";
         rowKey = "a000005585fe18";
     }
 
