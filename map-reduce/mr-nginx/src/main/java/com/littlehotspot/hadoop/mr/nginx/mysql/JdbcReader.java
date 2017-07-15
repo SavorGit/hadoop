@@ -44,7 +44,6 @@ public class JdbcReader {
      * @param selectModel
      */
     public static void readToMap(String hdfsCluster, SelectModel selectModel) {
-        MysqlCommonVariables.modelMap = new HashMap<>();
 
         JobConf jobConf = new JobConf(JdbcReader.class);
         setJdbc(jobConf, hdfsCluster, selectModel);
@@ -113,6 +112,24 @@ public class JdbcReader {
         setJdbc(jobConf,hdfsCluster,selectModel);
 
         jobConf.setMapperClass(JdbcTagToHdfsMapper.class); // hdfs
+        jobConf.setReducerClass(IdentityReducer.class);
+        JobClient.runJob(jobConf);
+
+    }
+
+    /**
+     * 读取mysql到hdfs
+     * @param hdfsCluster
+     * @param selectModel
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static void readRquserToHdfs(String hdfsCluster, SelectModel selectModel) throws IOException, URISyntaxException {
+
+        JobConf jobConf = new JobConf(JdbcReader.class);
+        setJdbc(jobConf,hdfsCluster,selectModel);
+
+        jobConf.setMapperClass(JdbcRqUserToHdfsMapper.class); // hdfs
         jobConf.setReducerClass(IdentityReducer.class);
         JobClient.runJob(jobConf);
 

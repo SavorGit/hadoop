@@ -1,6 +1,7 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.resources;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
+import com.littlehotspot.hadoop.mr.nginx.util.Constant;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileStatus;
@@ -25,15 +26,15 @@ public class ResourceScheduler extends Configured implements Tool {
     @Override
     public int run(String[] args) throws Exception {
         try {
-            CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
+            Constant.CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
 
             // 获取参数
-            String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);
-            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
+            String hbaseSharePath = Constant.CommonVariables.getParameterValue(Argument.HBaseSharePath);
+            String hdfsCluster = Constant.CommonVariables.getParameterValue(Argument.HDFSCluster);
 
-            String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
-            String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
-            String resourceType = CommonVariables.getParameterValue(Argument.ResourceType);
+            String hdfsInputPath = Constant.CommonVariables.getParameterValue(Argument.InputPath);
+            String hdfsOutputPath = Constant.CommonVariables.getParameterValue(Argument.OutputPath);
+            String resourceType = Constant.CommonVariables.getParameterValue(Argument.ResourceType);
             this.getConf().set("resourceType", resourceType);
 
             Path inputPath = new Path(hdfsInputPath);

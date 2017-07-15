@@ -1,7 +1,6 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.medias;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.resources.CommonVariables;
 import com.littlehotspot.hadoop.mr.nginx.util.Constant;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -29,8 +28,8 @@ public class MediaScheduler extends Configured implements Tool {
             Constant.CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
 
             // 获取参数
-            String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);
-            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
+            String hbaseSharePath = Constant.CommonVariables.getParameterValue(Argument.HBaseSharePath);
+            String hdfsCluster = Constant.CommonVariables.getParameterValue(Argument.HDFSCluster);
             String hdfsInputPath = Constant.CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = Constant.CommonVariables.getParameterValue(Argument.OutputPath);
 

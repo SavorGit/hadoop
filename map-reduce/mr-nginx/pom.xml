@@ -4,14 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>map-reduce</artifactId>
         <groupId>com.littlehotspot.hadoop</groupId>
-        <version>1.0.0.0.1-SNAPSHOT</version>
+        <artifactId>map-reduce</artifactId>
+        <version>LHS.HADOOP.2.0.0.0.1.0.0-SNAPSHOT</version>
     </parent>
 
 
     <groupId>com.littlehotspot.hadoop.mr</groupId>
     <artifactId>mr-nginx</artifactId>
+    <version>LHS.HADOOP.2.4.0.0.1.0.0-SNAPSHOT</version>
 
     <name>Hadoop Map-Reduce [Nginx]</name>
     <packaging>jar</packaging>
@@ -63,66 +64,17 @@
             <version>5.1.40</version>
         </dependency>
 
-        <!-- Mybatis -->
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-            <version>3.3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis-spring</artifactId>
-            <version>1.2.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis2</artifactId>
-            <version>2.3.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis-2-spring</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-
-        <!-- Spring -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
-            <version>1.4</version>
-        </dependency>
 
         <!-- 自定义 -->
         <dependency>
-            <groupId>net.lizhaoweb.common.util.data</groupId>
-            <artifactId>convert</artifactId>
-            <version>1.0.0.0.1-SNAPSHOT</version>
+            <groupId>com.littlehotspot.hadoop.util</groupId>
+            <artifactId>argument</artifactId>
+            <version>LHS.HADOOP.1.1.0.0.1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.littlehotspot.hadoop.util</groupId>
+            <artifactId>hbase</artifactId>
+            <version>LHS.HADOOP.1.2.0.0.1.0.0-SNAPSHOT</version>
         </dependency>
         
     </dependencies>
@@ -157,7 +109,191 @@
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.cdf.CDFMain</mainClass>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserDemaMain</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <!-- 用户首次阅读 阅读次数 -->
+                    <execution>
+                        <id>user-first-read</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>user-first-read</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserReadMain</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <!-- 用户首次点播 点播次数 -->
+                    <execution>
+                        <id>user-first-demand</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>user-first-demand</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserDemaMain</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <!-- 用户首次投屏 投屏次数 -->
+                    <execution>
+                        <id>user-first-projection</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>user-first-projection</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserProMain</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+
+                    <!--手机用户 -->
+                    <execution>
+                        <id>mobile-user</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>mobile-user</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.MobileUserMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <!--机顶盒用户 -->
+                    <execution>
+                        <id>box-user</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>box-user</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.BoxUserMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <!--Nginx用户 -->
+                    <execution>
+                        <id>nginx-user</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>nginx-user</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.NgxUserMain
+                                    </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
                                 </manifest>
@@ -196,14 +332,14 @@
 
                     <!-- [用户投屏点播start&end] -->
                     <execution>
-                        <id>SadActMain</id>
+                        <id>user_sad_act</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
                         <phase>package</phase>
                         <configuration>
                             <!--<finalName>nginx-log</finalName>-->
-                            <classifier>SadActMain</classifier>
+                            <classifier>user_sad_act</classifier>
                             <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
@@ -229,14 +365,14 @@
 
                     <!-- [用户投屏点播明细] -->
                     <execution>
-                        <id>UserSadMain</id>
+                        <id>user_sad</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
                         <phase>package</phase>
                         <configuration>
                             <!--<finalName>nginx-log</finalName>-->
-                            <classifier>UserSadMain</classifier>
+                            <classifier>user_sad</classifier>
                             <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
@@ -260,17 +396,136 @@
                         </configuration>
                     </execution>
 
-
-                    <!-- [MySql To Hdfs] -->
+                    <!-- 用户阅读start -->
                     <execution>
-                        <id>resources_mysql_to_hdfs</id>
+                        <id>user-read_start</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
                         <phase>package</phase>
                         <configuration>
                             <!--<finalName>nginx-log</finalName>-->
-                            <classifier>resources_mysql_to_hdfs</classifier>
+                            <classifier>user-read_start</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/read/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.ReadStartMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <!-- 用户阅读end -->
+                    <execution>
+                        <id>user-read_end</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>user-read_end</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/read/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.ReadEndMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <!-- 用户阅读明细 -->
+                    <execution>
+                        <id>user-read</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>user-read</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/read/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/mysql/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/mysql/model/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.ReadDurationMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <!-- 机顶盒用户索引表 -->
+                    <execution>
+                        <id>user_box-index</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>user_box-index</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/boxindex/*</include>
+
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.boxindex.BoxUserIndexMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+
+                    <!-- [MySql To Hdfs] -->
+                    <execution>
+                        <id>mysql_to_hdfs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>mysql_to_hdfs</classifier>
                             <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
@@ -322,6 +577,39 @@
                             </archive>
                         </configuration>
                     </execution>
+
+
+                    <!-- [媒体信息表 Hdfs To Hbase] -->
+                    <execution>
+                        <id>medias_hdfs_to_hbase</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>medias_hdfs_to_hbase</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/mysql/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/mysql/model/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/medias/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.medias.MediaMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
 
                 </executions>
             </plugin>

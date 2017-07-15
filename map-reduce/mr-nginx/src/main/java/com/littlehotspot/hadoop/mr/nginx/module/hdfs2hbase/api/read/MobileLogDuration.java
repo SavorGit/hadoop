@@ -12,25 +12,13 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.SourceUserBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.TargetUserAttrBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.TextTargetSadActBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.TextTargetSadAttrBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.TextTargetSadRelaBean;
 import com.littlehotspot.hadoop.mr.nginx.mysql.JdbcReader;
 import com.littlehotspot.hadoop.mr.nginx.mysql.MysqlCommonVariables;
-import com.littlehotspot.hadoop.mr.nginx.mysql.mapper.ICategoryMapper;
-import com.littlehotspot.hadoop.mr.nginx.mysql.mapper.IContentMapper;
-import com.littlehotspot.hadoop.mr.nginx.mysql.mapper.IHotelMapper;
-import com.littlehotspot.hadoop.mr.nginx.mysql.mapper.IRoomMapper;
 import com.littlehotspot.hadoop.mr.nginx.mysql.model.*;
-import com.littlehotspot.hadoop.mr.nginx.mysql.service.CategoryService;
-import com.littlehotspot.hadoop.mr.nginx.mysql.service.ContentService;
-import com.littlehotspot.hadoop.mr.nginx.mysql.service.HotelService;
-import com.littlehotspot.hadoop.mr.nginx.mysql.service.RoomService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
@@ -38,16 +26,17 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.filecache.DistributedCache;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 
 /**
@@ -55,26 +44,6 @@ import java.util.regex.Matcher;
  */
 public class MobileLogDuration extends Configured implements Tool {
 
-    private static Map<String,String> starts;
-
-    private static Map<String,String> ends;
-
-    private static List<HashMap<String, Object>> hotels;
-
-    private static List<HashMap<String, Object>> rooms;
-
-    private static List<HashMap<String, Object>> contents;
-
-    private static List<HashMap<String, Object>> cates;
-
-    static {
-        starts=new HashMap<String, String>();
-        ends=new HashMap<String, String>();
-        hotels = new HotelService().getAll();
-        rooms = new RoomService().getAll();
-        contents = new ContentService().getAll();
-        cates = new CategoryService().getAll();
-    }
 
     private static class MobileMapper extends Mapper<LongWritable, Text, Text, Text> {
 
@@ -112,8 +81,8 @@ public class MobileLogDuration extends Configured implements Tool {
                 Configuration conf = context.getConfiguration();
                 Iterator<Text> textIterator = value.iterator();
                 TargetUserReadBean targetUserReadBean = new TargetUserReadBean();
-                TargetUserReadAttrBean targetReadBean = new TargetUserReadAttrBean();
-                TargetUserReadRelaBean targetReadRelaBean = new TargetUserReadRelaBean();
+                TargetUserReadAttrBean targetUserReadAttrBean = new TargetUserReadAttrBean();
+                TargetUserReadRelaBean targetUserReadRelaBean = new TargetUserReadRelaBean();
                 String timestemps =null;
                 while (textIterator.hasNext()) {
                     Text item = textIterator.next();
@@ -123,13 +92,13 @@ public class MobileLogDuration extends Configured implements Tool {
                     String rowLineContent = item.toString();
                     SourceMobileBean sourceMobileBean = new SourceMobileBean(rowLineContent);
                     targetUserReadBean.setRowKey(sourceMobileBean.getMobileId()+sourceMobileBean.getUuid().substring(0,10));
-                    this.setForAttrBean(conf,targetReadBean, sourceMobileBean);
-                    this.setForRelaBean(conf,targetReadRelaBean, sourceMobileBean);
+                    this.setForAttrBean(conf,targetUserReadAttrBean, sourceMobileBean);
+                    this.setForRelaBean(conf,targetUserReadRelaBean, sourceMobileBean);
 
                 }
 
-                targetUserReadBean.setTargetUserReadRelaBean(targetReadRelaBean);
-                targetUserReadBean.setTargetUserReadAttrBean(targetReadBean);
+                targetUserReadBean.setTargetUserReadRelaBean(targetUserReadRelaBean);
+                targetUserReadBean.setTargetUserReadAttrBean(targetUserReadAttrBean);
                 CommonVariables.hBaseHelper.insert(targetUserReadBean);
 
 
@@ -290,13 +259,28 @@ public class MobileLogDuration extends Configured implements Tool {
             CommonVariables.hBaseHelper = new HBaseHelper(this.getConf());
 
             // 获取参数
-            String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
+            String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);
+            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
             String hdfsInputStart = CommonVariables.getParameterValue(Argument.InputPathStart);
             String hdfsInputEnd = CommonVariables.getParameterValue(Argument.InputPathEnd);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
             Job job = Job.getInstance(this.getConf(), MobileLogDuration.class.getSimpleName());
             job.setJarByClass(MobileLogDuration.class);
+
+            // 避免报错：ClassNotFoundError hbaseConfiguration
+            Configuration jobConf = job.getConfiguration();
+            FileSystem hdfs = FileSystem.get(new URI(hdfsCluster), jobConf);
+            Path hBaseSharePath = new Path(hbaseSharePath);
+            FileStatus[] hBaseShareJars = hdfs.listStatus(hBaseSharePath);
+            for (FileStatus fileStatus : hBaseShareJars) {
+                if (!fileStatus.isFile()) {
+                    continue;
+                }
+                Path archive = fileStatus.getPath();
+                FileSystem fs = archive.getFileSystem(jobConf);
+                DistributedCache.addArchiveToClassPath(archive, jobConf, fs);
+            }//
 
             /**作业输入*/
             Path inputPath1 = new Path(hdfsInputStart);

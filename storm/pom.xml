@@ -4,13 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>hadoop</artifactId>
         <groupId>com.littlehotspot</groupId>
-        <version>1.0.0.0.1-SNAPSHOT</version>
+        <artifactId>hadoop</artifactId>
+        <version>LHS.HADOOP.0.0.0.0.1.0.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.littlehotspot.storm</groupId>
-    <artifactId>parent</artifactId>
+    <groupId>com.littlehotspot.hadoop</groupId>
+    <artifactId>storm</artifactId>
+    <version>LHS.HADOOP.3.0.0.0.1.0.0-SNAPSHOT</version>
 
     <name>Hadoop Storm</name>
     <packaging>pom</packaging>

@@ -50,6 +50,11 @@ public class UserReadScheduler extends Configured implements Tool {
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
+            String hbaseRoot = CommonVariables.getParameterValue(Argument.HbaseRoot);
+            String hbaseZoo = CommonVariables.getParameterValue(Argument.HbaseZookeeper);
+            this.getConf().set("hbase.rootdir", hbaseRoot);
+            this.getConf().set("hbase.zookeeper.quorum", hbaseZoo);
+
             // 配置数据格式
             if (StringUtils.isNotBlank(matcherRegex)) {
                 CommonVariables.MAPPER_INPUT_FORMAT_REGEX = Pattern.compile(matcherRegex);

@@ -12,15 +12,6 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.tags;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.TargetUserReadAttrBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.TargetUserReadRelaBean;
-import com.littlehotspot.hadoop.mr.nginx.mysql.JdbcReader;
-import com.littlehotspot.hadoop.mr.nginx.mysql.MysqlCommonVariables;
-import com.littlehotspot.hadoop.mr.nginx.mysql.model.*;
-import com.littlehotspot.hadoop.mr.nginx.mysql.service.CategoryService;
-import com.littlehotspot.hadoop.mr.nginx.mysql.service.ContentService;
-import com.littlehotspot.hadoop.mr.nginx.mysql.service.HotelService;
-import com.littlehotspot.hadoop.mr.nginx.mysql.service.RoomService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -40,7 +31,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 
 /**

@@ -32,11 +32,16 @@ public class CommonVariables extends Constant.CommonVariables {
      */
     public static Pattern MAPPER_NGINX_FORMAT_REGEX = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
 
-    public static Pattern MAPPER_NGINX_LOG_FORMAT_REGEX = Pattern.compile("^(.*)|(.*)|(.*)|(.*)|(.*)|(.*)|(.*)|(.*)|(.*)|(.*)|(.*)|(.*)|(.*)|(.*)|(.*)|(.*)|(.*)|(.*)|(.*)|(.*)|(.*)$");
+//    public static Pattern MAPPER_NGINX_LOG_FORMAT_REGEX = Pattern.compile("^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$");
+    public static Pattern MAPPER_NGINX_LOG_FORMAT_REGEX = Pattern.compile("^(.*)\\|(\\d*)\\|([A-Za-z]*)\\|(.*)\\|(\\d*)\\|(.*)\\|([A-Za-z0-9.-_]*)\\|(\\d*)\\|([A-Za-z0-9.-_]*)\\|([A-Za-z0-9.-_]*)\\|(.*)\\|([A-Za-z0-9.-_]*)\\|([A-Za-z0-9.-]*)\\|([A-Za-z0-9.-_]*)\\|(.*)\\|([A-Za-z0-9.-_]*)\\|(\\d*)\\|([A-Za-z0-9.-_]*)\\|(.*)\\|(.*)\\|(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} \\+\\d{4})s*$");
 
     public static Pattern MAPPER_BOX_FORMAT_REGEX = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
 
     public static Pattern MAPPER_BOX_LOG_FORMAT_REGEX = Pattern.compile("^(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*)$");
+
+    public static Pattern MAPPER_DEMAND_FORMAT_REGEX = Pattern.compile("^(.*),(.*),(.*),(.*),(start),(vod),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*)$");
+
+    public static Pattern MAPPER_PROJECTION_FORMAT_REGEX = Pattern.compile("^(.*),(.*),(.*),(.*),(start),(projection),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*)$");
 
     public static Pattern MAPPER_MOBILE_FORMAT_REGEX = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
 
@@ -44,7 +49,7 @@ public class CommonVariables extends Constant.CommonVariables {
 
     public static Pattern MAPPER_USER_FORMAT_REGEX = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
 
-    public static Pattern MAPPER_ACT_FORMAT_REGEX = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
+    public static Pattern MAPPER_ACT_FORMAT_REGEX = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
 
     public static Pattern MAPPER_USERACT_FORMAT_REGEX = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
 

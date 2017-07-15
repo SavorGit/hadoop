@@ -48,19 +48,14 @@ public class UserProjectLog extends Configured implements Tool {
             /**数据清洗=========开始*/
             try {
                 String msg = value.toString();
-                Matcher matcher = CommonVariables.MAPPER_BOX_LOG_FORMAT_REGEX.matcher(msg);
+                Matcher matcher = CommonVariables.MAPPER_PROJECTION_FORMAT_REGEX.matcher(msg);
                 if (!matcher.find()) {
                     return;
                 }
                 if (StringUtils.isBlank(matcher.group(8))) {
                     return;
                 }
-                if (StringUtils.isBlank(matcher.group(5))||!matcher.group(5).equals("start")){
-                    return;
-                }
-                if (StringUtils.isBlank(matcher.group(6))||!matcher.group(6).equals("projection")){
-                    return;
-                }
+
                 context.write(new Text(matcher.group(8)), value);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -74,7 +69,6 @@ public class UserProjectLog extends Configured implements Tool {
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
                 Iterator<Text> iterator = value.iterator();
-                NgxSrcUserBean sourceUserBean = null;
                 UserActBean userActBean = new UserActBean();
                 Integer count=0;
                 while (iterator.hasNext()){
@@ -96,7 +90,7 @@ public class UserProjectLog extends Configured implements Tool {
                     count ++;
                 }
                 userActBean.setCount(count.toString());
-                context.write(new Text(sourceUserBean.getDeviceId()), new Text(sourceUserBean.rowLine()));
+                context.write(new Text(userActBean.getDeviceId()), new Text(userActBean.rowLine()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -109,7 +103,6 @@ public class UserProjectLog extends Configured implements Tool {
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
                 Iterator<Text> iterator = value.iterator();
-                NgxSrcUserBean sourceUserBean = null;
                 UserActBean userActBean = new UserActBean();
                 while (iterator.hasNext()){
                     Text item = iterator.next();
@@ -134,7 +127,8 @@ public class UserProjectLog extends Configured implements Tool {
                         userActBean.setCount(count.toString());
                     }
                 }
-                context.write(new Text(sourceUserBean.rowLine()), new Text());
+                userActBean.setType("pro");
+                context.write(new Text(userActBean.rowLine()), new Text());
             } catch (Exception e) {
                 e.printStackTrace();
             }

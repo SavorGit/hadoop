@@ -65,21 +65,21 @@ public class CleanByRegexScheduler extends Configured implements Tool {
         String matcherRegex = ArgumentFactory.getParameterValue(Argument.MapperInputFormatRegex);
         System.out.println("\tInput[Mapper-Input-Regex] : " + matcherRegex);
         if (matcherRegex == null) {
-            throw new IllegalArgumentException("The argument['inRegex'] for this program is null");
+            throw new IllegalArgumentException("The argument['" + Argument.MapperInputFormatRegex.getName() + "'] for this program is null");
         }
 
         // Hdfs 读取路径
         String[] hdfsInputPathArray = ArgumentFactory.getParameterValues(Argument.InputPath);
         System.out.println("\tInput[HDFS-Input-Path]    : " + hdfsInputPathArray);
         if (hdfsInputPathArray == null) {
-            throw new IllegalArgumentException("The argument['hdfsIn'] for this program is null");
+            throw new IllegalArgumentException("The argument['" + Argument.InputPath.getName() + "'] for this program is null");
         }
 
         // Hdfs 写入路径
         String hdfsOutputPath = ArgumentFactory.getParameterValue(Argument.OutputPath);
         System.out.println("\tInput[HDFS-Output-Path]   : " + hdfsOutputPath);
         if (hdfsOutputPath == null) {
-            throw new IllegalArgumentException("The argument['hdfsOut'] for this program is null");
+            throw new IllegalArgumentException("The argument['" + Argument.OutputPath.getName() + "'] for this program is null");
         }
 
 

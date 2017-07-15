@@ -22,7 +22,7 @@ public class JdbcToMapMapper extends MapReduceBase implements Mapper<LongWritabl
 
         Model model = ModelFactory.getModel(value);
 
-        MysqlCommonVariables.modelMap.put(model.getId(), model);
+        MysqlCommonVariables.modelMap.put(model.getClass().getName() + model.getId(), model);
 
 
     }
