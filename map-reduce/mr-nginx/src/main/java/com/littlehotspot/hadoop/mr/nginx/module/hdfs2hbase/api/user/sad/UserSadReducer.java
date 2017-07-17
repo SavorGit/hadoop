@@ -7,6 +7,7 @@ import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorBox;
 import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorHotel;
 import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorMedia;
 import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorRoom;
+import com.littlehotspot.hadoop.mr.nginx.util.Constant;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -57,7 +58,7 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
                 this.setPropertiesForAttrBean(targetSadAttrBean, sourceUserSadBean);
                 this.setPropertiesForRelaBean(conf, targetSadRelaBean, sourceUserSadBean);
 
-                rowKey = sourceUserSadBean.getMobile_id() + sourceUserSadBean.getTimestamps();
+                rowKey = sourceUserSadBean.getMobile_id() + Constant.ROWKEY_SPLIT_CHAR + sourceUserSadBean.getTimestamps();
             }
 
             if (targetSadAttrBean.getStart() != 0 && targetSadAttrBean.getEnd() != 0) {

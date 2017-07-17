@@ -31,6 +31,7 @@ public class Constant {
     public static final String DATA_FORMAT_1 = "dd/MMM/yyyy:HH:mm:ss Z";
     public static final String DATA_FORMAT_2 = "yyyy-MM-dd HH:mm:ss Z";
     public static final char VALUE_SPLIT_CHAR = 0x0001;
+    public static final char ROWKEY_SPLIT_CHAR = '|';
 
     public static class CommonVariables {
 
