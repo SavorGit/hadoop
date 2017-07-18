@@ -42,8 +42,8 @@ public class TestHBaseHelper {
         configuration.set("hbase.zookeeper.quorum", "devpd1");
 
         hBaseHelper = new HBaseHelper(configuration);
-        tableName = "test-aaa";
-        rowKey = "a000005585fe18";
+        tableName = "test_table";
+        rowKey = "FCD5D900B1881496322021";
     }
 
     @Test
@@ -53,7 +53,7 @@ public class TestHBaseHelper {
 
     @Test
     public void createTable() throws IOException {
-        hBaseHelper.createTable(tableName, new String[]{"basic", "info"});
+        hBaseHelper.createTable(tableName, new String[]{"attr", "ext1","ext2"});
     }
 
     @Test
