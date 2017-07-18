@@ -1,16 +1,23 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad;
 
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
-import com.littlehotspot.hadoop.mr.nginx.mysql.JdbcReader;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.JDBCTool;
 import com.littlehotspot.hadoop.mr.nginx.mysql.MysqlCommonVariables;
-import com.littlehotspot.hadoop.mr.nginx.mysql.model.*;
+import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorBox;
+import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorHotel;
+import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorMedia;
+import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorRoom;
+import com.littlehotspot.hadoop.mr.nginx.util.Constant;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <h1> 用户行为最终处理并插入到 Hbase </h1>
@@ -19,6 +26,14 @@ import java.util.Map;
 public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
 
     private HBaseHelper hBaseHelper;
+
+    private Map<String, Object> hotelMap = new ConcurrentHashMap<>();
+
+    private Map<String, Object> roomMap = new ConcurrentHashMap<>();
+
+    private Map<String, Object> boxMap = new ConcurrentHashMap<>();
+
+    private Map<String, Object> mediaMap = new ConcurrentHashMap<>();
 
     @Override
     protected void reduce(Text key, Iterable<Text> value, Reducer<Text, Text, Text, Text>.Context context) throws IOException, InterruptedException {
@@ -43,7 +58,7 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
                 this.setPropertiesForAttrBean(targetSadAttrBean, sourceUserSadBean);
                 this.setPropertiesForRelaBean(conf, targetSadRelaBean, sourceUserSadBean);
 
-                rowKey = sourceUserSadBean.getMobile_id() + sourceUserSadBean.getTimestamps();
+                rowKey = sourceUserSadBean.getMobile_id() + Constant.ROWKEY_SPLIT_CHAR + sourceUserSadBean.getTimestamps();
             }
 
             if (targetSadAttrBean.getStart() != 0 && targetSadAttrBean.getEnd() != 0) {
@@ -80,14 +95,14 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
         bean.setHotel(hotelId);
 
         //读取mysql
-        Hotel hotel = readMysqlHotel(conf.get("hdfsCluster"), Hotel.class.getName() + hotelId);
+        SavorHotel hotel = readMysqlHotel(hotelId);
         if (hotel != null) {
             bean.setHotel_name(hotel.getName());
         }
 
         String roomId = source.getRoom_id();
         bean.setRoom(roomId);
-        Room room = readMysqlRoom(conf.get("hdfsCluster"), roomId);
+        SavorRoom room = readMysqlRoom(roomId);
         if (room != null) {
             bean.setRoom_name(room.getName());
         }
@@ -95,7 +110,7 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
 
         String mac = source.getMac();
         bean.setBox_mac(mac);
-        Box box = readMysqlBox(conf.get("hdfsCluster"), mac);
+        SavorBox box = readMysqlBox(mac);
         if (box != null && mac.equals(box.getMac())) {
             bean.setBox_name(box.getName());
         }
@@ -103,10 +118,10 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
 
         String mediaId = source.getMedia_id();
         bean.setMedia(mediaId);
-        Media media = readMysqlMedia(conf.get("hdfsCluster"), mediaId);
-        if(media != null) {
+        SavorMedia media = readMysqlMedia(mediaId);
+        if (media != null) {
             bean.setMedia_name(media.getName());
-            bean.setMedia_down_url(media.getDownloadUrl());
+            bean.setMedia_down_url(media.getOss_addr());
         }
 
         bean.setApk_version(source.getApk_version());
@@ -118,111 +133,115 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
     /**
      * 查询酒店信息
      *
-     * @param hdfsCluster
      * @throws Exception
      */
-    public Hotel readMysqlHotel(String hdfsCluster, String hid) throws Exception {
-        Map<String, Model> map = MysqlCommonVariables.modelMap;
-        if (map.get(hid) != null) {
-            return (Hotel) map.get(hid);
+    public SavorHotel readMysqlHotel(String hid) throws Exception {
+        if (this.hotelMap == null || this.hotelMap.get(hid) == null || this.hotelMap.size() <= 0) {
+            findHotel();
         }
+        return (SavorHotel) this.hotelMap.get(hid);
+    }
 
-        SelectModel selectModel = new SelectModel();
-        selectModel.setInputClass(Hotel.class);
-        selectModel.setQuery("select id,name from savor_hotel");
-        selectModel.setCountQuery("select count(*) from savor_hotel");
-        selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
-
-        JdbcReader.readToMap(hdfsCluster, selectModel);
-
-        return (Hotel) MysqlCommonVariables.modelMap.get(hid);
-
+    private void findHotel() throws SQLException {
+        String sql = "select id,name from savor_hotel";
+        JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
+        jdbcUtil.getConnection();
+        try {
+            List<SavorHotel> result = jdbcUtil.findResult(SavorHotel.class, sql);
+            for (SavorHotel hotel : result) {
+                this.hotelMap.put(String.valueOf(hotel.getId()), hotel);
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            jdbcUtil.releaseConnection();
+        }
     }
 
     /**
      * 查询包间信息
      *
-     * @param hdfsCluster
      * @throws Exception
      */
-    public Room readMysqlRoom(String hdfsCluster, String rid) throws Exception {
-        Map<String, Model> map = MysqlCommonVariables.modelMap;
-        if (map.get(rid) != null) {
-            return (Room) map.get(rid);
+    public SavorRoom readMysqlRoom(String rid) throws Exception {
+        if (this.roomMap == null || this.roomMap.get(rid) == null || this.roomMap.size() <= 0) {
+            findRoom();
         }
 
-        SelectModel selectModel = new SelectModel();
-        selectModel.setInputClass(Room.class);
-        selectModel.setQuery("select id,name from savor_room");
-        selectModel.setCountQuery("select count(*) from savor_room");
-        selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
-
-        JdbcReader.readToMap(hdfsCluster, selectModel);
-
-        return (Room) MysqlCommonVariables.modelMap.get(rid);
-
+        return (SavorRoom) this.roomMap.get(rid);
     }
 
-    /**
-     * 查询机顶盒信息
-     *
-     * @param hdfsCluster
-     * @throws Exception
-     */
-    public Box readMysqlBox(String hdfsCluster, String mac) throws Exception {
-        if (findBox(mac) == null) {
-            SelectModel selectModel = new SelectModel();
-            selectModel.setInputClass(Box.class);
-
-            selectModel.setQuery("select id,name,mac from savor_box");
-            selectModel.setCountQuery("select count(*) from savor_box");
-            selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
-
-            JdbcReader.readToMap(hdfsCluster, selectModel);
-
-            return findBox(mac);
-        }
-
-        return findBox(mac);
-
-    }
-
-    public Box findBox(String mac) {
-        Map<String, Model> boxMap = MysqlCommonVariables.modelMap;
-
-        for (Map.Entry<String, Model> modelEntry : boxMap.entrySet()) {
-            if(modelEntry.getKey().contains(Box.class.getName())) {
-                Box box = (Box) modelEntry.getValue();
-                if (box != null && mac.equals(box.getMac())) {
-                    return box;
-                }
+    private void findRoom() throws SQLException {
+        String sql = "select id,name from savor_room";
+        JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
+        jdbcUtil.getConnection();
+        try {
+            List<SavorRoom> result = jdbcUtil.findResult(SavorRoom.class, sql);
+            for (SavorRoom room : result) {
+                this.roomMap.put(String.valueOf(room.getId()), room);
             }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            jdbcUtil.releaseConnection();
         }
-
-        return null;
     }
 
     /**
      * 查询机顶盒信息
      *
-     * @param hdfsCluster
      * @throws Exception
      */
-    public Media readMysqlMedia(String hdfsCluster, String mid) throws Exception {
-        Map<String, Model> map = MysqlCommonVariables.modelMap;
-        if (map.get(mid) != null) {
-            return (Media) map.get(mid);
+    public SavorBox readMysqlBox(String mac) throws Exception {
+        if (this.boxMap == null || this.boxMap.get(mac) == null || this.boxMap.size() <= 0) {
+            findBox();
         }
 
-        SelectModel selectModel = new SelectModel();
-        selectModel.setInputClass(Media.class);
-        selectModel.setQuery("select id,name,oss_addr from savor_media");
-        selectModel.setCountQuery("select count(*) from savor_media");
-        selectModel.setOutputPath("/home/data/hadoop/flume/test_hbase/mysql");
+        return (SavorBox) this.boxMap.get(mac);
+    }
 
-        JdbcReader.readToMap(hdfsCluster, selectModel);
+    private void findBox() throws SQLException {
+        String sql = "select id,name,mac from savor_box";
+        JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
+        jdbcUtil.getConnection();
+        try {
+            List<SavorBox> result = jdbcUtil.findResult(SavorBox.class, sql);
+            for (SavorBox box : result) {
+                this.boxMap.put(String.valueOf(box.getMac()), box);
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            jdbcUtil.releaseConnection();
+        }
+    }
 
-        return (Media) MysqlCommonVariables.modelMap.get(mid);
+    /**
+     * 查询媒体信息
+     *
+     * @throws Exception
+     */
+    public SavorMedia readMysqlMedia(String mid) throws Exception {
+        if (this.mediaMap == null || this.mediaMap.get(mid) == null || this.mediaMap.size() <= 0) {
+            findMedia();
+        }
 
+        return (SavorMedia) this.mediaMap.get(mid);
+    }
+
+    private void findMedia() throws SQLException {
+        String sql = "select id,name,oss_addr from savor_media";
+        JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
+        jdbcUtil.getConnection();
+        try {
+            List<SavorMedia> result = jdbcUtil.findResult(SavorMedia.class, sql);
+            for (SavorMedia media : result) {
+                this.mediaMap.put(String.valueOf(media.getId()), media);
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            jdbcUtil.releaseConnection();
+        }
     }
 }

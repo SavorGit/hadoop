@@ -11,6 +11,8 @@ import java.util.Map;
  */
 public class MysqlCommonVariables {
 
+    public static String driver = "com.mysql.jdbc.Driver";
+
     public static String dbUrl = "jdbc:mysql://rr-2zevja6lfg5718e3ko.mysql.rds.aliyuncs.com:3306/cloud?useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&zeroDateTimeBehavior=convertToNull";
 
     public static String userName = "java_api_read";

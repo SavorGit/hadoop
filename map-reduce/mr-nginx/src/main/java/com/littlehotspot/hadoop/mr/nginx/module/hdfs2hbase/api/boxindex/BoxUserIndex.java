@@ -70,7 +70,7 @@ public class BoxUserIndex extends Configured implements Tool {
                 String string = key.toString();
                 TargetIndexAttrBean targetIndexAttrBean = new TargetIndexAttrBean(string);
                 TargetIndexBean targetIndexBean = new TargetIndexBean();
-                targetIndexBean.setRowKey(targetIndexAttrBean.getUserId()+targetIndexAttrBean.getTimestamps().substring(0,10));
+                targetIndexBean.setRowKey(targetIndexAttrBean.getUserId()+"|"+targetIndexAttrBean.getTimestamps().substring(0,10));
                 targetIndexBean.setIndexAttrBean(targetIndexAttrBean);
                 CommonVariables.hBaseHelper.insert(targetIndexBean);
                 context.write(key, new Text());
