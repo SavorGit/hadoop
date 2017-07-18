@@ -73,6 +73,13 @@ public class MobileLogDuration extends Configured implements Tool {
 
     private static class MobileReduce extends Reducer<Text, Text, Text, Text> {
 
+        private HBaseHelper hBaseHelper;
+
+        @Override
+        protected void setup(Context context) throws IOException, InterruptedException {
+            Configuration conf = context.getConfiguration();
+            this.hBaseHelper = new HBaseHelper(conf);
+        }
 
         @Override
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
@@ -91,7 +98,7 @@ public class MobileLogDuration extends Configured implements Tool {
                     }
                     String rowLineContent = item.toString();
                     SourceMobileBean sourceMobileBean = new SourceMobileBean(rowLineContent);
-                    targetUserReadBean.setRowKey(sourceMobileBean.getMobileId()+sourceMobileBean.getUuid().substring(0,10));
+                    targetUserReadBean.setRowKey(sourceMobileBean.getMobileId()+"|"+sourceMobileBean.getUuid().substring(0,10));
                     this.setForAttrBean(conf,targetUserReadAttrBean, sourceMobileBean);
                     this.setForRelaBean(conf,targetUserReadRelaBean, sourceMobileBean);
 
@@ -99,7 +106,7 @@ public class MobileLogDuration extends Configured implements Tool {
 
                 targetUserReadBean.setTargetUserReadRelaBean(targetUserReadRelaBean);
                 targetUserReadBean.setTargetUserReadAttrBean(targetUserReadAttrBean);
-                CommonVariables.hBaseHelper.insert(targetUserReadBean);
+                hBaseHelper.insert(targetUserReadBean);
 
 
             } catch (Exception e) {
@@ -256,7 +263,6 @@ public class MobileLogDuration extends Configured implements Tool {
         try {
 
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
-            CommonVariables.hBaseHelper = new HBaseHelper(this.getConf());
 
             // 获取参数
             String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);

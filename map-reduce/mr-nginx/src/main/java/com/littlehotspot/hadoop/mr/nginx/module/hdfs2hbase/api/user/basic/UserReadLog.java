@@ -134,6 +134,7 @@ public class UserReadLog extends Configured implements Tool {
                         userActBean.setCount(count.toString());
                     }
                 }
+                userActBean.setType("read");
                 context.write(new Text(userActBean.rowLine()), new Text());
             } catch (Exception e) {
                 e.printStackTrace();

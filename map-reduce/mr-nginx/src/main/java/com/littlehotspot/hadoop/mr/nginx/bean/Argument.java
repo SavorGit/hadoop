@@ -30,6 +30,7 @@ public enum Argument {
     InputPathEnd("hdfsInEnd", null),
     BoxInputPath("hdfsBoxIn", null),
     MobInputPath("hdfsMobIn", null),
+    RqInputPath("hdfsRqIn",null),
     UserInputPath("hdfsUserIn", null),
     ProInputPath("hdfsProIn", null),
     DemaInputPath("hdfsDemaIn", null),

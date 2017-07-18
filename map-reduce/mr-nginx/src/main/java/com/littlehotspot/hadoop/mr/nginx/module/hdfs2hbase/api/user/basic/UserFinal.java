@@ -14,7 +14,9 @@ import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.*;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
@@ -22,6 +24,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.filecache.DistributedCache;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
@@ -67,6 +70,14 @@ public class UserFinal extends Configured implements Tool {
 
     private static class MobileReduce extends Reducer<Text, Text, Text, Text> {
 
+        private HBaseHelper hBaseHelper;
+
+        @Override
+        protected void setup(Context context) throws IOException, InterruptedException {
+            Configuration conf = context.getConfiguration();
+            this.hBaseHelper = new HBaseHelper(conf);
+        }
+
         @Override
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
@@ -108,7 +119,7 @@ public class UserFinal extends Configured implements Tool {
 
                 targetUserBean.setTargetUserAttrBean(targetUserAttrBean);
                 targetUserBean.setTargetUserActiBean(targetUserActiBean);
-                CommonVariables.hBaseHelper.insert(targetUserBean);
+                hBaseHelper.insert(targetUserBean);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -121,10 +132,10 @@ public class UserFinal extends Configured implements Tool {
         try {
 
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
-            CommonVariables.hBaseHelper = new HBaseHelper(this.getConf());
 
             // 获取参数
-            String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
+            String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);
+            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
             String hdfsInputPath1 = CommonVariables.getParameterValue(Argument.UserInputPath);
             String hdfsInputPath2 = CommonVariables.getParameterValue(Argument.ProInputPath);
             String hdfsInputPath3 = CommonVariables.getParameterValue(Argument.DemaInputPath);
@@ -133,6 +144,20 @@ public class UserFinal extends Configured implements Tool {
 
             Job job = Job.getInstance(this.getConf(), UserFinal.class.getSimpleName());
             job.setJarByClass(UserFinal.class);
+
+            // 避免报错：ClassNotFoundError hbaseConfiguration
+            Configuration jobConf = job.getConfiguration();
+            FileSystem hdfs = FileSystem.get(new URI(hdfsCluster), jobConf);
+            Path hBaseSharePath = new Path(hbaseSharePath);
+            FileStatus[] hBaseShareJars = hdfs.listStatus(hBaseSharePath);
+            for (FileStatus fileStatus : hBaseShareJars) {
+                if (!fileStatus.isFile()) {
+                    continue;
+                }
+                Path archive = fileStatus.getPath();
+                FileSystem fs = archive.getFileSystem(jobConf);
+                DistributedCache.addArchiveToClassPath(archive, jobConf, fs);
+            }//
 
             /**作业输入*/
             Path inputPath1 = new Path(hdfsInputPath1);

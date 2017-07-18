@@ -39,11 +39,12 @@ public class TestReadScheduler {
                 "hdfsCluster=hdfs://devpd1:8020",
 //                "hdfsIn=/home/data/hadoop/flume/test-mr/read_text",
 //                "hdfsOut=/home/data/hadoop/flume/test-mr/test-read_end",
-                "hdfsInStart=/home/data/hadoop/flume/test-mr/test-read_end",
-                "hdfsInEnd=/home/data/hadoop/flume/test-mr/test-read_start",
+                "hdfsInStart=/home/data/hadoop/flume/test-mr/test-read_start",
+                "hdfsInEnd=/home/data/hadoop/flume/test-mr/test-read_end",
                 "hdfsOut=/home/data/hadoop/flume/test-mr/test-read_duration",
 //                "inRegex=^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$",
-                "table=user_read"
+                "hbaseRoot=hdfs://devpd1:8020/hbase",
+                "hbaseZookeeper=devpd1"
         };
         System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
         Configuration conf = new Configuration();
