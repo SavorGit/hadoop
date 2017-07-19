@@ -2,6 +2,7 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.medias;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.util.Constant;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileStatus;
@@ -42,16 +43,18 @@ public class MediaScheduler extends Configured implements Tool {
             // 避免报错：ClassNotFoundError hbaseConfiguration
             Configuration jobConf = job.getConfiguration();
             FileSystem hdfs = FileSystem.get(new URI(hdfsCluster), jobConf);
-            Path hBaseSharePath = new Path(hbaseSharePath);
-            FileStatus[] hBaseShareJars = hdfs.listStatus(hBaseSharePath);
-            for (FileStatus fileStatus : hBaseShareJars) {
-                if (!fileStatus.isFile()) {
-                    continue;
-                }
-                Path archive = fileStatus.getPath();
-                FileSystem fs = archive.getFileSystem(jobConf);
-                DistributedCache.addArchiveToClassPath(archive, jobConf, fs);
-            }//
+            if (StringUtils.isNotBlank(hbaseSharePath)) {
+                Path hBaseSharePath = new Path(hbaseSharePath);
+                FileStatus[] hBaseShareJars = hdfs.listStatus(hBaseSharePath);
+                for (FileStatus fileStatus : hBaseShareJars) {
+                    if (!fileStatus.isFile()) {
+                        continue;
+                    }
+                    Path archive = fileStatus.getPath();
+                    FileSystem fs = archive.getFileSystem(jobConf);
+                    DistributedCache.addArchiveToClassPath(archive, jobConf, fs);
+                }//
+            }
 
             job.setMapperClass(MediaMapper.class);
             job.setMapOutputKeyClass(Text.class);

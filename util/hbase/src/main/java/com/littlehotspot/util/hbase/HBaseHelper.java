@@ -13,13 +13,17 @@ package com.littlehotspot.util.hbase;
 import lombok.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.filter.CompareFilter;
+import org.apache.hadoop.hbase.filter.Filter;
+import org.apache.hadoop.hbase.filter.RegexStringComparator;
+import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -47,20 +51,24 @@ public class HBaseHelper {
      * 获取HBase配置器
      *
      * @param conf Hadoop配置器
-     * @throws IOException 异常
      */
-    public HBaseHelper(Configuration conf) throws IOException {
-        this.conf = HBaseConfiguration.create(conf);
-        this.admin = new HBaseAdmin(this.conf);
-        System.out.println("创建 HBase 配置成功！");
+    public HBaseHelper(Configuration conf) {
+        if (conf == null) {
+            throw new IllegalArgumentException("The argument[conf] is null");
+        }
+        try {
+            this.conf = HBaseConfiguration.create(conf);
+            this.admin = new HBaseAdmin(this.conf);
+            System.out.println("The config of HBase is created");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
      * 获取HBase配置器
-     *
-     * @throws IOException 异常
      */
-    public HBaseHelper() throws IOException {
+    public HBaseHelper() {
         this(new Configuration());
     }
 
@@ -69,12 +77,15 @@ public class HBaseHelper {
      *
      * @param tableName   表名
      * @param colFamilies 列簇
-     * @throws IOException 异常
      */
-    public void createTable(String tableName, String colFamilies[]) throws IOException {
-        if (this.admin.tableExists(tableName)) {
-            System.out.println("Table: " + tableName + " already exists !");
-        } else {
+    public void createTable(String tableName, String colFamilies[]) {
+        try {
+            if (this.admin.tableExists(tableName)) {
+                String printMessage = String.format("The table[%s] of HBase already exists", tableName);
+                System.out.println(printMessage);
+                return;
+            }
+
             HTableDescriptor dsc = new HTableDescriptor(tableName);
             int len = colFamilies.length;
             for (int i = 0; i < len; i++) {
@@ -82,7 +93,10 @@ public class HBaseHelper {
                 dsc.addFamily(family);
             }
             admin.createTable(dsc);
-            System.out.println("创建表" + tableName + "成功");
+            String createTableMessage = String.format("The table[%s] of HBase is created", tableName);
+            System.out.println(createTableMessage);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -90,16 +104,23 @@ public class HBaseHelper {
      * 删除表
      *
      * @param tableName 表名
-     * @throws IOException 异常
      */
-    public void deleteTable(String tableName) throws IOException {
-        if (this.admin.tableExists(tableName)) {
+    public void deleteTable(String tableName) {
+        try {
+            if (!this.admin.tableExists(tableName)) {
+                String printMessage = String.format("The table[%s] of HBase is not exists", tableName);
+                System.out.println(printMessage);
+                return;
+            }
             admin.disableTable(tableName);
-            System.out.println("禁用表" + tableName + "!");
+            String disableTableMessage = String.format("The table[%s] of HBase is disabled", tableName);
+            System.out.println(disableTableMessage);
+
             admin.deleteTable(tableName);
-            System.out.println("删除表成功!");
-        } else {
-            System.out.println(tableName + "表不存在 !");
+            String dropTableMessage = String.format("The table[%s] of HBase is abandoned", tableName);
+            System.out.println(dropTableMessage);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -111,14 +132,19 @@ public class HBaseHelper {
      * @param family    簇
      * @param column    列
      * @param value     值
-     * @throws IOException 异常
      */
-    public void insertRecord(String tableName, String rowKey, String family, String column, String value) throws IOException {
-        HTable table = new HTable(this.conf, tableName);
-        Put put = new Put(Bytes.toBytes(rowKey));
-        put.add(Bytes.toBytes(family), Bytes.toBytes(column), Bytes.toBytes(value));
-        table.put(put);
-        System.out.println(tableName + "插入key:" + rowKey + "行成功!");
+    public void insertCellRecord(String tableName, String rowKey, String family, String column, String value) {
+        try {
+            HTable table = new HTable(this.conf, tableName);
+            Put put = new Put(Bytes.toBytes(rowKey));
+            put.add(Bytes.toBytes(family), Bytes.toBytes(column), Bytes.toBytes(value));
+            table.put(put);
+
+            String insertCellMessage = String.format("The cell[%s:%s] for '%s' in table[%s] is set to %s", family, column, rowKey, tableName, value);
+            System.out.println(insertCellMessage);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 //    /**
@@ -153,42 +179,43 @@ public class HBaseHelper {
      * 输入对象到 HBase
      *
      * @param object 对象
-     * @throws InvocationTargetException 异常
-     * @throws IllegalAccessException    异常
-     * @throws IOException               异常
      */
-    public void insert(Object object) throws InvocationTargetException, IllegalAccessException, IOException {
-        Class<?> beanClass = object.getClass();
-        HBaseTable hBaseTable = beanClass.getAnnotation(HBaseTable.class);
-        String tableName = hBaseTable.name();
-        Context hBaseContext = new Context(tableName);
+    public void insert(Object object) {
+        try {
+            Class<?> beanClass = object.getClass();
+            HBaseTable hBaseTable = beanClass.getAnnotation(HBaseTable.class);
+            String tableName = hBaseTable.name();
+            Context hBaseContext = new Context(tableName);
 
-        this.analysisHBaseData(object, beanClass, hBaseContext);
-        Object rowKeyObject = hBaseContext.getRowKey().getValue();
-        if (rowKeyObject == null) {
-            return;
-        }
-
-        String rowKey = rowKeyObject.toString();
-        if (StringUtils.isBlank(rowKey)) {
-            return;
-        }
-
-        HTable table = new HTable(this.conf, hBaseContext.getTableName());// HTabel负责跟记录相关的操作如增删改查等
-        Put put = new Put(Bytes.toBytes(rowKey));// 设置rowkey
-        Collection<Column> columns = hBaseContext.getColumnMap().values();
-        long version = System.currentTimeMillis();
-        for (Column entry : columns) {
-            String familyName = entry.getFamilyName();
-            String columnName = entry.getColumnName();
-            Object valueObject = entry.getColumnValue();
-            String value = "";
-            if (valueObject != null) {
-                value = valueObject.toString();
+            this.analysisHBaseData(object, beanClass, hBaseContext);
+            Object rowKeyObject = hBaseContext.getRowKey().getValue();
+            if (rowKeyObject == null) {
+                return;
             }
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes(columnName), version, Bytes.toBytes(value));
+
+            String rowKey = rowKeyObject.toString();
+            if (StringUtils.isBlank(rowKey)) {
+                return;
+            }
+
+            HTable table = new HTable(this.conf, hBaseContext.getTableName());// HTabel负责跟记录相关的操作如增删改查等
+            Put put = new Put(Bytes.toBytes(rowKey));// 设置rowkey
+            Collection<Column> columns = hBaseContext.getColumnMap().values();
+            long version = System.currentTimeMillis();
+            for (Column entry : columns) {
+                String familyName = entry.getFamilyName();
+                String columnName = entry.getColumnName();
+                Object valueObject = entry.getColumnValue();
+                String value = "";
+                if (valueObject != null) {
+                    value = valueObject.toString();
+                }
+                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes(columnName), version, Bytes.toBytes(value));
+            }
+            table.put(put);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        table.put(put);
     }
 
     /**
@@ -196,13 +223,18 @@ public class HBaseHelper {
      *
      * @param tableName 表名
      * @param rowKey    主键
-     * @throws IOException 异常
      */
-    public void deleteRecord(String tableName, String rowKey) throws IOException {
-        HTable table = new HTable(this.conf, tableName);
-        Delete del = new Delete(Bytes.toBytes(rowKey));
-        table.delete(del);
-        System.out.println(tableName + "删除行" + rowKey + "成功!");
+    public void deleteRecord(String tableName, String rowKey) {
+        try {
+            HTable table = new HTable(this.conf, tableName);
+            Delete del = new Delete(Bytes.toBytes(rowKey));
+            table.delete(del);
+
+            String deleteRowMessage = String.format("The row for '%s' in table[%s] is deleted", rowKey, tableName);
+            System.out.println(deleteRowMessage);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -211,12 +243,15 @@ public class HBaseHelper {
      * @param tableName 表名
      * @param rowKey    主键
      * @return Result
-     * @throws IOException 异常
      */
-    public Result getOneRecord(String tableName, String rowKey) throws IOException {
-        HTable table = new HTable(this.conf, tableName);
-        Get get = new Get(Bytes.toBytes(rowKey));
-        return table.get(get);
+    public Result getOneRecord(String tableName, String rowKey) {
+        try {
+            HTable table = new HTable(this.conf, tableName);
+            Get get = new Get(Bytes.toBytes(rowKey));
+            return table.get(get);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -224,20 +259,88 @@ public class HBaseHelper {
      *
      * @param tableName 表名
      * @return List
-     * @throws IOException 异常
      */
-    public List<Result> getAllRecord(String tableName) throws IOException {
-        HTable table = new HTable(this.conf, tableName);
-        Scan scan = new Scan();
-        ResultScanner scanner = table.getScanner(scan);
-        List<Result> list = new ArrayList<>();
-        for (Result result : scanner) {
-            list.add(result);
+    public List<Result> getAllRecord(String tableName) {
+        try {
+            HTable table = new HTable(this.conf, tableName);
+            Scan scan = new Scan();
+            ResultScanner scanner = table.getScanner(scan);
+            List<Result> list = new ArrayList<>();
+            for (Result result : scanner) {
+                list.add(result);
+            }
+            scanner.close();
+            return list;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        scanner.close();
-        return list;
     }
 
+    /**
+     * 通过用正则表达式匹配行键，来达到数据的模糊查询。
+     *
+     * @param tableName   表名
+     * @param rowKeyRegex 行键的正则表达式
+     * @return List
+     */
+    public List<Result> searchByRowKeyRegex(String tableName, String rowKeyRegex) {
+        try {
+            HTable table = new HTable(this.conf, tableName);
+            Scan scan = new Scan();
+            RegexStringComparator rowKeyRegexStringComparator = new RegexStringComparator(rowKeyRegex);
+            Filter rowKeyFilter = new RowFilter(CompareFilter.CompareOp.EQUAL, rowKeyRegexStringComparator);
+            scan.setFilter(rowKeyFilter);
+            ResultScanner scanner = table.getScanner(scan);
+            List<Result> list = new ArrayList<>();
+            for (Result result : scanner) {
+                list.add(result);
+            }
+            scanner.close();
+            return list;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public <T> T toBean(Result result, Class<T> clazz) {
+        try {
+            byte[] rowKeyBytes = result.getRow();
+            String rowKey = Bytes.toString(rowKeyBytes);
+            System.out.println(rowKey);
+
+            Cell[] rowCellArray = result.rawCells();
+            for (Cell cell : rowCellArray) {
+                byte[] rowBytes = cell.getRowArray();
+                int rowOffset = cell.getRowOffset();
+                short rowLength = cell.getRowLength();
+                String row = Bytes.toString(rowBytes, rowOffset, rowLength);
+                System.out.print(row + "/");
+
+                byte[] familyBytes = cell.getFamilyArray();
+                int familyOffset = cell.getFamilyOffset();
+                byte familyLength = cell.getFamilyLength();
+                String family = Bytes.toString(familyBytes, familyOffset, familyLength);
+                System.out.print(family + ":");
+
+                byte[] qualifierBytes = cell.getQualifierArray();
+                int qualifierOffset = cell.getQualifierOffset();
+                int qualifierLength = cell.getQualifierLength();
+                String qualifier = Bytes.toString(qualifierBytes, qualifierOffset, qualifierLength);
+                System.out.print(qualifier + "=");
+
+                byte[] valueBytes = cell.getValueArray();
+                int valueOffset = cell.getValueOffset();
+                int valueLength = cell.getValueLength();
+                String value = Bytes.toString(valueBytes, valueOffset, valueLength);
+                System.out.println(value);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    /* ============================= 以下是私有方法 ============================= */
     // 解析 HBase 数据
     private void analysisHBaseData(Object object, Class<?> beanClass, Context hBaseContext) throws IllegalAccessException, InvocationTargetException {
         this.getDataFromTableFields(hBaseContext, object, beanClass);// 处理字段
@@ -446,6 +549,8 @@ public class HBaseHelper {
         field.setAccessible(true);
         return field.get(bean);
     }
+
+    /* ============================= 以下是私有内部类 ============================= */
 
     /**
      * 上下文
