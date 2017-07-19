@@ -13,13 +13,17 @@ package com.littlehotspot.util.hbase;
 import lombok.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.filter.CompareFilter;
+import org.apache.hadoop.hbase.filter.Filter;
+import org.apache.hadoop.hbase.filter.RegexStringComparator;
+import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -49,6 +53,9 @@ public class HBaseHelper {
      * @param conf Hadoop配置器
      */
     public HBaseHelper(Configuration conf) {
+        if (conf == null) {
+            throw new IllegalArgumentException("The argument[conf] is null");
+        }
         try {
             this.conf = HBaseConfiguration.create(conf);
             this.admin = new HBaseAdmin(this.conf);
@@ -267,6 +274,70 @@ public class HBaseHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 通过用正则表达式匹配行键，来达到数据的模糊查询。
+     *
+     * @param tableName   表名
+     * @param rowKeyRegex 行键的正则表达式
+     * @return List
+     */
+    public List<Result> searchByRowKeyRegex(String tableName, String rowKeyRegex) {
+        try {
+            HTable table = new HTable(this.conf, tableName);
+            Scan scan = new Scan();
+            RegexStringComparator rowKeyRegexStringComparator = new RegexStringComparator(rowKeyRegex);
+            Filter rowKeyFilter = new RowFilter(CompareFilter.CompareOp.EQUAL, rowKeyRegexStringComparator);
+            scan.setFilter(rowKeyFilter);
+            ResultScanner scanner = table.getScanner(scan);
+            List<Result> list = new ArrayList<>();
+            for (Result result : scanner) {
+                list.add(result);
+            }
+            scanner.close();
+            return list;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public <T> T toBean(Result result, Class<T> clazz) {
+        try {
+            byte[] rowKeyBytes = result.getRow();
+            String rowKey = Bytes.toString(rowKeyBytes);
+            System.out.println(rowKey);
+
+            Cell[] rowCellArray = result.rawCells();
+            for (Cell cell : rowCellArray) {
+                byte[] rowBytes = cell.getRowArray();
+                int rowOffset = cell.getRowOffset();
+                short rowLength = cell.getRowLength();
+                String row = Bytes.toString(rowBytes, rowOffset, rowLength);
+                System.out.print(row + "/");
+
+                byte[] familyBytes = cell.getFamilyArray();
+                int familyOffset = cell.getFamilyOffset();
+                byte familyLength = cell.getFamilyLength();
+                String family = Bytes.toString(familyBytes, familyOffset, familyLength);
+                System.out.print(family + ":");
+
+                byte[] qualifierBytes = cell.getQualifierArray();
+                int qualifierOffset = cell.getQualifierOffset();
+                int qualifierLength = cell.getQualifierLength();
+                String qualifier = Bytes.toString(qualifierBytes, qualifierOffset, qualifierLength);
+                System.out.print(qualifier + "=");
+
+                byte[] valueBytes = cell.getValueArray();
+                int valueOffset = cell.getValueOffset();
+                int valueLength = cell.getValueLength();
+                String value = Bytes.toString(valueBytes, valueOffset, valueLength);
+                System.out.println(value);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 
     /* ============================= 以下是私有方法 ============================= */
