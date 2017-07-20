@@ -58,7 +58,7 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
                 this.setPropertiesForAttrBean(targetSadAttrBean, sourceUserSadBean);
                 this.setPropertiesForRelaBean(conf, targetSadRelaBean, sourceUserSadBean);
 
-                rowKey = sourceUserSadBean.getMobile_id() + Constant.ROWKEY_SPLIT_CHAR + sourceUserSadBean.getTimestamps();
+                rowKey = sourceUserSadBean.getMobile_id() + Constant.ROWKEY_SPLIT_CHAR + sourceUserSadBean.getTimestamps().substring(0, 10);
             }
 
             if (targetSadAttrBean.getStart() != 0 && targetSadAttrBean.getEnd() != 0) {
@@ -84,9 +84,9 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
         bean.setDevice_id(source.getMobile_id());
         bean.setType(source.getMedia_type());
         if ("start".equals(source.getOption_type())) {
-            bean.setStart(Long.decode(source.getTimestamps().substring(0, 10)));
+            bean.setStart(Long.decode(source.getTimestamps()));
         } else if ("end".equals(source.getOption_type())) {
-            bean.setEnd(Long.decode(source.getTimestamps().substring(0, 10)));
+            bean.setEnd(Long.decode(source.getTimestamps()));
         }
     }
 

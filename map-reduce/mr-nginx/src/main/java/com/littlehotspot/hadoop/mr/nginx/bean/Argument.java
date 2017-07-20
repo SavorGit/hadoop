@@ -59,6 +59,9 @@ public enum Argument {
     SadType("sadType", ""),// 用户行为类型
 
     ResourceType("resourceType",""),// 资源类型
+
+    ColumnFamily("columnFamily",""),// 列族名
+    ColumnName("columnName",""),// 列名
     ;
 
     @Getter
