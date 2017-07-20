@@ -1,5 +1,6 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.medias;
 
+import com.littlehotspot.hadoop.mr.nginx.util.Constant;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -21,6 +22,8 @@ public class MediaMapper extends Mapper<LongWritable, Text, Text, Text> {
             return;
         }
 
-        context.write(new Text(key.toString()), value);
+        String keyString = rowLineContent.substring(0,rowLineContent.indexOf(Constant.VALUE_SPLIT_CHAR));
+
+        context.write(new Text(keyString), value);
     }
 }
