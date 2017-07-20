@@ -11,8 +11,10 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.client.HTable;
@@ -22,6 +24,7 @@ import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.filecache.DistributedCache;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
@@ -47,7 +50,8 @@ public class BoxCleanJob extends Configured implements Tool {
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
             String hbaseRoot = CommonVariables.getParameterValue(Argument.HbaseRoot);
             String hbaseZoo = CommonVariables.getParameterValue(Argument.HbaseZookeeper);
-//            String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);
+            String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);
+
             String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
@@ -64,7 +68,21 @@ public class BoxCleanJob extends Configured implements Tool {
             Job job = Job.getInstance(this.getConf(), this.getClass().getName());
             job.setJarByClass(this.getClass());
 
-
+            // 避免报错：ClassNotFoundError hbaseConfiguration
+            Configuration jobConf = job.getConfiguration();
+            FileSystem hdfs = FileSystem.get(new URI(hdfsCluster), jobConf);
+            if (StringUtils.isNotBlank(hbaseSharePath)) {
+                Path hBaseSharePath = new Path(hbaseSharePath);
+                FileStatus[] hBaseShareJars = hdfs.listStatus(hBaseSharePath);
+                for (FileStatus fileStatus : hBaseShareJars) {
+                    if (!fileStatus.isFile()) {
+                        continue;
+                    }
+                    Path archive = fileStatus.getPath();
+                    FileSystem fs = archive.getFileSystem(jobConf);
+                    DistributedCache.addArchiveToClassPath(archive, jobConf, fs);
+                }//
+            }
             Scan scan = new Scan();
 //            scan.setCaching(500);
 //            scan.setCacheBlocks(false);

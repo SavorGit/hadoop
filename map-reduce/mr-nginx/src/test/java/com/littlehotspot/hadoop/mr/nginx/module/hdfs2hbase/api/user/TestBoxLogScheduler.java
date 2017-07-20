@@ -41,16 +41,16 @@ public class TestBoxLogScheduler {
     @Test
     public void run() {
         String[] args = {
-                "hdfsCluster=hdfs://localhost:9000",
+                "hdfsCluster=hdfs://devpd1:8020",
 //                "hdfsIn=/home/data/hadoop/flume/nginx_log/export/2017-05-31",
                 "hdfsOut=/home/data/hadoop/flume/text_mr/test-box_log",
-                "hbaseRoot=hdfs://localhost:9000/hbase",
-                "hbaseZookeeper=localhost"
+                "hbaseRoot=hdfs://devpd1:8020/hbase",
+                "hbaseZookeeper=devpd1",
 
-//                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase"
+                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase"
 //                "hdfsIn=/home/data/hadoop/flume/test-mr/mob_user",
 //                "hdfsOut=/home/data/hadoop/flume/test-mr/test-mob_user",
-////                "inRegex=^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$",
+//                "inRegex=^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$",
 //                "table=user"
         };
         System.setProperty("hadoop.home.dir", "D:\\GreenProfram\\hadoop-2.7.3");
