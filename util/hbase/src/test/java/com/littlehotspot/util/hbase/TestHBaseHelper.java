@@ -35,6 +35,9 @@ import static org.fusesource.jansi.Ansi.ansi;
  */
 public class TestHBaseHelper {
 
+    private static final String FORMAT_PRINT_TIME_CONSUMING = "执行 %s 用时 %s 毫秒";
+    private static final String FORMAT_COLOR_PRINT_TIME_CONSUMING = "@|blue 执行|@ @|green %s|@ @|blue 用时|@ @|red %s|@ @|blue 毫秒|@\n";
+
     private DecimalFormat decimalFormat;
 
     private HBaseHelper hBaseHelper;
@@ -46,6 +49,7 @@ public class TestHBaseHelper {
      */
     @Before
     public void init() {
+        System.out.println();
         Locale.setDefault(Locale.CHINA);
         decimalFormat = new DecimalFormat();
 
@@ -78,10 +82,10 @@ public class TestHBaseHelper {
         hBaseHelper.deleteTable(tableName);
         long end = System.currentTimeMillis();
 
-        String printMessage = String.format("执行 %s 用时 %s 毫秒", Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
+        String printMessage = String.format(FORMAT_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
         System.out.println(ansi().eraseScreen().fg(YELLOW).a(printMessage).reset());
 
-        String ansiPrintMessage = String.format("@|blue 执行|@ @|green %s|@ @|blue 用时|@ @|red %s|@ @|blue 毫秒|@", Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
+        String ansiPrintMessage = String.format(FORMAT_COLOR_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
         System.out.println(ansi().eraseScreen().render(ansiPrintMessage));
     }
 
@@ -94,10 +98,10 @@ public class TestHBaseHelper {
         hBaseHelper.createTable(tableName, new String[]{"basic", "attr"});
         long end = System.currentTimeMillis();
 
-        String printMessage = String.format("执行 %s 用时 %s 毫秒", Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
+        String printMessage = String.format(FORMAT_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
         System.out.println(ansi().eraseScreen().fg(YELLOW).a(printMessage).reset());
 
-        String ansiPrintMessage = String.format("@|blue 执行|@ @|green %s|@ @|blue 用时|@ @|red %s|@ @|blue 毫秒|@", Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
+        String ansiPrintMessage = String.format(FORMAT_COLOR_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
         System.out.println(ansi().eraseScreen().render(ansiPrintMessage));
     }
 
@@ -112,10 +116,10 @@ public class TestHBaseHelper {
         hBaseHelper.insert(table);
         long end = System.currentTimeMillis();
 
-        String printMessage = String.format("执行 %s 用时 %s 毫秒", Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
+        String printMessage = String.format(FORMAT_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
         System.out.println(ansi().eraseScreen().fg(YELLOW).a(printMessage).reset());
 
-        String ansiPrintMessage = String.format("@|blue 执行|@ @|green %s|@ @|blue 用时|@ @|red %s|@ @|blue 毫秒|@", Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
+        String ansiPrintMessage = String.format(FORMAT_COLOR_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
         System.out.println(ansi().eraseScreen().render(ansiPrintMessage));
     }
 
@@ -130,10 +134,10 @@ public class TestHBaseHelper {
         System.out.println(testTable);
         long end = System.currentTimeMillis();
 
-        String printMessage = String.format("执行 %s 用时 %s 毫秒", Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
+        String printMessage = String.format(FORMAT_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
         System.out.println(ansi().eraseScreen().fg(YELLOW).a(printMessage).reset());
 
-        String ansiPrintMessage = String.format("@|blue 执行|@ @|green %s|@ @|blue 用时|@ @|red %s|@ @|blue 毫秒|@", Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
+        String ansiPrintMessage = String.format(FORMAT_COLOR_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
         System.out.println(ansi().eraseScreen().render(ansiPrintMessage));
     }
 
@@ -149,10 +153,10 @@ public class TestHBaseHelper {
         System.out.println(String.format("共查找到 %s 条数据", decimalFormat.format(resultList.size())));
         long end = System.currentTimeMillis();
 
-        String printMessage = String.format("执行 %s 用时 %s 毫秒", Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
+        String printMessage = String.format(FORMAT_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
         System.out.println(ansi().eraseScreen().fg(YELLOW).a(printMessage).reset());
 
-        String ansiPrintMessage = String.format("@|blue 执行|@ @|green %s|@ @|blue 用时|@ @|red %s|@ @|blue 毫秒|@", Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
+        String ansiPrintMessage = String.format(FORMAT_COLOR_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
         System.out.println(ansi().eraseScreen().render(ansiPrintMessage));
     }
 
@@ -166,10 +170,10 @@ public class TestHBaseHelper {
         System.out.println(String.format("共查找到 %s 条数据", decimalFormat.format(resultList.size())));
         long end = System.currentTimeMillis();
 
-        String printMessage = String.format("执行 %s 用时 %s 毫秒", Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
+        String printMessage = String.format(FORMAT_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
         System.out.println(ansi().eraseScreen().fg(YELLOW).a(printMessage).reset());
 
-        String ansiPrintMessage = String.format("@|blue 执行|@ @|green %s|@ @|blue 用时|@ @|red %s|@ @|blue 毫秒|@", Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
+        String ansiPrintMessage = String.format(FORMAT_COLOR_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
         System.out.println(ansi().eraseScreen().render(ansiPrintMessage));
     }
 }
