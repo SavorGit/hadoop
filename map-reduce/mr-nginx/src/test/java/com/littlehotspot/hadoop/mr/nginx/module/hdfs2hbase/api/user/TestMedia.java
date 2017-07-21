@@ -15,15 +15,15 @@ public class TestMedia {
     public void test(){
         String[] args = {
                 "hdfsCluster=hdfs://devpd1:8020",
-                "hdfsIn=/home/data/hadoop/flume/test_hbase/mysql",
-                "hdfsOut=/home/data/hadoop/flume/test_hbase/mysql1",
+                "hdfsIn=/home/data/hadoop/flume/mysql/medias",
+                "hdfsOut=/home/data/hadoop/flume/mysql/medias_hdfs",
 
-                "hbaseRoot=hdfs://devpd1:8020/hbase",
-                "hbaseZookeeper=devpd1",
+                "hbaseRoot=hdfs://localhost:9000/hbase",
+                "hbaseZookeeper=localhost"
 
-                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase"
+//                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase"
         };
-        System.setProperty("hadoop.home.dir", "E:\\DevpPrograms\\hadoop-2.7.3");
+        System.setProperty("hadoop.home.dir", "D:\\GreenProfram\\hadoop-2.7.3");
         Configuration conf = new Configuration();
 
         try {

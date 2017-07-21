@@ -297,12 +297,15 @@ public class HBaseHelper {
     }
 
     /**
-     * 将对象转换成 HBase {@link Put} 对象
+     * 将 JAVA 对象转换成 HBase {@link Put} 对象
      *
      * @param bean 对象
      * @return {@link Put}
      */
     public static Put toPut(Object bean) {
+        if (bean == null) {
+            throw new IllegalArgumentException("The argument[bean] is null");
+        }
         try {
             Class<?> beanClass = bean.getClass();
             HBaseTable hBaseTable = beanClass.getAnnotation(HBaseTable.class);
@@ -339,41 +342,92 @@ public class HBaseHelper {
         }
     }
 
-    public <T> T toBean(Result result, Class<T> clazz) {
+    /**
+     * 将 HBase {@link Result} 对象转换成 JAVA 对象
+     *
+     * @param result {@link Result} 对象
+     * @param clazz  JAVA 对象的类型
+     * @param <T>    泛型
+     * @return T
+     */
+    public static <T> T toBean(Result result, Class<T> clazz) {
+        if (result == null) {
+            throw new IllegalArgumentException("The argument[result] is null");
+        }
+        if (clazz == null) {
+            throw new IllegalArgumentException("The argument[clazz] is null");
+        }
+        T bean = null;
         try {
+            AbstractHelper.Context hBaseContext = new AbstractHelper.Context();
+            if (hBaseContext.getRowKey() == null) {
+                hBaseContext.setRowKey(new AbstractHelper.RowKey());
+            }
+
+            // RowKey
             byte[] rowKeyBytes = result.getRow();
             String rowKey = Bytes.toString(rowKeyBytes);
-            System.out.println(rowKey);
+            hBaseContext.getRowKey().setValue(rowKey);
 
             Cell[] rowCellArray = result.rawCells();
             for (Cell cell : rowCellArray) {
-                byte[] rowBytes = cell.getRowArray();
-                int rowOffset = cell.getRowOffset();
-                short rowLength = cell.getRowLength();
-                String row = Bytes.toString(rowBytes, rowOffset, rowLength);
-                System.out.print(row + "/");
+                AbstractHelper.Column column = new AbstractHelper.Column();
 
+                // Family
                 byte[] familyBytes = cell.getFamilyArray();
                 int familyOffset = cell.getFamilyOffset();
                 byte familyLength = cell.getFamilyLength();
                 String family = Bytes.toString(familyBytes, familyOffset, familyLength);
-                System.out.print(family + ":");
+                column.setFamilyName(family);
 
+                // Column
                 byte[] qualifierBytes = cell.getQualifierArray();
                 int qualifierOffset = cell.getQualifierOffset();
                 int qualifierLength = cell.getQualifierLength();
                 String qualifier = Bytes.toString(qualifierBytes, qualifierOffset, qualifierLength);
-                System.out.print(qualifier + "=");
+                column.setColumnName(qualifier);
 
+                // Value
                 byte[] valueBytes = cell.getValueArray();
                 int valueOffset = cell.getValueOffset();
                 int valueLength = cell.getValueLength();
                 String value = Bytes.toString(valueBytes, valueOffset, valueLength);
-                System.out.println(value);
+                column.setColumnValue(value);
+
+                String key = String.format(AbstractHelper.MAP_KEY_FORMAT_HBASE_COLUMN, family, qualifier);
+                hBaseContext.getColumnMap().put(key, column);
+            }
+            bean = AbstractHelper.getBeanFromTableData(hBaseContext, clazz);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return bean;
+    }
+
+    /**
+     * 将 HBase {@link ResultScanner} 对象转换成 {@link List} 对象
+     *
+     * @param scanner {@link ResultScanner} 对象
+     * @param clazz   JAVA 对象的类型
+     * @param <T>     泛型
+     * @return {@link List} 对象
+     */
+    public static <T> List<T> toList(ResultScanner scanner, Class<T> clazz) {
+        if (scanner == null) {
+            throw new IllegalArgumentException("The argument[result] is null");
+        }
+        if (clazz == null) {
+            throw new IllegalArgumentException("The argument[clazz] is null");
+        }
+        List<T> list = new ArrayList<>();
+        try {
+            for (Result result : scanner) {
+                T bean = toBean(result, clazz);
+                list.add(bean);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return null;
+        return list;
     }
 }

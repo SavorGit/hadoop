@@ -13,6 +13,7 @@ package com.littlehotspot.util.hbase.model;
 import com.littlehotspot.util.hbase.HBaseColumn;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
@@ -25,6 +26,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class TestFamilyAttribute {
 
     @HBaseColumn(name = "attr_1")

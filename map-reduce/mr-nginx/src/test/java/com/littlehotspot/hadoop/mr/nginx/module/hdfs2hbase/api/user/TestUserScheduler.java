@@ -141,7 +141,7 @@ public class TestUserScheduler {
 //                "inRegex=^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$",
 //                "table=user"
         };
-        System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
+        System.setProperty("hadoop.home.dir", "D:\\GreenProfram\\hadoop-2.7.3");
         Configuration conf = new Configuration();
 //        conf.set("fs.defaultFS", "hdfs://devpd1:8020");
 //        conf.set("fs.defaultFS", "file:///");

@@ -30,6 +30,7 @@
         <module>mr-box</module>
         <module>mr-mobile</module>
         <module>mr-nginx</module>
+        <module>mr-user</module>
         <module>hdfs</module>
     </modules>
 

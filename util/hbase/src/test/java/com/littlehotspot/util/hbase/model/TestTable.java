@@ -16,6 +16,7 @@ import com.littlehotspot.util.hbase.HBaseRowKey;
 import com.littlehotspot.util.hbase.HBaseTable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
@@ -29,6 +30,7 @@ import lombok.Data;
 @HBaseTable(name = "test_hbase")
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class TestTable {
 
     @HBaseRowKey
