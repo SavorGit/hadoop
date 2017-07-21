@@ -27,6 +27,4 @@ import java.lang.annotation.*;
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HBaseRowKey {
-
-    HBaseAnnotationScope scope() default HBaseAnnotationScope.FIELD;
 }

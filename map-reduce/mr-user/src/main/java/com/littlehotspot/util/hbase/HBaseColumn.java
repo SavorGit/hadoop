@@ -6,14 +6,16 @@
  * @Package : com.littlehotspot.util.hbase
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
- * @Time : 16:31
+ * @Time : 16:23
  */
 package com.littlehotspot.util.hbase;
 
 import java.lang.annotation.*;
 
 /**
- * <h1>注解 - HBase 行键</h1>
+ * <h1>注解 - HBase 列</h1>
+ * 1、必须注解到最外层类的成员（属性/方法）上
+ * 2、必须注解到列族类的成员（属性/方法）上
  *
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
@@ -26,7 +28,7 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HBaseRowKey {
+public @interface HBaseColumn {
 
-    HBaseAnnotationScope scope() default HBaseAnnotationScope.FIELD;
+    String name();
 }

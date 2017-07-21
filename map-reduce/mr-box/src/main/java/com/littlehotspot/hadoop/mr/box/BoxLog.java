@@ -3,13 +3,14 @@
  * STUPID BIRD PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  * @Project : hadoop
- * @Package : com.littlehotspot.hadoop.mr.hdfs
+ * @Package : com.littlehotspot.hadoop.mr.box
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
- * @Time : 12:47
+ * @Time : 15:38
  */
 package com.littlehotspot.hadoop.mr.box;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -30,15 +31,14 @@ import java.util.regex.Pattern;
 /**
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
- * @EMAIL 404644381@qq.com
- * @notes Created on 2017年06月30日<br>
+ * @notes Created on 2017年05月16日<br>
  * Revision of last commit:$Revision$<br>
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
 public class BoxLog extends Configured implements Tool {
 
-    private static Pattern BOX_LOG_FORMAT_REGEX = null;
+    private static Pattern BOX_LOG_FORMAT_REGEX = Pattern.compile("^.+,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.+,.*,?$");
 
     private static class BoxMapper extends Mapper<LongWritable, Text, Text, Text> {
 
@@ -47,10 +47,10 @@ public class BoxLog extends Configured implements Tool {
             /**数据清洗=========开始*/
             try {
                 String msg = value.toString();
-                Matcher matcher = BOX_LOG_FORMAT_REGEX.matcher(msg);
-                if (!matcher.find()) {
-                    return;
-                }
+//                Matcher matcher = BOX_LOG_FORMAT_REGEX.matcher(msg);
+//                if (!matcher.find()) {
+//                    return;
+//                }
                 context.write(value, new Text());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -78,8 +78,8 @@ public class BoxLog extends Configured implements Tool {
                 BOX_LOG_FORMAT_REGEX = Pattern.compile(arg[2]);
             }
 
-            Job job = Job.getInstance(this.getConf(), this.getClass().getSimpleName());
-            job.setJarByClass(this.getClass());
+            Job job = Job.getInstance(this.getConf(), BoxLog.class.getSimpleName());
+            job.setJarByClass(BoxLog.class);
 
             /**作业输入*/
             Path inputPath = new Path(arg[0]);
@@ -90,7 +90,7 @@ public class BoxLog extends Configured implements Tool {
 
             /**作业输出*/
             Path outputPath = new Path(arg[1]);
-            FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());
+            FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()),this.getConf());
             if (fileSystem.exists(outputPath)) {
                 fileSystem.delete(outputPath, true);
             }
