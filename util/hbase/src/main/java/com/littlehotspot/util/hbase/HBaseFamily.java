@@ -31,5 +31,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HBaseFamily {
 
+    HBaseAnnotationScope scope() default HBaseAnnotationScope.FIELD;
+
     String name();
 }
