@@ -159,11 +159,17 @@ public class TestHBaseHelper {
     @Test
     public void searchByRowKeyRegex() {
         long start = System.currentTimeMillis();
-        List<Result> resultList = hBaseHelper.searchByRowKeyRegex(tableName, "864412032481097\\|.+");
+        List<Result> resultList = hBaseHelper.searchByRowKeyRegex(tableName, "rk_.+");
         for (Result result : resultList) {
-            System.out.println(result);
+            System.out.println(HBaseHelper.toBean(result, TestTable.class));
         }
         System.out.println(String.format("共查找到 %s 条数据", decimalFormat.format(resultList.size())));
-        System.out.println(String.format("用时： %s 毫秒", decimalFormat.format(System.currentTimeMillis() - start)));
+        long end = System.currentTimeMillis();
+
+        String printMessage = String.format("执行 %s 用时 %s 毫秒", Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
+        System.out.println(ansi().eraseScreen().fg(YELLOW).a(printMessage).reset());
+
+        String ansiPrintMessage = String.format("@|blue 执行|@ @|green %s|@ @|blue 用时|@ @|red %s|@ @|blue 毫秒|@", Thread.currentThread().getStackTrace()[1].getMethodName(), decimalFormat.format(end - start));
+        System.out.println(ansi().eraseScreen().render(ansiPrintMessage));
     }
 }
