@@ -157,6 +157,28 @@ public class JDBCTool {
             String errorMessage = String.format("The argument[sql] is \"%s\"", sql);
             throw new IllegalArgumentException(errorMessage);
         }
+        return findResult(this.connection, clazz, sql, params);
+    }
+
+    /**
+     * 执行查询操作
+     *
+     * @param connection 连接对象
+     * @param clazz      JAVA 对象的类型
+     * @param sql        SQL 语句
+     * @param params     SQL 语句参数
+     * @param <T>        java 泛型
+     * @return List
+     * @throws SQLException SQL 异常
+     */
+    public <T> List<T> findResult(Connection connection, Class<T> clazz, String sql, Object... params) throws SQLException {
+        if (sql == null) {
+            throw new IllegalArgumentException("The argument[sql] is null");
+        }
+        if (sql.trim().length() < 1) {
+            String errorMessage = String.format("The argument[sql] is \"%s\"", sql);
+            throw new IllegalArgumentException(errorMessage);
+        }
         List<T> list = new ArrayList<T>();
         this.preparedStatement = connection.prepareStatement(sql);
         if (params != null && params.length > 0) {
@@ -164,7 +186,45 @@ public class JDBCTool {
                 this.preparedStatement.setObject(argIndex++, params[index]);
             }
         }
-        resultSet = this.preparedStatement.executeQuery();
+        return findResult(this.preparedStatement, clazz);
+    }
+
+    /**
+     * 执行查询操作
+     *
+     * @param preparedStatement SQL 语句预处理器
+     * @param clazz             JAVA 对象的类型
+     * @return List
+     * @throws SQLException Sql 异常
+     */
+    public <T> List<T> findResult(PreparedStatement preparedStatement, Class<T> clazz) throws SQLException {
+        if (preparedStatement == null) {
+            throw new IllegalArgumentException("The argument[preparedStatement] is null");
+        }
+        if (clazz == null) {
+            throw new IllegalArgumentException("The argument[clazz] is null");
+        }
+        this.resultSet = preparedStatement.executeQuery();
+        return toList(this.resultSet, clazz);
+    }
+
+    /**
+     * 将 {@link ResultSet} 对象转换为 JAVA 对象
+     *
+     * @param resultSet {@link ResultSet} 对象
+     * @param clazz     JAVA 对象的类型
+     * @param <T>       java 泛型
+     * @return List
+     * @throws SQLException SQL 异常
+     */
+    public <T> List<T> toList(ResultSet resultSet, Class<T> clazz) throws SQLException {
+        if (resultSet == null) {
+            throw new IllegalArgumentException("The argument[resultSet] is null");
+        }
+        if (clazz == null) {
+            throw new IllegalArgumentException("The argument[clazz] is null");
+        }
+        List<T> list = new ArrayList<T>();
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
         int columnCount = resultSetMetaData.getColumnCount();
         while (resultSet.next()) {
@@ -266,8 +326,8 @@ public class JDBCTool {
 //            Boolean columnValue = (Boolean) resultSet.getObject(columnName);
 //            method.invoke(bean, columnValue);
 //        } else {
-            Object columnValue = resultSet.getObject(columnName);
-            method.invoke(bean, columnValue);
+        Object columnValue = resultSet.getObject(columnName);
+        method.invoke(bean, columnValue);
 //        }
     }
 }
