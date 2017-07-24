@@ -12,8 +12,8 @@ package com.littlehotspot.hadoop.mr.hdfs.module;
 
 import com.littlehotspot.hadoop.mr.hdfs.mapper.CleanByRegexMapper;
 import com.littlehotspot.hadoop.mr.hdfs.util.CleanByRegexConstant;
-import com.littlehotspot.util.argument.model.Argument;
 import net.lizhaoweb.common.util.argument.ArgumentFactory;
+import net.lizhaoweb.spring.hadoop.commons.argument.model.Argument;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
