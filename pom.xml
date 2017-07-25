@@ -103,8 +103,10 @@
         <codehaus.jackson.version>1.9.13</codehaus.jackson.version>
         <fasterxml.jackson.version>2.6.0</fasterxml.jackson.version>
         <aspect.version>1.8.9</aspect.version>
-        <hadoop.version>2.7.3</hadoop.version>
-        <hbase.version>1.2.6</hbase.version>
+        <hadoop.version>2.5.0</hadoop.version>
+        <hbase.version>1.2.0</hbase.version>
+        <hive.version>1.1.0</hive.version>
+        <spark.version>1.6.0</spark.version>
     </properties>
 
     <dependencyManagement>
