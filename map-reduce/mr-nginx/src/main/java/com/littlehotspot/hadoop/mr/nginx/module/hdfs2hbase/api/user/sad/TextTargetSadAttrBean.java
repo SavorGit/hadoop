@@ -28,6 +28,9 @@ public class TextTargetSadAttrBean {
 
     public void setP_time() {
         this.p_time = this.end-this.start;
+        if(this.p_time < 0){
+            this.p_time = 0;
+        }
     }
 
     public void setStart(long start) {

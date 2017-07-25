@@ -1,19 +1,17 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad;
 
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.JDBCTool;
-import com.littlehotspot.hadoop.mr.nginx.mysql.MysqlCommonVariables;
 import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorBox;
 import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorHotel;
 import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorMedia;
 import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorRoom;
 import com.littlehotspot.hadoop.mr.nginx.util.Constant;
+import com.littlehotspot.hadoop.mr.nginx.util.JSONUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -55,10 +53,14 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
                 String rowLineContent = item.toString();
                 TextTargetSadActBean sourceUserSadBean = new TextTargetSadActBean(rowLineContent);
 
-                this.setPropertiesForAttrBean(targetSadAttrBean, sourceUserSadBean);
-                this.setPropertiesForRelaBean(conf, targetSadRelaBean, sourceUserSadBean);
+                if ("start".equals(sourceUserSadBean.getOption_type())) {
+                    this.setPropertiesForAttrBean(targetSadAttrBean, sourceUserSadBean);
+                    this.setPropertiesForRelaBean(targetSadRelaBean, sourceUserSadBean);
+                } else if ("end".equals(sourceUserSadBean.getOption_type())) {
+                    targetSadAttrBean.setEnd(Long.decode(sourceUserSadBean.getTimestamps()));
+                }
 
-                rowKey = sourceUserSadBean.getMobile_id() + Constant.ROWKEY_SPLIT_CHAR + (9999999999L-Long.valueOf(sourceUserSadBean.getTimestamps().substring(0, 10)));
+                rowKey = sourceUserSadBean.getMobile_id() + Constant.ROWKEY_SPLIT_CHAR + (9999999999L - Long.valueOf(sourceUserSadBean.getTimestamps().substring(0, 10)));
             }
 
             if (targetSadAttrBean.getStart() != 0 && targetSadAttrBean.getEnd() != 0) {
@@ -78,8 +80,44 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
     protected void setup(Context context) throws IOException, InterruptedException {
         Configuration conf = context.getConfiguration();
         this.hBaseHelper = new HBaseHelper(conf);
+
+        String hotels = conf.get("hotels");
+        String rooms = conf.get("rooms");
+        String boxes = conf.get("boxes");
+        String medias = conf.get("medias");
+
+        List<Object> hotelList = JSONUtil.JSONArrayToList(hotels, SavorHotel.class);
+        for (Object o : hotelList) {
+            SavorHotel hotel = (SavorHotel) o;
+            this.hotelMap.put(String.valueOf(hotel.getId()), hotel);
+        }
+
+        List<Object> roomList = JSONUtil.JSONArrayToList(rooms, SavorRoom.class);
+        for (Object o : roomList) {
+            SavorRoom room = (SavorRoom) o;
+            this.roomMap.put(String.valueOf(room.getId()), room);
+        }
+
+        List<Object> boxList = JSONUtil.JSONArrayToList(boxes, SavorBox.class);
+        for (Object o : boxList) {
+            SavorBox box = (SavorBox) o;
+            this.boxMap.put(String.valueOf(box.getMac()), box);
+        }
+
+        List<Object> mediaList = JSONUtil.JSONArrayToList(medias, SavorMedia.class);
+        for (Object o : mediaList) {
+            SavorMedia media = (SavorMedia) o;
+            this.mediaMap.put(String.valueOf(media.getId()), media);
+        }
+
     }
 
+    /**
+     * 设置基本属性
+     *
+     * @param bean
+     * @param source
+     */
     private void setPropertiesForAttrBean(TextTargetSadAttrBean bean, TextTargetSadActBean source) {
         bean.setDevice_id(source.getMobile_id());
         bean.setType(source.getCommon_value());
@@ -90,35 +128,40 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
         }
     }
 
-    private void setPropertiesForRelaBean(Configuration conf, TextTargetSadRelaBean bean, TextTargetSadActBean source) throws Exception {
+    /**
+     * 设置关联属性
+     *
+     * @param bean
+     * @param source
+     * @throws Exception
+     */
+    private void setPropertiesForRelaBean(TextTargetSadRelaBean bean, TextTargetSadActBean source) throws Exception {
         String hotelId = source.getHotel_id();
         bean.setHotel(hotelId);
 
         //读取mysql
-        SavorHotel hotel = readMysqlHotel(hotelId);
+        SavorHotel hotel = this.getHotel(hotelId);
         if (hotel != null) {
             bean.setHotel_name(hotel.getName());
         }
 
         String roomId = source.getRoom_id();
         bean.setRoom(roomId);
-        SavorRoom room = readMysqlRoom(roomId);
+        SavorRoom room = this.getRoom(roomId);
         if (room != null) {
             bean.setRoom_name(room.getName());
         }
 
-
         String mac = source.getMac();
         bean.setBox_mac(mac);
-        SavorBox box = readMysqlBox(mac);
+        SavorBox box = this.getBox(mac);
         if (box != null && mac.equals(box.getMac())) {
             bean.setBox_name(box.getName());
         }
 
-
         String mediaId = source.getMedia_id();
         bean.setMedia(mediaId);
-        SavorMedia media = readMysqlMedia(mediaId);
+        SavorMedia media = this.getMedia(mediaId);
         if (media != null) {
             bean.setMedia_name(media.getName());
             bean.setMedia_down_url(media.getOss_addr());
@@ -135,27 +178,11 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
      *
      * @throws Exception
      */
-    public SavorHotel readMysqlHotel(String hid) throws Exception {
+    private SavorHotel getHotel(String hid) throws Exception {
         if (this.hotelMap == null || this.hotelMap.get(hid) == null || this.hotelMap.size() <= 0) {
-            findHotel();
+            return null;
         }
         return (SavorHotel) this.hotelMap.get(hid);
-    }
-
-    private void findHotel() throws SQLException {
-        String sql = "select id,name from savor_hotel";
-        JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
-        jdbcUtil.getConnection();
-        try {
-            List<SavorHotel> result = jdbcUtil.findResult(SavorHotel.class, sql);
-            for (SavorHotel hotel : result) {
-                this.hotelMap.put(String.valueOf(hotel.getId()), hotel);
-            }
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-            jdbcUtil.releaseConnection();
-        }
     }
 
     /**
@@ -163,28 +190,12 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
      *
      * @throws Exception
      */
-    public SavorRoom readMysqlRoom(String rid) throws Exception {
+    private SavorRoom getRoom(String rid) throws Exception {
         if (this.roomMap == null || this.roomMap.get(rid) == null || this.roomMap.size() <= 0) {
-            findRoom();
+            return null;
         }
 
         return (SavorRoom) this.roomMap.get(rid);
-    }
-
-    private void findRoom() throws SQLException {
-        String sql = "select id,name from savor_room";
-        JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
-        jdbcUtil.getConnection();
-        try {
-            List<SavorRoom> result = jdbcUtil.findResult(SavorRoom.class, sql);
-            for (SavorRoom room : result) {
-                this.roomMap.put(String.valueOf(room.getId()), room);
-            }
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-            jdbcUtil.releaseConnection();
-        }
     }
 
     /**
@@ -192,28 +203,12 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
      *
      * @throws Exception
      */
-    public SavorBox readMysqlBox(String mac) throws Exception {
+    private SavorBox getBox(String mac) throws Exception {
         if (this.boxMap == null || this.boxMap.get(mac) == null || this.boxMap.size() <= 0) {
-            findBox();
+            return null;
         }
 
         return (SavorBox) this.boxMap.get(mac);
-    }
-
-    private void findBox() throws SQLException {
-        String sql = "select id,name,mac from savor_box";
-        JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
-        jdbcUtil.getConnection();
-        try {
-            List<SavorBox> result = jdbcUtil.findResult(SavorBox.class, sql);
-            for (SavorBox box : result) {
-                this.boxMap.put(String.valueOf(box.getMac()), box);
-            }
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-            jdbcUtil.releaseConnection();
-        }
     }
 
     /**
@@ -221,27 +216,12 @@ public class UserSadReducer extends Reducer<Text, Text, Text, Text> {
      *
      * @throws Exception
      */
-    public SavorMedia readMysqlMedia(String mid) throws Exception {
+    private SavorMedia getMedia(String mid) throws Exception {
         if (this.mediaMap == null || this.mediaMap.get(mid) == null || this.mediaMap.size() <= 0) {
-            findMedia();
+            return null;
         }
 
         return (SavorMedia) this.mediaMap.get(mid);
     }
 
-    private void findMedia() throws SQLException {
-        String sql = "select id,name,oss_addr from savor_media";
-        JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
-        jdbcUtil.getConnection();
-        try {
-            List<SavorMedia> result = jdbcUtil.findResult(SavorMedia.class, sql);
-            for (SavorMedia media : result) {
-                this.mediaMap.put(String.valueOf(media.getId()), media);
-            }
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-            jdbcUtil.releaseConnection();
-        }
-    }
 }

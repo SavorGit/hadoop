@@ -127,8 +127,8 @@ public class TextTargetSadActBean {
         return value.trim();
     }
 
-    private String cleanNull(String value){
-        if("\\N".equals(value)) {
+    private String cleanNull(String value) {
+        if ("\\N".equals(value)) {
             return null;
         }
 
