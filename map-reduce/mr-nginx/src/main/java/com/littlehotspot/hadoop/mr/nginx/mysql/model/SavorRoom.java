@@ -12,4 +12,6 @@ public class SavorRoom {
     private long id;
 
     private String name;
+
+    private int type;
 }

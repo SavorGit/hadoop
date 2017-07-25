@@ -7,16 +7,10 @@ import lombok.Data;
  * Created by Administrator on 2017-07-14 下午 5:20.
  */
 @Data
-public class SavorHotel {
+public class SavorArea {
 
     private long id;
 
-    private String name;
-
-    private Long area_id;
-
-    private int iskey;
-
-    private String maintainer;
+    private String region_name;
 
 }

@@ -10,11 +10,9 @@
  */
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate;
 
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.CommonVariables;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseColumn;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.regex.Matcher;
 
 /**
  * <h1>模型 - [源] 用户</h1>
@@ -27,139 +25,91 @@ import java.util.regex.Matcher;
  * Date of last commit:$Date$<br>
  */
 @Data
-@NoArgsConstructor
-public class SourceRareBean {
+public class TargetRareBean {
 
     /**
      * 区域
      */
+    @HBaseColumn(name = "area")
     private String area;
 
 
     /**
      * 酒楼ID
      */
+    @HBaseColumn(name = "hotel_id")
     private String hotelId;
 
     /**
      * 酒楼名称
      */
+    @HBaseColumn(name = "hotel_name")
     private String hotelName;
 
 
     /**
      * 机顶盒位置
      */
+    @HBaseColumn(name = "addr")
     private String addr;
     /**
      * 包间ID
      */
+    @HBaseColumn(name = "room_id")
     private String roomId;
 
     /**
      * 包间名称
      */
+    @HBaseColumn(name = "room_name")
     private String roomName;
 
     /**
      * 维护人
      *
      */
+    @HBaseColumn(name = "mainten_man")
     private String maintenMan;
 
     /**
      * 重点酒楼
      */
+    @HBaseColumn(name = "isKey")
     private String isKey;
 
     /**
      * 播放日期
      */
+    @HBaseColumn(name = "play_date")
     private String playDate;
 
     /**
      * 机顶盒mac
      */
+    @HBaseColumn(name = "mac")
     private String mac;
 
     /**
      * 播放次数
      */
+    @HBaseColumn(name = "play_count")
     private String playCount;
 
     /**
      * 播放总秒数
      */
+    @HBaseColumn(name = "play_time")
     private String playTime;
 
     /**
      * 开机率
      *
      */
+    @HBaseColumn(name = "production")
     private String production;
 
-    /**
-     * 媒体类型
-     *
-     */
-    private String mediaType;
 
-
-    /**
-     * HTTP-Response-Status
-     */
-    private String timestamps;
-
-    /**
-     * HTTP-Header[referer]
-     */
-    private String optionType;
-
-
-    /**
-     * HTTP-Header[x_forwarded_for]
-     */
-    private String contentId;
-
-    /**
-     * Access-Time
-     */
-    private String categoryId;
-
-    /**
-     * 版本名称
-     */
-    private String mobileId;
-
-    /**
-     * 版本号
-     */
-    private String mediaId;
-
-    /**
-     * 手机系统版本
-     */
-    private String osType;
-
-
-    /**
-     * 机器型号
-     */
-    private String commonValue;
-
-    public String rowLine1() {
-        StringBuffer rowLine = new StringBuffer();
-        rowLine.append(this.getHotelId() == null ? "" : this.getHotelId()).append(",");
-        rowLine.append(this.getRoomId() == null ? "" : this.getRoomId()).append(",");
-        rowLine.append(this.getRoomName() == null ? "" : this.getRoomName()).append(",");
-        rowLine.append(this.getMac() == null ? "" : this.getMac()).append(",");
-        rowLine.append(this.getMediaId() == null ? "" : this.getMediaId()).append(",");
-        rowLine.append(this.getPlayDate() == null ? "" : this.getPlayDate()).append(",");
-        rowLine.append(this.getMediaType() == null ? "" : this.getMediaType()).append(",");
-        return rowLine.toString();
-    }
-
-    public String rowLine2() {
+    public String rowLine() {
         StringBuffer rowLine = new StringBuffer();
         rowLine.append(this.getArea() == null ? "" : this.getArea()).append(",");
         rowLine.append(this.getHotelName() == null ? "" : this.getHotelName()).append(",");

@@ -63,7 +63,7 @@ public class TargetUserReadAttrBean {
     /**
      * 设备类型
      */
-    @HBaseColumn(name = "content")
+    @HBaseColumn(name = "con_text")
     private String content;
 
     /**

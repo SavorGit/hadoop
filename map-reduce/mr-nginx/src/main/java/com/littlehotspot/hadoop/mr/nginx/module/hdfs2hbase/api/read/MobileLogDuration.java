@@ -111,7 +111,8 @@ public class MobileLogDuration extends Configured implements Tool {
                     }
                     String rowLineContent = item.toString();
                     SourceMobileBean sourceMobileBean = new SourceMobileBean(rowLineContent);
-                    targetUserReadBean.setRowKey(sourceMobileBean.getMobileId()+"|"+sourceMobileBean.getUuid().substring(0,10));
+                    Long times = 9999999999l -Long.valueOf(sourceMobileBean.getUuid().substring(0,10));
+                    targetUserReadBean.setRowKey(sourceMobileBean.getMobileId()+"|"+times);
                     this.setForAttrBean(conf,targetUserReadAttrBean, sourceMobileBean);
                     this.setForRelaBean(conf,targetUserReadRelaBean, sourceMobileBean);
 
@@ -207,7 +208,7 @@ public class MobileLogDuration extends Configured implements Tool {
          * @throws Exception
          */
         public Hotel readMysqlHotel(String hotelId) throws Exception{
-            if (this.contentMap == null || this.contentMap.get(hotelId) == null || this.contentMap.size() <= 0) {
+            if (this.hotelMap == null || this.hotelMap.get(hotelId) == null || this.hotelMap.size() <= 0) {
                 findHotel();
             }
             return (Hotel) this.hotelMap.get(hotelId);

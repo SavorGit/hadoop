@@ -32,7 +32,7 @@ public class TargetUserActiBean {
     /**
      * 来源
      */
-    @HBaseColumn(name = "since")
+    @HBaseColumn(name = "f_down_src")
     private String since;
 
     /**

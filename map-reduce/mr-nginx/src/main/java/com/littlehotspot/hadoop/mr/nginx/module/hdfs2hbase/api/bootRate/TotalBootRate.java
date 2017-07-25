@@ -11,7 +11,6 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -39,7 +38,7 @@ import java.util.List;
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class BoxCleanJob extends Configured implements Tool {
+public class TotalBootRate extends Configured implements Tool {
 
     @Override
     public int run(String[] args) throws Exception {
@@ -57,14 +56,11 @@ public class BoxCleanJob extends Configured implements Tool {
             String columnName = CommonVariables.getParameterValue(Argument.ColumnName);
 
             Configuration conf = new Configuration();
-            conf.set("columnFamily",columnFamily);
-            conf.set("columnName",columnName);
-
 
 //            HTable hTable = new HTable(this.getConf(),"box_log");
 //            Job job = new Job(hTable.getConfiguration(),this.getClass().getName());
-            Job job = Job.getInstance(this.getConf(), BoxCleanJob.class.getSimpleName());
-            job.setJarByClass(BoxCleanJob.class);
+            Job job = Job.getInstance(this.getConf(), TotalBootRate.class.getSimpleName());
+            job.setJarByClass(TotalBootRate.class);
 
             // 避免报错：ClassNotFoundError hbaseConfiguration
 //            Configuration jobConf = job.getConfiguration();
@@ -87,31 +83,13 @@ public class BoxCleanJob extends Configured implements Tool {
 //            scan.addColumn(Bytes.toBytes("attr"),Bytes.toBytes("mda_type"));
 //            scan.addColumn(Bytes.toBytes("attr"),Bytes.toBytes("option_type"));
 
-            //设置过滤器
-            List<Filter> filters= new ArrayList<Filter>();
-            RegexStringComparator comp = new RegexStringComparator("(ads)|(pro)");
-            SingleColumnValueFilter typefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                    Bytes.toBytes("mda_type"), CompareFilter.CompareOp.EQUAL,comp);
-            SingleColumnValueFilter optionfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                    Bytes.toBytes("option_type"), CompareFilter.CompareOp.EQUAL,new BinaryComparator(Bytes.toBytes("end")));
-            SingleColumnValueFilter bigfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                    Bytes.toBytes("timestamps"), CompareFilter.CompareOp.LESS_OR_EQUAL,new BinaryComparator(Bytes.toBytes("1500134399")));
-            SingleColumnValueFilter smallfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                    Bytes.toBytes("timestamps"), CompareFilter.CompareOp.GREATER_OR_EQUAL,new BinaryComparator(Bytes.toBytes("1498838400")));
-
             if(null==scan) {
                 System.out.println("error : scan = null");
                 System.exit(1);
             }
 
 
-            filters.add(typefilter);
-            filters.add(optionfilter);
-//            filters.add(bigfilter);
-//            filters.add(smallfilter);
-            FilterList filterList = new FilterList(filters);
-            scan.setFilter(filterList);
-            TableMapReduceUtil.initTableMapperJob("box_log", scan, BoxTableMapper.class, Text.class, Text.class, job,false);
+            TableMapReduceUtil.initTableMapperJob("boot_rate", scan, BoxTableMapper.class, Text.class, Text.class, job,false);
 
 
             /**作业输出*/

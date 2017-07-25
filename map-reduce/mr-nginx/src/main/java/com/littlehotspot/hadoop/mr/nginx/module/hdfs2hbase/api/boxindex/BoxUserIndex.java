@@ -70,7 +70,8 @@ public class BoxUserIndex extends Configured implements Tool {
                 String string = key.toString();
                 TargetIndexAttrBean targetIndexAttrBean = new TargetIndexAttrBean(string);
                 TargetIndexBean targetIndexBean = new TargetIndexBean();
-                targetIndexBean.setRowKey(targetIndexAttrBean.getUserId()+"|"+targetIndexAttrBean.getTimestamps().substring(0,10));
+                Long times = 9999999999l -Long.valueOf(targetIndexAttrBean.getTimestamps().substring(0,10));
+                targetIndexBean.setRowKey(targetIndexAttrBean.getUserId()+"|"+times.toString());
                 targetIndexBean.setIndexAttrBean(targetIndexAttrBean);
                 CommonVariables.hBaseHelper.insert(targetIndexBean);
                 context.write(key, new Text());
@@ -97,7 +98,7 @@ public class BoxUserIndex extends Configured implements Tool {
 
             /**作业输入*/
             Path inputPath = new Path(hdfsInputPath);
-            FileInputFormat.addInputPath(job, inputPath);
+            FileInputFormat.setInputPaths(job, inputPath);
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);

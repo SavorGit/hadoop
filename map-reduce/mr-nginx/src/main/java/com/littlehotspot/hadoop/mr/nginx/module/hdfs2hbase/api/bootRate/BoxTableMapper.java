@@ -8,6 +8,8 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.Text;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by gy on 2017/7/18.
@@ -28,11 +30,18 @@ public class BoxTableMapper extends TableMapper<Text, Text> {
         String roomName = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("room_name")));
         String hotelId = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("hotel_id")));
         String roomId = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("room_id")));
-
-        System.out.println("ROWKEY{"+row+"}"+":mda_type="+mediaType+":option_type="+optionType+":mda_id="+mediaId);
+        SourceRareBean sourceRareBean = new SourceRareBean();
+        sourceRareBean.setMediaId(mediaId);
+        sourceRareBean.setHotelId(hotelId);
+        sourceRareBean.setRoomId(roomId);
+        sourceRareBean.setMac(mac);
+        sourceRareBean.setRoomName(roomName);
+        sourceRareBean.setPlayDate(stampToDate(timestamps));
+        sourceRareBean.setMediaType(mediaType);
+//        System.out.println("ROWKEY{"+row+"}"+":mda_type="+mediaType+":option_type="+optionType+":mda_id="+mediaId);
         try {
-            if (StringUtils.isBlank(mediaId)){
-                context.write(new Text(mac), new Text(mediaId));
+            if (!StringUtils.isBlank(mediaId)){
+                context.write(new Text(mac+sourceRareBean.getPlayDate()), new Text(sourceRareBean.rowLine1()));
             }else {
                 return;
             }
@@ -41,5 +50,13 @@ public class BoxTableMapper extends TableMapper<Text, Text> {
             e.printStackTrace();
         }
 
+    }
+    public static String stampToDate(String s){
+        String res;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        long lt = new Long(s);
+        Date date = new Date(lt);
+        res = simpleDateFormat.format(date);
+        return res;
     }
 }
