@@ -119,7 +119,13 @@ public class UserSadScheduler extends Configured implements Tool {
         }
     }
 
-    public void findByMysql() throws SQLException, IOException, JSONException {
+    /**
+     * 查询mysql数据库
+     * @throws SQLException
+     * @throws IOException
+     * @throws JSONException
+     */
+    private void findByMysql() throws SQLException, IOException, JSONException {
         JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
         jdbcUtil.getConnection();
         try {
