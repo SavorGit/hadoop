@@ -42,11 +42,65 @@
             <artifactId>hadoop-mapreduce-client-app</artifactId>
         </dependency>
 
+        <!-- HBase -->
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+        </dependency>
+
+        <!-- Mysql -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.40</version>
+        </dependency>
+
+        <!-- Spring -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.4</version>
+        </dependency>
+
         <!-- 自定义插件 -->
         <dependency>
-            <groupId>net.lizhaoweb.spring.hadoop.commons</groupId>
+            <groupId>com.littlehotspot.hadoop.util</groupId>
             <artifactId>argument</artifactId>
-            <version>JL.SPRING.4.1.1.0.1.0.0</version>
+            <version>LHS.HADOOP.1.1.0.0.1.0.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
@@ -77,6 +131,95 @@
                             <archive>
                                 <manifest>
                                     <mainClass>com.littlehotspot.hadoop.mr.box.Main</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                    <!--清理数据-->
+                    <execution>
+                        <id>box-clear</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <classifier>box-clear</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/box/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/common/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/mysql/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/mysql/model/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/mapper/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/scheduler/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/main/BoxClearLogMain.class</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.box.main.BoxClearLogMain</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <!--整合mysql数据 -->
+                    <execution>
+                        <id>box-mysql</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <classifier>box-mysql</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/box/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/common/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/mysql/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/mysql/model/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/mapper/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/scheduler/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/main/BoxJdbcDataMain.class</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.box.main.BoxJdbcDataMain</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <!--to hbase -->
+                    <execution>
+                        <id>box-hbase</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <classifier>box-hbase</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/box/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/common/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/hbase/model/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/hbase/mapper/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/hbase/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/hbase/scheduler/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/main/BoxToHbaseMain.class</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.box.main.BoxToHbaseMain</mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
                                 </manifest>

@@ -2,10 +2,14 @@ package com.littlehotspot.util.excel;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.impl.cookie.DateUtils;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
@@ -51,19 +55,19 @@ public class ExcelUtil{
 				Font font = swb.createFont();
 				font.setFontName(eb.getFontName());
 				font.setFontHeightInPoints((short) eb.getFontSize());
-				font.setBoldweight(eb.isBord() ? HSSFFont.BOLDWEIGHT_BOLD
-						: HSSFFont.BOLDWEIGHT_NORMAL);
+				font.setBoldweight(eb.isBord() ? XSSFFont.BOLDWEIGHT_BOLD
+						: XSSFFont.BOLDWEIGHT_NORMAL);
 				font.setColor(eb.getFontColor());
 				font.setItalic(eb.isItalic() ? true : false);
-				font.setUnderline(eb.isUnderline() ? HSSFFont.U_SINGLE
-						: HSSFFont.U_NONE);
+				font.setUnderline(eb.isUnderline() ? XSSFFont.U_SINGLE
+						: XSSFFont.U_NONE);
 				style.setFont(font);
 				style.setAlignment(eb.getAlignment());
 				if (eb.isBorder()) {
-					style.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-					style.setBorderRight(HSSFCellStyle.BORDER_THIN);
-					style.setBorderTop(HSSFCellStyle.BORDER_THIN);
-					style.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+					style.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+					style.setBorderRight(XSSFCellStyle.BORDER_THIN);
+					style.setBorderTop(XSSFCellStyle.BORDER_THIN);
+					style.setBorderBottom(XSSFCellStyle.BORDER_THIN);
 				}
 				if (eb.getData() instanceof List) {
 					List rowList = (List) eb.getData();
@@ -139,12 +143,12 @@ public class ExcelUtil{
 				CellStyle cellStyle = sswb.createCellStyle();
 				cellStyle.setFont(sswb.getFontAt(style.getFontIndex()));
 				if (isBorder) {
-					cellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
-					cellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-					cellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-					cellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+					cellStyle.setBorderTop(XSSFCellStyle.BORDER_THIN);
+					cellStyle.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+					cellStyle.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+					cellStyle.setBorderRight(XSSFCellStyle.BORDER_THIN);
 				}
-				cellStyle.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
+				cellStyle.setAlignment(XSSFCellStyle.ALIGN_RIGHT);
 				cell.setCellStyle(cellStyle);
 				cell.setCellValue(def.format((BigDecimal) content));
 			} else if (content instanceof java.sql.Date) {
@@ -154,12 +158,12 @@ public class ExcelUtil{
 				CellStyle cellStyle = sswb.createCellStyle();
 				cellStyle.setFont(sswb.getFontAt(style.getFontIndex()));
 				if (isBorder) {
-					cellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
-					cellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-					cellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-					cellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+					cellStyle.setBorderTop(XSSFCellStyle.BORDER_THIN);
+					cellStyle.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+					cellStyle.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+					cellStyle.setBorderRight(XSSFCellStyle.BORDER_THIN);
 				}
-				cellStyle.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
+				cellStyle.setAlignment(XSSFCellStyle.ALIGN_RIGHT);
 				cell.setCellStyle(cellStyle);
 				cell.setCellValue(Double.parseDouble(content.toString()));
 
@@ -167,12 +171,12 @@ public class ExcelUtil{
 				CellStyle cellStyle = sswb.createCellStyle();
 				cellStyle.setFont(sswb.getFontAt(style.getFontIndex()));
 				if (isBorder) {
-					cellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
-					cellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-					cellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-					cellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+					cellStyle.setBorderTop(XSSFCellStyle.BORDER_THIN);
+					cellStyle.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+					cellStyle.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+					cellStyle.setBorderRight(XSSFCellStyle.BORDER_THIN);
 				}
-				cellStyle.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
+				cellStyle.setAlignment(XSSFCellStyle.ALIGN_RIGHT);
 				cell.setCellStyle(cellStyle);
 				cell.setCellValue(def.format((Double) content));
 			} else {

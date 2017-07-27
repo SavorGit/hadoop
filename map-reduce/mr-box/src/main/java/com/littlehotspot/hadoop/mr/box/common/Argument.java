@@ -8,7 +8,7 @@
  * @EMAIL 404644381@qq.com
  * @Time : 13:59
  */
-package com.littlehotspot.util;
+package com.littlehotspot.hadoop.mr.box.common;
 
 import lombok.Getter;
 
@@ -51,10 +51,6 @@ public enum Argument {
     SadType("sadType", ""),// 用户行为类型
 
     ResourceType("resourceType",""),// 资源类型
-
-    ExcelOutPath("excelOutPath",""), //excel输出地址
-
-    IsFilter("isFilter","") //是否过滤公司userid
     ;
 
     @Getter

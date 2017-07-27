@@ -105,9 +105,9 @@
 
         <!-- 自定义插件 -->
         <dependency>
-            <groupId>net.lizhaoweb.spring.hadoop.commons</groupId>
-            <artifactId>argument</artifactId>
-            <version>JL.SPRING.4.1.1.0.1.0.0</version>
+            <groupId>com.littlehotspot.hadoop.util</groupId>
+            <artifactId>hbase</artifactId>
+            <version>LHS.HADOOP.1.2.0.0.1.0.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
@@ -129,14 +129,40 @@
                             <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
                             <includes>
                                 <include>**/com/littlehotspot/hbase/*</include>
-                                <include>**/com/littlehotspot/util/excel/*</include>
-                                <include>**/com/littlehotspot/util/hbase/*</include>
                                 <include>**/com/littlehotspot/util/*</include>
-                                <include>**/temp/*</include>
+                                <include>**/com/littlehotspot/model/*</include>
+                                <include>**/lib/*</include>
                             </includes>
                             <archive>
                                 <manifest>
                                     <mainClass>com.littlehotspot.hbase.UserMrMain</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>export-user</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <classifier>export-user</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/util/excel/*</include>
+                                <include>**/com/littlehotspot/util/*</include>
+                                <include>**/com/littlehotspot/export/*</include>
+                                <include>**/com/littlehotspot/model/*</include>
+                                <include>**/temp/*</include>
+                                <include>**/lib/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.export.ExportUserInfo</mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
                                 </manifest>

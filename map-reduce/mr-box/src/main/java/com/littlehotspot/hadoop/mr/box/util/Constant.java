@@ -8,8 +8,9 @@
  * @EMAIL 404644381@qq.com
  * @Time : 11:05
  */
-package com.littlehotspot.util;
+package com.littlehotspot.hadoop.mr.box.util;
 
+import com.littlehotspot.hadoop.mr.box.common.Argument;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 
@@ -28,7 +29,7 @@ import java.util.Map;
  */
 public class Constant {
     public static final String DATA_FORMAT_1 = "dd/MMM/yyyy:HH:mm:ss Z";
-    public static final String DATA_FORMAT_2 = "yyyy-MM-dd HH:mm:ss";
+    public static final String DATA_FORMAT_2 = "yyyy-MM-dd HH:mm:ss Z";
     public static final char VALUE_SPLIT_CHAR = 0x0001;
 
     public static class CommonVariables {
@@ -70,15 +71,5 @@ public class Constant {
             }
 
         }
-    }
-
-    public static void main(String[] args) {
-        System.out.println(9999999999999L-1499570769998L);
-
-        String regex="[^\\|]+";
-        String str="FCD5D900B60D1498395598";
-        System.out.println(str.matches(regex));
-
-
     }
 }
