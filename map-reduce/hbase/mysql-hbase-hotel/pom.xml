@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.littlehotspot.hadoop.mr</groupId>
+        <artifactId>hbase</artifactId>
+        <version>LHS.HADOOP.2.6.0.0.1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.littlehotspot.hadoop.mr.hbase</groupId>
+    <artifactId>mysql-hbase-hotel</artifactId>
+    <version>LHS.HADOOP.2.6.1.0.1.0.0-SNAPSHOT</version>
+
+    <name>Hadoop Map-Reduce HBase [Mysql-To-HBase Hotel]</name>
+    <packaging>jar</packaging>
+
+    <dependencies>
+
+        <!-- 常用工具 -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.fusesource.jansi</groupId>
+            <artifactId>jansi</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <!-- Hadoop -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-mapreduce-client-app</artifactId>
+        </dependency>
+
+        <!-- HBase -->
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.40</version>
+        </dependency>
+
+        <!-- 自定义插件 -->
+        <dependency>
+            <groupId>net.lizhaoweb.spring.hadoop.commons</groupId>
+            <artifactId>argument</artifactId>
+            <version>JL.SPRING.4.1.1.0.1.0.0</version>
+        </dependency>
+
+    </dependencies>
+    
+</project>

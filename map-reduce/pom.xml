@@ -32,6 +32,7 @@
         <module>mr-nginx</module>
         <module>mr-user</module>
         <module>hdfs</module>
+        <module>hbase</module>
     </modules>
 
 </project>
