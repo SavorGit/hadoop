@@ -128,9 +128,13 @@ public class Mysql2HBaseScheduler extends Configured implements Tool {
                 throw new Exception("MapReduce task execute failed.........");
             }
 
-//            // 导入到 HBASE 表中
-//            LoadIncrementalHFiles loader = new LoadIncrementalHFiles(this.getConf());
-//            loader.doBulkLoad(outputPath, hTable);
+            // 导入到 HBASE 表中
+            LoadIncrementalHFiles loader = new LoadIncrementalHFiles(this.getConf());
+            loader.doBulkLoad(outputPath, hTable);
+
+            if (fileSystem.exists(outputPath)) {
+                fileSystem.delete(outputPath, true);
+            }
 
             return 0;
         } catch (Exception e) {

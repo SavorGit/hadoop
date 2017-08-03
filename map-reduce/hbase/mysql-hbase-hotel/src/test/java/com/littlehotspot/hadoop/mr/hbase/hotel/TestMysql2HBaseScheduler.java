@@ -48,6 +48,13 @@ public class TestMysql2HBaseScheduler {
         this.decimalFormat = new DecimalFormat();
 
         this.conf = new Configuration();
+//        this.conf.set("mapred.job.tracker", "local");
+//        this.conf.set("mapreduce.framework.name", "yarn");
+//        this.conf.set("yarn.resoucemanager.hostname", "localhost");
+//        this.conf.set("yarn.resourcemanager.address", "localhost:8032");
+//        this.conf.set("yarn.resourcemanager.scheduler.address", "localhost:8030");
+//        this.conf.set("yarn.resourcemanager.resource-tracker.address", "localhost:8035");
+//        this.conf.set("yarn.resourcemanager.admin.address", "localhost:8033");
     }
 
     @Test
@@ -62,7 +69,7 @@ public class TestMysql2HBaseScheduler {
                 "jdbcUsername=javaweb",
                 "jdbcPassword=123456",
                 "hBaseTable=hotel",
-                "jdbcSql=SELECT hotel.id AS id, hotel.name AS name, hotel.addr AS address, hotel.area_id AS areaId, hotel.media_id AS mediaId, hotel.contractor AS contractor, hotel.mobile AS mobile, hotel.tel AS tel, hotel.maintainer AS maintainer, hotel.level AS level, hotel.iskey AS isKey, hotel.install_date AS installDate, hotel.state AS state, hotel.state_change_reason AS stateChangeReason, hotel.gps AS gps, hotel.remark AS remark, hotel.hotel_box_type AS boxType, hotel.create_time AS createTime, hotel.update_time AS updateTime, hotel.flag AS flag, hotel.tech_maintainer AS techMaintainer, hotel.remote_id AS remoteId, hotel.hotel_wifi AS hotelWifi, hotel.hotel_wifi_pas AS hotelWifiPassword, hotel.bill_per AS billPer, hotel.bill_tel AS billTel, hotel.collection_company AS collectionCompany, hotel.bank_account AS bankAccount, hotel.bank_name AS bankName, ext.mac_addr AS macAddr, ext.ip_local AS ipLocal, ext.ip AS ip, ext.server_location AS serverLocation FROM savor_hotel AS hotel LEFT JOIN savor_hotel_ext AS ext ON hotel.id=ext.hotel_id ORDER BY id ASC"
+                "jdbcSql=SELECT hotel.id AS id, hotel.name AS name, hotel.addr AS address, hotel.area_id AS areaId, hotel.media_id AS mediaId, hotel.contractor AS contractor, hotel.mobile AS mobile, hotel.tel AS tel, hotel.maintainer AS maintainer, hotel.level AS level, hotel.iskey AS isKey, hotel.install_date AS installDate, hotel.state AS state, hotel.state_change_reason AS stateChangeReason, hotel.gps AS gps, hotel.remark AS remark, hotel.hotel_box_type AS boxType, hotel.create_time AS createTime, hotel.update_time AS updateTime, hotel.flag AS flag, hotel.tech_maintainer AS techMaintainer, hotel.remote_id AS remoteId, hotel.hotel_wifi AS hotelWifi, hotel.hotel_wifi_pas AS hotelWifiPassword, hotel.bill_per AS billPer, hotel.bill_tel AS billTel, hotel.collection_company AS collectionCompany, hotel.bank_account AS bankAccount, hotel.bank_name AS bankName, ext.mac_addr AS macAddress, ext.ip_local AS ipLocal, ext.ip AS ip, ext.server_location AS serverLocation FROM savor_hotel AS hotel LEFT JOIN savor_hotel_ext AS ext ON hotel.id=ext.hotel_id ORDER BY id ASC"
         };
 
         try {
