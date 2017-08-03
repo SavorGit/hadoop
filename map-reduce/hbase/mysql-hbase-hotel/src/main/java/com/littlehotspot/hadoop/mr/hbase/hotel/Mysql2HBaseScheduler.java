@@ -47,32 +47,41 @@ import java.util.regex.Pattern;
  */
 public class Mysql2HBaseScheduler extends Configured implements Tool {
 
-    //    private String tableName = "savor_media";
-    private String hTableName = "hotel";
-
     @Override
     public int run(String[] args) throws Exception {
         try {
             MapReduceConstant.CommonVariables.initMapReduce(this.getConf(), args);
 
-            // 任务名称
             String jobName = ArgumentFactory.getParameterValue(Argument.JobName);
-            System.out.println("\tInput[Job-Name]           : " + jobName);
+            ArgumentFactory.printInputArgument(Argument.JobName, jobName);
 
-            // Hdfs 输出路径
+            String jdbcDriver = ArgumentFactory.getParameterValue(Argument.JDBCDriver);
+            ArgumentFactory.printInputArgument(Argument.JDBCDriver, jdbcDriver);
+
+            String jdbcUrl = ArgumentFactory.getParameterValue(Argument.JDBCUrl);
+            ArgumentFactory.printInputArgument(Argument.JDBCUrl, jdbcUrl);
+
+            String jdbcUsername = ArgumentFactory.getParameterValue(Argument.JDBCUsername);
+            ArgumentFactory.printInputArgument(Argument.JDBCUsername, jdbcUsername);
+
+            String jdbcPassword = ArgumentFactory.getParameterValue(Argument.JDBCPassword);
+            ArgumentFactory.printInputArgument(Argument.JDBCPassword, jdbcPassword);
+
+            String jdbcSql = ArgumentFactory.getParameterValue(Argument.JDBCSql);
+            ArgumentFactory.printInputArgument(Argument.JDBCSql, jdbcSql);
+
             String hdfsOutputPath = ArgumentFactory.getParameterValue(Argument.OutputPath);
-            System.out.println("\tInput[HDFS-Output-Path]   : " + hdfsOutputPath);
-            if (hdfsOutputPath == null) {
-                throw new IllegalArgumentException("The argument['" + Argument.OutputPath.getName() + "'] for this program is null");
-            }
+            ArgumentFactory.printInputArgument(Argument.OutputPath, hdfsOutputPath);
 
-            String jdbcDriver = null;
-            String jdbcUrl = "jdbc:mysql://192.168.2.145:3306/cloud";
-            String jdbcUsername = "javaweb";
-            String jdbcPassword = "123456";
-            String jdbcSql = "SELECT id, name, description, creator, create_time, md5, creator_id, oss_addr, file_path, duration, surfix, type, oss_etag, flag, state, checker_id FROM savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC";
+            String hTableName = ArgumentFactory.getParameterValue(Argument.HbaseTable);
+            ArgumentFactory.printInputArgument(Argument.HbaseTable, hTableName);
+
 
             // 准备工作
+            ArgumentFactory.checkNullValueForArgument(Argument.JDBCUrl, jdbcUrl);
+            ArgumentFactory.checkNullValueForArgument(Argument.JDBCSql, jdbcSql);
+            ArgumentFactory.checkNullValueForArgument(Argument.OutputPath, hdfsOutputPath);
+            ArgumentFactory.checkNullValueForArgument(Argument.HbaseTable, hTableName);
             if (StringUtils.isBlank(jobName)) {
                 jobName = this.getClass().getName();
             }
@@ -81,10 +90,9 @@ public class Mysql2HBaseScheduler extends Configured implements Tool {
             }
 
             Path outputPath = new Path(hdfsOutputPath);
-            HTable hTable = new HTable(this.getConf(), this.hTableName);
 
             // 这句话很关键
-            this.getConf().set("mapred.job.tracker", "localhost:9001");
+//            this.getConf().set("mapred.job.tracker", "localhost:9001");
             DBConfiguration.configureDB(this.getConf(), jdbcDriver, jdbcUrl, jdbcUsername, jdbcPassword);
 
             // 如果输出路径已经存在，则删除
@@ -107,12 +115,12 @@ public class Mysql2HBaseScheduler extends Configured implements Tool {
 
             job.setPartitionerClass(SimpleTotalOrderPartitioner.class);
 
-            Pattern pattern = Pattern.compile("^.+ (FROM .+) ORDER BY .+$", Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(jdbcSql);
-            String countSQL = "SELECT COUNT(*) " + matcher.group(1);
+            String countSQL = this.getCountSql(jdbcSql);
             DBInputFormat.setInput(job, HotelWritable.class, jdbcSql, countSQL);
 
             FileOutputFormat.setOutputPath(job, outputPath);
+
+            HTable hTable = new HTable(this.getConf(), hTableName);
             HFileOutputFormat2.configureIncrementalLoad(job, hTable, hTable.getRegionLocator());
 
             boolean status = job.waitForCompletion(true);
@@ -120,14 +128,30 @@ public class Mysql2HBaseScheduler extends Configured implements Tool {
                 throw new Exception("MapReduce task execute failed.........");
             }
 
-            // 导入到 HBASE 表中
-            LoadIncrementalHFiles loader = new LoadIncrementalHFiles(this.getConf());
-            loader.doBulkLoad(outputPath, hTable);
+//            // 导入到 HBASE 表中
+//            LoadIncrementalHFiles loader = new LoadIncrementalHFiles(this.getConf());
+//            loader.doBulkLoad(outputPath, hTable);
 
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
             return 1;
         }
+    }
+
+    private String getCountSql(String jdbcSql) {
+        Pattern pattern = Pattern.compile("^SELECT\\s+[a-z0-9_ ,.\\s]+\\s+(FROM\\s+.+)$", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(jdbcSql);
+        if (!matcher.find()) {
+            throw new RuntimeException("SQL statement error");
+        }
+        String countSQL = matcher.group(1);
+        pattern = Pattern.compile("^(FROM\\s+.+)\\s+ORDER\\s+BY\\s+.+$", Pattern.CASE_INSENSITIVE);
+        matcher = pattern.matcher(countSQL);
+        if (matcher.find()) {
+            countSQL = matcher.group(1);
+        }
+        countSQL = String.format("SELECT COUNT(*) %s", countSQL);
+        return countSQL;
     }
 }
