@@ -113,7 +113,7 @@ public class Mysql2HBaseScheduler extends Configured implements Tool {
                 fileSystem.delete(outputPath, true);
             }
 
-            Job job = new Job(this.getConf(), jobName);
+            Job job = Job.getInstance(this.getConf(), jobName);
             job.setJarByClass(this.getClass());
 
             job.setInputFormatClass(DBInputFormat.class);

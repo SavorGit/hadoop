@@ -62,8 +62,7 @@ public class TestMysql2HBaseScheduler {
         long start = System.currentTimeMillis();
         String[] args = {
                 "jobName=Import data to hBase from mysql for hotel",
-//                "hdfsCluster=hdfs://localhost:9000",
-                "hdfsOut=file:///e:/home/data/hadoop/flume/mysql/medias-hbase",
+                "hdfsOut=hdfs://localhost:9000/home/data/hadoop/flume/mysql/medias-hbase",
                 "jdbcDriver=com.mysql.jdbc.Driver",
                 "jdbcUrl=jdbc:mysql://192.168.2.145:3306/cloud",
                 "jdbcUsername=javaweb",
