@@ -34,11 +34,9 @@ import java.sql.SQLException;
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class HotelWritable implements Writable, DBWritable {
+public class HotelWritable extends AbstractWritable implements Writable, DBWritable {
 
-    private static final char FIELD_DELIMITER = 0x0001;
-
-
+    // 基本属性
     @Setter
     @Getter
     private Long id;// 酒楼信息表id
@@ -71,6 +69,7 @@ public class HotelWritable implements Writable, DBWritable {
     private String bankAccount;// 银行账号
     private String bankName;// 开户行名称
 
+    // 扩展属性
     private String macAddress;// mac地址
     private String ipLocal;// 小平台内网ip
     private String ip;// 外网ip
@@ -115,39 +114,43 @@ public class HotelWritable implements Writable, DBWritable {
 
     @Override
     public void readFields(ResultSet result) throws SQLException {
-        this.id = result.getLong("id");
-        this.name = result.getString("name");
-        this.address = result.getString("address");
-        this.areaId = result.getLong("areaId");
-        this.mediaId = result.getInt("mediaId");
-        this.contractor = result.getString("contractor");
-        this.mobile = result.getString("mobile");
-        this.tel = result.getString("tel");
-        this.maintainer = result.getString("maintainer");
-        this.level = result.getString("level");
-        this.isKey = result.getInt("isKey");
-        this.installDate = result.getTimestamp("installDate").getTime();
-        this.state = result.getInt("state");
-        this.stateChangeReason = result.getInt("stateChangeReason");
-        this.gps = result.getString("gps");
-        this.remark = result.getString("remark");
-        this.boxType = result.getInt("boxType");
-        this.createTime = result.getTimestamp("createTime").getTime();
-        this.updateTime = result.getTimestamp("updateTime").getTime();
-        this.flag = result.getInt("flag");
-        this.techMaintainer = result.getString("techMaintainer");
-        this.remoteId = result.getString("remoteId");
-        this.hotelWifi = result.getString("hotelWifi");
-        this.hotelWifiPassword = result.getString("hotelWifiPassword");
-        this.billPer = result.getString("billPer");
-        this.billTel = result.getString("billTel");
-        this.collectionCompany = result.getString("collectionCompany");
-        this.bankAccount = result.getString("bankAccount");
-        this.bankName = result.getString("bankName");
-        this.macAddress = result.getString("macAddress");
-        this.ipLocal = result.getString("ipLocal");
-        this.ip = result.getString("ip");
-        this.serverLocation = result.getString("serverLocation");
+        // 基本属性
+        this.setValue(HotelWritable.class, this, "id", result, "id");
+        this.setValue(HotelWritable.class, this, "name", result, "name");
+        this.setValue(HotelWritable.class, this, "address", result, "address");
+        this.setValue(HotelWritable.class, this, "areaId", result, "areaId");
+        this.setValue(HotelWritable.class, this, "mediaId", result, "mediaId");
+        this.setValue(HotelWritable.class, this, "contractor", result, "contractor");
+        this.setValue(HotelWritable.class, this, "mobile", result, "mobile");
+        this.setValue(HotelWritable.class, this, "tel", result, "tel");
+        this.setValue(HotelWritable.class, this, "maintainer", result, "maintainer");
+        this.setValue(HotelWritable.class, this, "level", result, "level");
+        this.setValue(HotelWritable.class, this, "isKey", result, "isKey");
+        this.setValue(HotelWritable.class, this, "installDate", result, "installDate");
+        this.setValue(HotelWritable.class, this, "state", result, "state");
+        this.setValue(HotelWritable.class, this, "stateChangeReason", result, "stateChangeReason");
+        this.setValue(HotelWritable.class, this, "gps", result, "gps");
+        this.setValue(HotelWritable.class, this, "remark", result, "remark");
+        this.setValue(HotelWritable.class, this, "boxType", result, "boxType");
+        this.setValue(HotelWritable.class, this, "createTime", result, "createTime");
+        this.setValue(HotelWritable.class, this, "updateTime", result, "updateTime");
+        this.setValue(HotelWritable.class, this, "flag", result, "flag");
+        this.setValue(HotelWritable.class, this, "techMaintainer", result, "techMaintainer");
+        this.setValue(HotelWritable.class, this, "remoteId", result, "remoteId");
+        this.setValue(HotelWritable.class, this, "hotelWifi", result, "hotelWifi");
+        this.setValue(HotelWritable.class, this, "hotelWifiPassword", result, "hotelWifiPassword");
+        this.setValue(HotelWritable.class, this, "billPer", result, "billPer");
+        this.setValue(HotelWritable.class, this, "id", result, "id");
+        this.setValue(HotelWritable.class, this, "billTel", result, "billTel");
+        this.setValue(HotelWritable.class, this, "collectionCompany", result, "collectionCompany");
+        this.setValue(HotelWritable.class, this, "bankAccount", result, "bankAccount");
+        this.setValue(HotelWritable.class, this, "bankName", result, "bankName");
+
+        // 扩展属性
+        this.setValue(HotelWritable.class, this, "macAddress", result, "macAddress");
+        this.setValue(HotelWritable.class, this, "ipLocal", result, "ipLocal");
+        this.setValue(HotelWritable.class, this, "ip", result, "ip");
+        this.setValue(HotelWritable.class, this, "serverLocation", result, "serverLocation");
     }
 
     @Override
@@ -213,105 +216,46 @@ public class HotelWritable implements Writable, DBWritable {
 
         // 基本属性
         familyName = "attr";
-        if (this.id != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("id"), version, Bytes.toBytes(this.id));
-        }
-        if (this.name != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("name"), version, Bytes.toBytes(this.name));
-        }
-        if (this.address != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("addr"), version, Bytes.toBytes(this.address));
-        }
-        if (this.areaId != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("area_id"), version, Bytes.toBytes(this.areaId));
-        }
-        if (this.mediaId != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("media_id"), version, Bytes.toBytes(this.mediaId));
-        }
-        if (this.contractor != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("contractor"), version, Bytes.toBytes(this.contractor));
-        }
-        if (this.mobile != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("mobile"), version, Bytes.toBytes(this.mobile));
-        }
-        if (this.tel != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("tel"), version, Bytes.toBytes(this.tel));
-        }
-        if (this.maintainer != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("maintainer"), version, Bytes.toBytes(this.maintainer));
-        }
-        if (this.level != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("level"), version, Bytes.toBytes(this.level));
-        }
-        if (this.isKey != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("iskey"), version, Bytes.toBytes(this.isKey));
-        }
+        this.addColumn(HotelWritable.class, this, "id", put, familyName, "id", version);
+        this.addColumn(HotelWritable.class, this, "name", put, familyName, "name", version);
+        this.addColumn(HotelWritable.class, this, "address", put, familyName, "addr", version);
+        this.addColumn(HotelWritable.class, this, "areaId", put, familyName, "area_id", version);
+        this.addColumn(HotelWritable.class, this, "mediaId", put, familyName, "media_id", version);
+        this.addColumn(HotelWritable.class, this, "contractor", put, familyName, "contractor", version);
+        this.addColumn(HotelWritable.class, this, "mobile", put, familyName, "mobile", version);
+        this.addColumn(HotelWritable.class, this, "tel", put, familyName, "tel", version);
+        this.addColumn(HotelWritable.class, this, "maintainer", put, familyName, "maintainer", version);
+        this.addColumn(HotelWritable.class, this, "level", put, familyName, "level", version);
+        this.addColumn(HotelWritable.class, this, "isKey", put, familyName, "iskey", version);
         put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("install_date"), version, Bytes.toBytes(this.installDate));
-        if (this.state != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("state"), version, Bytes.toBytes(this.state));
-        }
-        if (this.stateChangeReason != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("state_change_reason"), version, Bytes.toBytes(this.stateChangeReason));
-        }
-        if (this.gps != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("gps"), version, Bytes.toBytes(this.gps));
-        }
-        if (this.remark != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("remark"), version, Bytes.toBytes(this.remark));
-        }
-        if (this.boxType != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("hotel_box_type"), version, Bytes.toBytes(this.boxType));
-        }
+        this.addColumn(HotelWritable.class, this, "state", put, familyName, "state", version);
+        this.addColumn(HotelWritable.class, this, "stateChangeReason", put, familyName, "state_change_reason", version);
+        this.addColumn(HotelWritable.class, this, "gps", put, familyName, "gps", version);
+        this.addColumn(HotelWritable.class, this, "remark", put, familyName, "remark", version);
+        this.addColumn(HotelWritable.class, this, "boxType", put, familyName, "hotel_box_type", version);
         put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("create_time"), version, Bytes.toBytes(this.createTime));
         put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("update_time"), version, Bytes.toBytes(this.updateTime));
-        if (this.flag != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("flag"), version, Bytes.toBytes(this.flag));
-        }
-        if (this.techMaintainer != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("tech_maintainer"), version, Bytes.toBytes(this.techMaintainer));
-        }
-        if (this.remoteId != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("remote_id"), version, Bytes.toBytes(this.remoteId));
-        }
-        if (this.hotelWifi != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("hotel_wifi"), version, Bytes.toBytes(this.hotelWifi));
-        }
-        if (this.hotelWifiPassword != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("hotel_wifi_pas"), version, Bytes.toBytes(this.hotelWifiPassword));
-        }
-        if (this.billPer != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("bill_per"), version, Bytes.toBytes(this.billPer));
-        }
-        if (this.billTel != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("bill_tel"), version, Bytes.toBytes(this.billTel));
-        }
-        if (this.collectionCompany != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("collection_company"), version, Bytes.toBytes(this.collectionCompany));
-        }
-        if (this.bankAccount != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("bank_account"), version, Bytes.toBytes(this.bankAccount));
-        }
-        if (this.bankName != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("bank_name"), version, Bytes.toBytes(this.bankName));
-        }
+        this.addColumn(HotelWritable.class, this, "flag", put, familyName, "flag", version);
+        this.addColumn(HotelWritable.class, this, "techMaintainer", put, familyName, "tech_maintainer", version);
+        this.addColumn(HotelWritable.class, this, "remoteId", put, familyName, "remote_id", version);
+        this.addColumn(HotelWritable.class, this, "hotelWifi", put, familyName, "hotel_wifi", version);
+        this.addColumn(HotelWritable.class, this, "hotelWifiPassword", put, familyName, "hotel_wifi_pas", version);
+        this.addColumn(HotelWritable.class, this, "billPer", put, familyName, "bill_per", version);
+        this.addColumn(HotelWritable.class, this, "billTel", put, familyName, "bill_tel", version);
+        this.addColumn(HotelWritable.class, this, "collectionCompany", put, familyName, "collection_company", version);
+        this.addColumn(HotelWritable.class, this, "bankAccount", put, familyName, "bank_account", version);
+        this.addColumn(HotelWritable.class, this, "bankName", put, familyName, "bank_name", version);
 
         // 扩展属性
         familyName = "ext";
-        if (this.macAddress != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("mac_addr"), version, Bytes.toBytes(this.macAddress));
-        }
-        if (this.ipLocal != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("ip_local"), version, Bytes.toBytes(this.ipLocal));
-        }
-        if (this.ip != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("ip"), version, Bytes.toBytes(this.ip));
-        }
-        if (this.serverLocation != null) {
-            put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("server_location"), version, Bytes.toBytes(this.serverLocation));
-        }
+        this.addColumn(HotelWritable.class, this, "macAddress", put, familyName, "mac_addr", version);
+        this.addColumn(HotelWritable.class, this, "ipLocal", put, familyName, "ip_local", version);
+        this.addColumn(HotelWritable.class, this, "ip", put, familyName, "ip", version);
+        this.addColumn(HotelWritable.class, this, "serverLocation", put, familyName, "server_location", version);
 
         return put;
     }
+
 
     private void buildBean(String line) {
     }

@@ -27,6 +27,7 @@ import org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles;
 import org.apache.hadoop.hbase.mapreduce.SimpleTotalOrderPartitioner;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.db.DBConfiguration;
 import org.apache.hadoop.mapreduce.lib.db.DBInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -47,34 +48,39 @@ import java.util.regex.Pattern;
  */
 public class Mysql2HBaseScheduler extends Configured implements Tool {
 
+    public static final Argument WritableClass = new Argument("writableClass", null, null);// MR 读写器
+
     @Override
     public int run(String[] args) throws Exception {
         try {
             MapReduceConstant.CommonVariables.initMapReduce(this.getConf(), args);
 
             String jobName = ArgumentFactory.getParameterValue(Argument.JobName);
-            ArgumentFactory.printInputArgument(Argument.JobName, jobName);
+            ArgumentFactory.printInputArgument(Argument.JobName, jobName, false);
 
             String jdbcDriver = ArgumentFactory.getParameterValue(Argument.JDBCDriver);
-            ArgumentFactory.printInputArgument(Argument.JDBCDriver, jdbcDriver);
+            ArgumentFactory.printInputArgument(Argument.JDBCDriver, jdbcDriver, false);
 
             String jdbcUrl = ArgumentFactory.getParameterValue(Argument.JDBCUrl);
-            ArgumentFactory.printInputArgument(Argument.JDBCUrl, jdbcUrl);
+            ArgumentFactory.printInputArgument(Argument.JDBCUrl, jdbcUrl, false);
 
             String jdbcUsername = ArgumentFactory.getParameterValue(Argument.JDBCUsername);
-            ArgumentFactory.printInputArgument(Argument.JDBCUsername, jdbcUsername);
+            ArgumentFactory.printInputArgument(Argument.JDBCUsername, jdbcUsername, false);
 
             String jdbcPassword = ArgumentFactory.getParameterValue(Argument.JDBCPassword);
-            ArgumentFactory.printInputArgument(Argument.JDBCPassword, jdbcPassword);
+            ArgumentFactory.printInputArgument(Argument.JDBCPassword, jdbcPassword, true);
 
             String jdbcSql = ArgumentFactory.getParameterValue(Argument.JDBCSql);
-            ArgumentFactory.printInputArgument(Argument.JDBCSql, jdbcSql);
+            ArgumentFactory.printInputArgument(Argument.JDBCSql, jdbcSql, false);
 
             String hdfsOutputPath = ArgumentFactory.getParameterValue(Argument.OutputPath);
-            ArgumentFactory.printInputArgument(Argument.OutputPath, hdfsOutputPath);
+            ArgumentFactory.printInputArgument(Argument.OutputPath, hdfsOutputPath, false);
 
             String hTableName = ArgumentFactory.getParameterValue(Argument.HbaseTable);
-            ArgumentFactory.printInputArgument(Argument.HbaseTable, hTableName);
+            ArgumentFactory.printInputArgument(Argument.HbaseTable, hTableName, false);
+
+            String writableClassName = ArgumentFactory.getParameterValue(WritableClass);
+            ArgumentFactory.printInputArgument(WritableClass, writableClassName, false);
 
 
             // 准备工作
@@ -82,11 +88,17 @@ public class Mysql2HBaseScheduler extends Configured implements Tool {
             ArgumentFactory.checkNullValueForArgument(Argument.JDBCSql, jdbcSql);
             ArgumentFactory.checkNullValueForArgument(Argument.OutputPath, hdfsOutputPath);
             ArgumentFactory.checkNullValueForArgument(Argument.HbaseTable, hTableName);
+            ArgumentFactory.checkNullValueForArgument(WritableClass, writableClassName);
             if (StringUtils.isBlank(jobName)) {
                 jobName = this.getClass().getName();
             }
             if (StringUtils.isBlank(jdbcDriver)) {
                 jdbcDriver = "com.mysql.jdbc.Driver";
+            }
+            Class<?> writableClass = Class.forName(writableClassName);
+            Class<? extends Mapper> mapperClass = null;
+            if (HotelWritable.class.equals(writableClass)) {
+                mapperClass = DBInputHotelMapper.class;
             }
 
             Path outputPath = new Path(hdfsOutputPath);
@@ -105,7 +117,7 @@ public class Mysql2HBaseScheduler extends Configured implements Tool {
             job.setJarByClass(this.getClass());
 
             job.setInputFormatClass(DBInputFormat.class);
-            job.setMapperClass(DBInputMapper.class);
+            job.setMapperClass(mapperClass);
             job.setMapOutputKeyClass(ImmutableBytesWritable.class);
             job.setMapOutputValueClass(Put.class);
 

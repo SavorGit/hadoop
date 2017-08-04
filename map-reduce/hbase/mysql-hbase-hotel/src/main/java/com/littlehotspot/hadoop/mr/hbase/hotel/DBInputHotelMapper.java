@@ -30,7 +30,7 @@ import java.io.IOException;
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class DBInputMapper extends Mapper<LongWritable, HotelWritable, ImmutableBytesWritable, Put> {
+public class DBInputHotelMapper extends Mapper<LongWritable, HotelWritable, ImmutableBytesWritable, Put> {
 
     @Override
     public void map(LongWritable key, HotelWritable value, Context context) throws IOException, InterruptedException {
