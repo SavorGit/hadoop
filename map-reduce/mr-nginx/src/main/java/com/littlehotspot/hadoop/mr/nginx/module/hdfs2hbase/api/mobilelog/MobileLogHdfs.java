@@ -8,12 +8,9 @@
  * @EMAIL 404644381@qq.com
  * @Time : 15:38
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mobilelog;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.CommonVariables;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.NgxSrcUserBean;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.UserActBean;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -32,13 +29,12 @@ import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.regex.Matcher;
 
 /**
  * 手机日志
  */
-public class UserDemaLog extends Configured implements Tool {
+public class MobileLogHdfs extends Configured implements Tool {
 
     private static class MobileMapper extends Mapper<LongWritable, Text, Text, Text> {
 
@@ -48,50 +44,15 @@ public class UserDemaLog extends Configured implements Tool {
             /**数据清洗=========开始*/
             try {
                 String msg = value.toString();
-                Matcher matcher = CommonVariables.MAPPER_DEMAND_FORMAT_REGEX.matcher(msg);
+                Matcher matcher = CommonVariables.MAPPER_LOG_FORMAT_REGEX.matcher(msg);
                 if (!matcher.find()) {
                     return;
                 }
-                if (StringUtils.isBlank(matcher.group(8))) {
+                if (StringUtils.isBlank(matcher.group(9))) {
                     return;
                 }
 
-                context.write(new Text(matcher.group(8)), value);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private static class Combiner extends Reducer<Text, Text, Text, Text> {
-
-        @Override
-        protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
-            try {
-                Iterator<Text> iterator = value.iterator();
-                UserActBean userActBean = new UserActBean();
-                Integer count=0;
-                while (iterator.hasNext()){
-                    Text item = iterator.next();
-                    if (item == null) {
-                        continue;
-                    }
-                    String rowLineContent = item.toString();
-                    Matcher matcher = CommonVariables.MAPPER_BOX_LOG_FORMAT_REGEX.matcher(rowLineContent);
-                    if (!matcher.find()) {
-                        return;
-                    }
-                    userActBean.setDeviceId(matcher.group(8));
-                    if (StringUtils.isBlank(userActBean.getTime())){
-                        userActBean.setTime(matcher.group(4));
-                    }else if (Long.valueOf(userActBean.getTime())>=Long.valueOf(matcher.group(4))){
-                        userActBean.setTime(matcher.group(4));
-                    }
-                    count ++;
-                }
-                userActBean.setCount(count.toString());
-                userActBean.setType("dema");
-                context.write(new Text(userActBean.getDeviceId()), new Text(userActBean.rowLine()));
+                context.write(value, new Text());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -103,34 +64,7 @@ public class UserDemaLog extends Configured implements Tool {
         @Override
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
-                Iterator<Text> iterator = value.iterator();
-                UserActBean userActBean = new UserActBean();
-                while (iterator.hasNext()){
-                    Text item = iterator.next();
-                    if (item == null) {
-                        continue;
-                    }
-                    String rowLineContent = item.toString();
-                    Matcher matcher = CommonVariables.MAPPER_ACT_FORMAT_REGEX.matcher(rowLineContent);
-                    if (!matcher.find()) {
-                        return;
-                    }
-                    userActBean.setDeviceId(matcher.group(1));
-                    if (StringUtils.isBlank(userActBean.getTime())){
-                        userActBean.setTime(matcher.group(2));
-                    }else if (Long.valueOf(userActBean.getTime())>=Long.valueOf(matcher.group(2))){
-                        userActBean.setTime(matcher.group(2));
-                    }
-                    if (StringUtils.isBlank(userActBean.getCount())){
-                        userActBean.setCount(matcher.group(3));
-                    }else {
-                        Long count=Long.valueOf(userActBean.getCount())+Long.valueOf(matcher.group(3));
-                        userActBean.setCount(count.toString());
-                    }
-
-                }
-                userActBean.setType("dema");
-                context.write(new Text(userActBean.rowLine()), new Text());
+                context.write(key, new Text());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -148,8 +82,8 @@ public class UserDemaLog extends Configured implements Tool {
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
-            Job job = Job.getInstance(this.getConf(), UserDemaLog.class.getSimpleName());
-            job.setJarByClass(UserDemaLog.class);
+            Job job = Job.getInstance(this.getConf(), MobileLogHdfs.class.getSimpleName());
+            job.setJarByClass(MobileLogHdfs.class);
 
             /**作业输入*/
             Path inputPath = new Path(hdfsInputPath);
@@ -157,8 +91,6 @@ public class UserDemaLog extends Configured implements Tool {
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
-
-            job.setCombinerClass(Combiner.class);
 
             /**作业输出*/
             Path outputPath = new Path(hdfsOutputPath);

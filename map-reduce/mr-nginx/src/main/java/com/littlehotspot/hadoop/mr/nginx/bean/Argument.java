@@ -31,6 +31,9 @@ public enum Argument {
     BoxInputPath("hdfsBoxIn", null),
     MobInputPath("hdfsMobIn", null),
     RqInputPath("hdfsRqIn",null),
+    DemaInputPath("hdfsDemaIn", null),
+    ReadInputPath("hdfsReadIn", null),
+    ProInputPath("hdfsProIn",null),
     UserInputPath("hdfsUserIn", null),
     ActInputPath("hdfsActIn", null),
     NgxInputPath("hdfsNgxIn", null),
@@ -39,6 +42,7 @@ public enum Argument {
     HbaseRoot("hbaseRoot", null),
     HbaseZookeeper("hbaseZookeeper", null),
     HBaseSharePath("hbaseSharePath", null),
+
 
     VersionName("versionname", ""),// 版本名称
     VersionCode("versioncode", ""),// 版本号
@@ -60,6 +64,9 @@ public enum Argument {
 
     ColumnFamily("columnFamily",""),// 列族名
     ColumnName("columnName",""),// 列名
+
+
+    Time("time", null),
     ;
 
     @Getter

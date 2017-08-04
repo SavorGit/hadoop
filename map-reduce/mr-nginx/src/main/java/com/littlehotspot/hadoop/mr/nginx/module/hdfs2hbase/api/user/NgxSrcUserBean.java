@@ -114,8 +114,8 @@ public class NgxSrcUserBean {
             return;
         }
         this.setDeviceId(matcher.group(16));
-        this.setMType(matcher.group(15));
-        this.setMMachine(matcher.group(13));
+        this.setMType(matcher.group(13));
+        this.setMMachine(matcher.group(11));
         if (StringUtils.isBlank(this.getFDownTime())||(!StringUtils.isBlank(matcher.group(2))&&Long.valueOf(this.getFDownTime())>Long.valueOf(matcher.group(2)))){
             this.setFDownTime(matcher.group(2));
             this.setFDownSrc("ngx");

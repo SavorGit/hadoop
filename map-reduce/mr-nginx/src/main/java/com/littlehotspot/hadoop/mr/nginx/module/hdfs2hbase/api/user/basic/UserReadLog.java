@@ -117,7 +117,7 @@ public class UserReadLog extends Configured implements Tool {
                         continue;
                     }
                     String rowLineContent = item.toString();
-                    Matcher matcher = CommonVariables.MAPPER_USERACT_FORMAT_REGEX.matcher(rowLineContent);
+                    Matcher matcher = CommonVariables.MAPPER_ACT_FORMAT_REGEX.matcher(rowLineContent);
                     if (!matcher.find()) {
                         return;
                     }

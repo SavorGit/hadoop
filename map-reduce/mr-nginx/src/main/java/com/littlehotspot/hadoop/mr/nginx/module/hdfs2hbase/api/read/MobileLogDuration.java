@@ -61,13 +61,7 @@ public class MobileLogDuration extends Configured implements Tool {
                 if (!matcher.find()) {
                     return;
                 }
-//                if (!StringUtils.isBlank(matcher.group(6))&&matcher.group(6).equals("start")){
-//                    starts.put(matcher.group(2),msg);
-//
-//                }
-//                if (!StringUtils.isBlank(matcher.group(6))&&matcher.group(6).equals("end")){
-//                    ends.put(matcher.group(2),msg);
-//                }
+
 
                 context.write(new Text(matcher.group(1)), value);
             } catch (Exception e) {
@@ -145,7 +139,7 @@ public class MobileLogDuration extends Configured implements Tool {
             Content content = readMysqlContent(source.getContentId());
             if (null!=content){
                 bean.setConNam(content.getTitle());
-                bean.setContent(content.getContent());
+                bean.setContent(content.getContent().toString());
             }
 
             if (!(StringUtils.isBlank(bean.getStart())||StringUtils.isBlank(bean.getEnd()))){
@@ -185,7 +179,7 @@ public class MobileLogDuration extends Configured implements Tool {
             }
 
             //读取mysql
-            Hotel hotel = readMysqlHotel(source.getHotelId());
+            SavorHotel hotel = readMysqlHotel(source.getHotelId());
             if(hotel != null) {
                 bean.setHotelName(hotel.getName());
             }
@@ -196,7 +190,7 @@ public class MobileLogDuration extends Configured implements Tool {
                 bean.setRoom(source.getRoomId());
             }
             //读取mysql
-            Room room = readMysqlRoom(source.getRoomId());
+            SavorRoom room = readMysqlRoom(source.getRoomId());
             if (null!=room){
                 bean.setRoomName(room.getName());
             }
@@ -207,11 +201,11 @@ public class MobileLogDuration extends Configured implements Tool {
          * 查询酒店信息
          * @throws Exception
          */
-        public Hotel readMysqlHotel(String hotelId) throws Exception{
+        public SavorHotel readMysqlHotel(String hotelId) throws Exception{
             if (this.hotelMap == null || this.hotelMap.get(hotelId) == null || this.hotelMap.size() <= 0) {
                 findHotel();
             }
-            return (Hotel) this.hotelMap.get(hotelId);
+            return (SavorHotel) this.hotelMap.get(hotelId);
 
         }
 
@@ -220,8 +214,8 @@ public class MobileLogDuration extends Configured implements Tool {
             JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
             jdbcUtil.getConnection();
             try {
-                List<Hotel> result = jdbcUtil.findResult(Hotel.class, sql);
-                for (Hotel hotel : result) {
+                List<SavorHotel> result = jdbcUtil.findResult(SavorHotel.class, sql);
+                for (SavorHotel hotel : result) {
                     this.hotelMap.put(String.valueOf(hotel.getId()), hotel);
                 }
             } catch (SQLException e) {
@@ -235,11 +229,11 @@ public class MobileLogDuration extends Configured implements Tool {
          * 查询包间信息
          * @throws Exception
          */
-        public Room readMysqlRoom(String roomId) throws Exception{
+        public SavorRoom readMysqlRoom(String roomId) throws Exception{
             if (this.contentMap == null || this.contentMap.get(roomId) == null || this.contentMap.size() <= 0) {
                 findHotel();
             }
-            return (Room) this.roomMap.get(roomId);
+            return (SavorRoom) this.roomMap.get(roomId);
 
         }
 
@@ -248,8 +242,8 @@ public class MobileLogDuration extends Configured implements Tool {
             JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
             jdbcUtil.getConnection();
             try {
-                List<Room> result = jdbcUtil.findResult(Room.class, sql);
-                for (Room room : result) {
+                List<SavorRoom> result = jdbcUtil.findResult(SavorRoom.class, sql);
+                for (SavorRoom room : result) {
                     this.roomMap.put(String.valueOf(room.getId()), room);
                 }
             } catch (SQLException e) {

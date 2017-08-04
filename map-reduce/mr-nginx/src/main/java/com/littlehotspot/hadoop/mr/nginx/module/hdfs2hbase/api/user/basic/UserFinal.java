@@ -94,15 +94,15 @@ public class UserFinal extends Configured implements Tool {
                     String rowLineContent = item.toString();
                     Matcher userMatcher = CommonVariables.MAPPER_USER_FORMAT_REGEX.matcher(rowLineContent);
                     Matcher actMatcher = CommonVariables.MAPPER_ACT_FORMAT_REGEX.matcher(rowLineContent);
-                    if (userMatcher.find()){
-                        targetUserBean.setRowKey(userMatcher.group(1));
-                        targetUserAttrBean.setDeviceId(userMatcher.group(1));
-                        targetUserAttrBean.setDeviceType(userMatcher.group(2));
-                        targetUserAttrBean.setMachineModel(userMatcher.group(3));
-                        targetUserAttrBean.setToken(userMatcher.group(6));
-                        targetUserActiBean.setDownloadTime(userMatcher.group(4));
-                        targetUserActiBean.setSince(userMatcher.group(5));
-                    }else if (actMatcher.find()){
+                        if (userMatcher.find()){
+                            targetUserBean.setRowKey(userMatcher.group(1));
+                            targetUserAttrBean.setDeviceId(userMatcher.group(1));
+                            targetUserAttrBean.setDeviceType(userMatcher.group(2));
+                            targetUserAttrBean.setMachineModel(userMatcher.group(3));
+                            targetUserAttrBean.setToken(userMatcher.group(6));
+                            targetUserActiBean.setDownloadTime(userMatcher.group(4));
+                            targetUserActiBean.setSince(userMatcher.group(5));
+                        }else if (actMatcher.find()){
                         if (!StringUtils.isBlank(actMatcher.group(4))&&actMatcher.group(4).equals("pro")){
                             targetUserActiBean.setProjectionTime(actMatcher.group(2));
                             targetUserActiBean.setProjectionCount(actMatcher.group(3));

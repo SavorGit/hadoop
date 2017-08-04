@@ -13,7 +13,9 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.boxindex;
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
@@ -21,6 +23,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.filecache.DistributedCache;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
@@ -64,16 +67,24 @@ public class BoxUserIndex extends Configured implements Tool {
 
     private static class MobileReduce extends Reducer<Text, Text, Text, Text> {
 
+        private HBaseHelper hBaseHelper;
+
+        @Override
+        protected void setup(Context context) throws IOException, InterruptedException {
+            Configuration conf = context.getConfiguration();
+            this.hBaseHelper = new HBaseHelper(conf);
+        }
+
         @Override
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
                 String string = key.toString();
                 TargetIndexAttrBean targetIndexAttrBean = new TargetIndexAttrBean(string);
                 TargetIndexBean targetIndexBean = new TargetIndexBean();
-                Long times = 9999999999l -Long.valueOf(targetIndexAttrBean.getTimestamps().substring(0,10));
+                Long times = 9999999999999l -Long.valueOf(targetIndexAttrBean.getTimestamps());
                 targetIndexBean.setRowKey(targetIndexAttrBean.getUserId()+"|"+times.toString());
                 targetIndexBean.setIndexAttrBean(targetIndexAttrBean);
-                CommonVariables.hBaseHelper.insert(targetIndexBean);
+                hBaseHelper.insert(targetIndexBean);
                 context.write(key, new Text());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -89,12 +100,28 @@ public class BoxUserIndex extends Configured implements Tool {
             CommonVariables.hBaseHelper = new HBaseHelper(this.getConf());
 
             // 获取参数
+            String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);
+            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
             String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
             Job job = Job.getInstance(this.getConf(), BoxUserIndex.class.getSimpleName());
             job.setJarByClass(BoxUserIndex.class);
+
+            // 避免报错：ClassNotFoundError hbaseConfiguration
+            Configuration jobConf = job.getConfiguration();
+            FileSystem hdfs = FileSystem.get(new URI(hdfsCluster), jobConf);
+            Path hBaseSharePath = new Path(hbaseSharePath);
+            FileStatus[] hBaseShareJars = hdfs.listStatus(hBaseSharePath);
+            for (FileStatus fileStatus : hBaseShareJars) {
+                if (!fileStatus.isFile()) {
+                    continue;
+                }
+                Path archive = fileStatus.getPath();
+                FileSystem fs = archive.getFileSystem(jobConf);
+                DistributedCache.addArchiveToClassPath(archive, jobConf, fs);
+            }//
 
             /**作业输入*/
             Path inputPath = new Path(hdfsInputPath);

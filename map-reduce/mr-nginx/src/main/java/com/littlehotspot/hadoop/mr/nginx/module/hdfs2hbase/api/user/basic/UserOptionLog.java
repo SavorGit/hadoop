@@ -96,7 +96,7 @@ public class UserOptionLog extends Configured implements Tool {
                     userActBean.setType(matcher.group(4));
                 }
 
-                context.write(new Text(userActBean.getDeviceId()), new Text(userActBean.rowLine()));
+                context.write(new Text(userActBean.getDeviceId()+userActBean.getType()), new Text(userActBean.rowLine()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -116,7 +116,7 @@ public class UserOptionLog extends Configured implements Tool {
                         continue;
                     }
                     String rowLineContent = item.toString();
-                    Matcher matcher = CommonVariables.MAPPER_USERACT_FORMAT_REGEX.matcher(rowLineContent);
+                    Matcher matcher = CommonVariables.MAPPER_ACT_FORMAT_REGEX.matcher(rowLineContent);
                     if (!matcher.find()) {
                         return;
                     }
@@ -132,9 +132,9 @@ public class UserOptionLog extends Configured implements Tool {
                         Long count=Long.valueOf(userActBean.getCount())+Long.valueOf(matcher.group(3));
                         userActBean.setCount(count.toString());
                     }
-
+                    userActBean.setType(matcher.group(4));
                 }
-                userActBean.setType("dema");
+
                 context.write(new Text(userActBean.rowLine()), new Text());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -150,8 +150,9 @@ public class UserOptionLog extends Configured implements Tool {
 
             // 获取参数
             String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
-            String hdfsInputPath1 = CommonVariables.getParameterValue(Argument.InputPath);
-            String hdfsInputPath2 = CommonVariables.getParameterValue(Argument.InputPath);
+            String hdfsInputPath1 = CommonVariables.getParameterValue(Argument.ProInputPath);
+            String hdfsInputPath2 = CommonVariables.getParameterValue(Argument.DemaInputPath);
+            String hdfsInputPath3 = CommonVariables.getParameterValue(Argument.ReadInputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
             Job job = Job.getInstance(this.getConf(), UserOptionLog.class.getSimpleName());
@@ -160,8 +161,10 @@ public class UserOptionLog extends Configured implements Tool {
             /**作业输入*/
             Path inputPath1 = new Path(hdfsInputPath1);
             Path inputPath2 = new Path(hdfsInputPath2);
+            Path inputPath3 = new Path(hdfsInputPath3);
             FileInputFormat.addInputPath(job, inputPath1);
             FileInputFormat.addInputPath(job, inputPath2);
+            FileInputFormat.addInputPath(job, inputPath3);
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);

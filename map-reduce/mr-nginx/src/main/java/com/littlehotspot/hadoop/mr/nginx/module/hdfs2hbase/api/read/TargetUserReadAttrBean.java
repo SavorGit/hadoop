@@ -57,7 +57,7 @@ public class TargetUserReadAttrBean {
     /**
      * 设备类型
      */
-    @HBaseColumn(name = "con_nam")
+    @HBaseColumn(name = "con_name")
     private String conNam;
 
     /**

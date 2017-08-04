@@ -15,32 +15,10 @@ import java.sql.SQLException;
  * Created by Administrator on 2017-06-29 下午 5:38.
  */
 @Data
-public class Category extends Model {
-    private String id;
+public class Category{
+    private int id;
     private String name;
 
-    @Override
-    public void write(DataOutput out) throws IOException {
-        Text.writeString(out,this.id);
-        Text.writeString(out,this.name);
-    }
 
-    @Override
-    public void readFields(DataInput in) throws IOException {
-        this.id = in.readUTF();
-        this.name = in.readUTF();
-    }
-
-    @Override
-    public void write(PreparedStatement stmt) throws SQLException {
-        stmt.setString(1, this.id);
-        stmt.setString(2, this.name);
-    }
-
-    @Override
-    public void readFields(ResultSet result) throws SQLException {
-        this.id = result.getString(1);
-        this.name = result.getString(2);
-    }
 
 }

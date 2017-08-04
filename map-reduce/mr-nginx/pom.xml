@@ -214,6 +214,36 @@
                         </configuration>
                     </execution>
 
+                    <!-- 用户操作汇总 -->
+                    <execution>
+                        <id>user-option</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>user-option</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserOptionMain</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
 
                     <!--手机用户 -->
                     <execution>
@@ -672,6 +702,151 @@
                             <archive>
                                 <manifest>
                                     <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.medias.MediaMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+
+                    <execution>
+                        <id>media_sta-hbase</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>media_sta-hbase</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/mediabox/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mediabox.InToHbaseMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>media_sta</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>media_sta</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/mysql/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/mysql/model/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/mediabox/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mediabox.StaOfCaaMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>media_sta-mysql</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>media_sta-mysql</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/mysql/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/mysql/model/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/mediabox/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mediabox.InToMysqlMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>heart_log-hbase</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>heart_log-hbase</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/heartbeat/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.heartbeat.InToHbaseMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>mobile_log-hbase</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>mobile_log-hbase</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/mobilelog/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mobilelog.MobileToHbaseMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
