@@ -44,7 +44,7 @@
     </dependencyManagement>
 
     <modules>
-        <module>mysql-hbase-hotel</module>
+        <module>mysql-hbase</module>
     </modules>
-    
+
 </project>

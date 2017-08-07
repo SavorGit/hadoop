@@ -10,10 +10,10 @@
     </parent>
 
     <groupId>com.littlehotspot.hadoop.mr.hbase</groupId>
-    <artifactId>mysql-hbase-hotel</artifactId>
+    <artifactId>mysql-hbase</artifactId>
     <version>LHS.HADOOP.2.6.1.0.1.0.0-SNAPSHOT</version>
 
-    <name>Hadoop Map-Reduce HBase [Mysql-To-HBase Hotel]</name>
+    <name>Hadoop Map-Reduce HBase [Mysql-To-HBase]</name>
     <packaging>jar</packaging>
 
     <dependencies>

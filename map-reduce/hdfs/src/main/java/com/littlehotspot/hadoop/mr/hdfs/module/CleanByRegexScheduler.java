@@ -54,75 +54,70 @@ public class CleanByRegexScheduler extends Configured implements Tool {
      */
     @Override
     public int run(String[] args) throws Exception {
-//        try {
-        CleanByRegexConstant.CommonVariables.initMapReduce(this.getConf(), args);// 解析参数并初始化 MAP REDUCE
+        try {
+            CleanByRegexConstant.CommonVariables.initMapReduce(this.getConf(), args);// 解析参数并初始化 MAP REDUCE
 
-        // Mapper 输入正则表达式
-        String jobName = ArgumentFactory.getParameterValue(Argument.JobName);
-        System.out.println("\tInput[Job-Name]           : " + jobName);
+            // Mapper 输入正则表达式
+            String jobName = ArgumentFactory.getParameterValue(Argument.JobName);
+            ArgumentFactory.printInputArgument(Argument.JobName, jobName, false);
 
-        // Mapper 输入正则表达式
-        String matcherRegex = ArgumentFactory.getParameterValue(Argument.MapperInputFormatRegex);
-        System.out.println("\tInput[Mapper-Input-Regex] : " + matcherRegex);
-        if (matcherRegex == null) {
-            throw new IllegalArgumentException("The argument['" + Argument.MapperInputFormatRegex.getName() + "'] for this program is null");
-        }
+            // Mapper 输入正则表达式
+            String matcherRegex = ArgumentFactory.getParameterValue(Argument.MapperInputFormatRegex);
+            ArgumentFactory.printInputArgument(Argument.MapperInputFormatRegex, matcherRegex, false);
 
-        // Hdfs 读取路径
-        String[] hdfsInputPathArray = ArgumentFactory.getParameterValues(Argument.InputPath);
-        System.out.println("\tInput[HDFS-Input-Path]    : " + hdfsInputPathArray);
-        if (hdfsInputPathArray == null) {
-            throw new IllegalArgumentException("The argument['" + Argument.InputPath.getName() + "'] for this program is null");
-        }
+            // Hdfs 读取路径
+            String[] hdfsInputPathArray = ArgumentFactory.getParameterValues(Argument.InputPath);
+            ArgumentFactory.printInputArgument(Argument.InputPath, hdfsInputPathArray);
 
-        // Hdfs 写入路径
-        String hdfsOutputPath = ArgumentFactory.getParameterValue(Argument.OutputPath);
-        System.out.println("\tInput[HDFS-Output-Path]   : " + hdfsOutputPath);
-        if (hdfsOutputPath == null) {
-            throw new IllegalArgumentException("The argument['" + Argument.OutputPath.getName() + "'] for this program is null");
-        }
+            // Hdfs 写入路径
+            String hdfsOutputPath = ArgumentFactory.getParameterValue(Argument.OutputPath);
+            ArgumentFactory.printInputArgument(Argument.OutputPath, hdfsOutputPath, false);
 
 
-        if (StringUtils.isBlank(jobName)) {
-            jobName = this.getClass().getName();
-        }
+            // 准备工作
+            ArgumentFactory.checkNullValueForArgument(Argument.MapperInputFormatRegex, matcherRegex);
+            ArgumentFactory.checkNullValuesForArgument(Argument.InputPath, hdfsInputPathArray);
+            ArgumentFactory.checkNullValueForArgument(Argument.OutputPath, hdfsOutputPath);
+            if (StringUtils.isBlank(jobName)) {
+                jobName = this.getClass().getName();
+            }
 
-        this.getConf().setPattern(CleanByRegexConstant.HadoopConfig.Key.MAPPER_INPUT_FORMAT_REGEX_PATTERN, Pattern.compile(matcherRegex));// 配置 Mapper 输入的正则匹配对象
-        Job job = Job.getInstance(this.getConf(), jobName);
-        job.setJarByClass(this.getClass());
+            this.getConf().setPattern(CleanByRegexConstant.HadoopConfig.Key.MAPPER_INPUT_FORMAT_REGEX_PATTERN, Pattern.compile(matcherRegex));// 配置 Mapper 输入的正则匹配对象
+            Job job = Job.getInstance(this.getConf(), jobName);
+            job.setJarByClass(this.getClass());
 
 
-        // 作业输入
-        for (String hdfsInputPath : hdfsInputPathArray) {
-            Path inputPath = new Path(hdfsInputPath);
-            FileInputFormat.addInputPath(job, inputPath);
-        }
-        job.setMapperClass(CleanByRegexMapper.class);
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(Text.class);
+            // 作业输入
+            for (String hdfsInputPath : hdfsInputPathArray) {
+                Path inputPath = new Path(hdfsInputPath);
+                FileInputFormat.addInputPath(job, inputPath);
+            }
+            job.setMapperClass(CleanByRegexMapper.class);
+            job.setMapOutputKeyClass(Text.class);
+            job.setMapOutputValueClass(Text.class);
 
-        // 作业输出
-        Path outputPath = new Path(hdfsOutputPath);
-        FileOutputFormat.setOutputPath(job, outputPath);
+            // 作业输出
+            Path outputPath = new Path(hdfsOutputPath);
+            FileOutputFormat.setOutputPath(job, outputPath);
 //            job.setReducerClass(GeneralReducer.class);
 //            job.setOutputKeyClass(Text.class);
 //            job.setOutputValueClass(Text.class);
 
-        // 如果输入路径已经存在，则删除
-        FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());
-        if (fileSystem.exists(outputPath)) {
-            fileSystem.delete(outputPath, true);
-        }
+            // 如果输入路径已经存在，则删除
+            FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());
+            if (fileSystem.exists(outputPath)) {
+                fileSystem.delete(outputPath, true);
+            }
 
-        boolean status = job.waitForCompletion(true);
-        if (!status) {
-            String exceptionMessage = String.format("MapReduce[Clean-By-Regex] task[%s] execute failed", jobName);
-            throw new RuntimeException(exceptionMessage);
+            boolean status = job.waitForCompletion(true);
+            if (!status) {
+                String exceptionMessage = String.format("MapReduce[Clean-By-Regex] task[%s] execute failed", jobName);
+                throw new RuntimeException(exceptionMessage);
+            }
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 1;
         }
-        return 0;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return 1;
-//        }
     }
 }
