@@ -57,28 +57,40 @@ public class InToMysql extends Configured implements Tool {
         protected void map(ImmutableBytesWritable rowKey, Result result, Context context) throws IOException, InterruptedException {
             try {
                 String row = Bytes.toString(result.getRow());
+                String areaId = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("area_id")));
                 String areaName = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("area_name")));
+                String hotelId = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("hotel_id")));
                 String hotelName = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("hotel_name")));
+                String roomId = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("room_id")));
                 String roomName = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("room_name")));
+                String boxId = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("box_id")));
+                String boxName = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("box_name")));
                 String mac = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mac")));
-                String tvCount = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("tv_count")));
+                String mediaId = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("media_id")));
+                String mediaName = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("media_name")));
                 String playTime = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_time")));
                 String playCount = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_count")));
                 String playDate = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_date")));
                 SourceBean bean = new SourceBean();
                 bean.setRowKey(row);
+                bean.setAreaId(areaId);
                 bean.setArea(areaName);
+                bean.setHotelId(hotelId);
                 bean.setHotelName(hotelName);
+                bean.setRoomId(roomId);
                 bean.setRoomName(roomName);
+                bean.setBoxId(boxId);
+                bean.setBoxName(boxName);
                 bean.setMac(mac);
-                bean.setTvCount(tvCount);
+                bean.setMediaId(mediaId);
+                bean.setMediaName(mediaName);
                 bean.setPlayTime(playTime);
                 bean.setPlayCount(playCount);
                 bean.setPlayDate(playDate);
 //        System.out.println("ROWKEY{"+row+"}"+":mda_type="+mediaType+":option_type="+optionType+":mda_id="+mediaId);
 
 
-                context.write(new Text(row), new Text(bean.toString()));
+                context.write(new Text(row), new Text(bean.rowLine2()));
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -103,20 +115,26 @@ public class InToMysql extends Configured implements Tool {
                 if (item == null) {
                     continue;
                 }
-                Matcher matcher = Pattern.compile("^(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*)$").matcher(item.toString());
+                Matcher matcher = Pattern.compile("^(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*)$").matcher(item.toString());
                 if (!matcher.find()) {
                     return;
                 }
 
                 model.setRowKey(matcher.group(1));
-                model.setAreaName(matcher.group(2));
-                model.setHotelName(matcher.group(3));
-                model.setRoomName(matcher.group(4));
-                model.setMac(matcher.group(5));
-                model.setTvCount(matcher.group(6));
-                model.setPlayTime(matcher.group(7));
-                model.setPlayCount(matcher.group(8));
-                model.setPlayDate(matcher.group(9));
+                model.setAreaId(matcher.group(2));
+                model.setAreaName(matcher.group(3));
+                model.setHotelId(matcher.group(4));
+                model.setHotelName(matcher.group(5));
+                model.setRoomId(matcher.group(6));
+                model.setRoomName(matcher.group(7));
+                model.setBoxId(matcher.group(8));
+                model.setBoxName(matcher.group(9));
+                model.setMac(matcher.group(10));
+                model.setMediaId(matcher.group(11));
+                model.setMediaName(matcher.group(12));
+                model.setPlayTime(matcher.group(13));
+                model.setPlayCount(matcher.group(14));
+                model.setPlayDate(matcher.group(15));
             }
 //            Matcher matcher = MEDIA_PATTERN.matcher(line);
 //            if (!matcher.find()) {
@@ -142,12 +160,13 @@ public class InToMysql extends Configured implements Tool {
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
 //            String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
-            Job job = Job.getInstance(this.getConf(), InToMysql.class.getSimpleName());
-            job.setJarByClass(InToMysql.class);
+
 
 //            this.getConf().set("mapred.job.tracker", "localhost:9001");
             DBConfiguration.configureDB(this.getConf(), "com.mysql.jdbc.Driver", "jdbc:mysql://192.168.2.145:3306/cloud?useSSL=false&useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&zeroDateTimeBehavior=convertToNull", "javaweb", "123456");
 
+            Job job = Job.getInstance(this.getConf(), this.getClass().getSimpleName());
+            job.setJarByClass(this.getClass());
 
             Scan scan = new Scan();
 
