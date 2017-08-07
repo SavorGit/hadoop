@@ -10,7 +10,11 @@
  */
 package com.littlehotspot.hadoop.mr.hbase.hotel;
 
+import com.littlehotspot.hadoop.mr.hbase.box.DBInputBoxMapper;
+import com.littlehotspot.hadoop.mr.hbase.io.BoxWritable;
 import com.littlehotspot.hadoop.mr.hbase.io.HotelWritable;
+import com.littlehotspot.hadoop.mr.hbase.io.RoomWritable;
+import com.littlehotspot.hadoop.mr.hbase.room.DBInputRoomMapper;
 import net.lizhaoweb.common.util.argument.ArgumentFactory;
 import net.lizhaoweb.spring.hadoop.commons.argument.MapReduceConstant;
 import net.lizhaoweb.spring.hadoop.commons.argument.model.Argument;
@@ -30,6 +34,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.db.DBConfiguration;
 import org.apache.hadoop.mapreduce.lib.db.DBInputFormat;
+import org.apache.hadoop.mapreduce.lib.db.DBWritable;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
@@ -99,6 +104,10 @@ public class Mysql2HBaseScheduler extends Configured implements Tool {
             Class<? extends Mapper> mapperClass = null;
             if (HotelWritable.class.equals(writableClass)) {
                 mapperClass = DBInputHotelMapper.class;
+            }else if (RoomWritable.class.equals(writableClass)){
+                mapperClass = DBInputRoomMapper.class;
+            }else if (BoxWritable.class.equals(writableClass)){
+                mapperClass = DBInputBoxMapper.class;
             }
 
             Path outputPath = new Path(hdfsOutputPath);
@@ -128,7 +137,7 @@ public class Mysql2HBaseScheduler extends Configured implements Tool {
             job.setPartitionerClass(SimpleTotalOrderPartitioner.class);
 
             String countSQL = this.getCountSql(jdbcSql);
-            DBInputFormat.setInput(job, HotelWritable.class, jdbcSql, countSQL);
+            DBInputFormat.setInput(job, (Class<? extends DBWritable>) writableClass, jdbcSql, countSQL);
 
             FileOutputFormat.setOutputPath(job, outputPath);
 

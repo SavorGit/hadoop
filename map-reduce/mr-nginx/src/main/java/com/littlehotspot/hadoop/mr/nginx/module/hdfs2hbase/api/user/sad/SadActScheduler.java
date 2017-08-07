@@ -45,7 +45,7 @@ public class SadActScheduler extends Configured implements Tool {
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(Text.class);
 
-            FileInputFormat.addInputPath(job, inputPath);
+            FileInputFormat.addInputPaths(job, hdfsInputPath);
             FileOutputFormat.setOutputPath(job, outputPath);
 
             FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());

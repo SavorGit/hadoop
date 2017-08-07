@@ -85,4 +85,62 @@ public class TestMysql2HBaseScheduler {
         String ansiPrintMessage = String.format(FORMAT_COLOR_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), this.decimalFormat.format(end - start));
         System.out.println(ansi().eraseScreen().render(ansiPrintMessage));
     }
+
+    @Test
+    public void roomMysql2HBase() {
+        long start = System.currentTimeMillis();
+        String[] args = {
+                "jobName=Import data to hBase from mysql for hotel",
+                "hdfsOut=hdfs://localhost:9000/home/data/hadoop/flume/mysql/medias-hbase",
+                "jdbcDriver=com.mysql.jdbc.Driver",
+                "jdbcUrl=jdbc:mysql://192.168.2.145:3306/cloud",
+                "jdbcUsername=javaweb",
+                "jdbcPassword=123456",
+                "hBaseTable=room",
+                "jdbcSql=SELECT room.id as id,room.hotel_id as hotel_id,room.name as name,room.type as type,room.remark as remark,room.create_time as create_time,room.update_time as update_time,room.flag as flag,room.state as state from savor_room as room",
+                "writableClass=com.littlehotspot.hadoop.mr.hbase.io.RoomWritable"
+        };
+
+        try {
+            ToolRunner.run(this.conf, new Mysql2HBaseScheduler(), args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        long end = System.currentTimeMillis();
+
+        String printMessage = String.format(FORMAT_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), this.decimalFormat.format(end - start));
+        System.out.println(ansi().eraseScreen().fg(YELLOW).a(printMessage).reset());
+
+        String ansiPrintMessage = String.format(FORMAT_COLOR_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), this.decimalFormat.format(end - start));
+        System.out.println(ansi().eraseScreen().render(ansiPrintMessage));
+    }
+
+    @Test
+    public void boxMysql2HBase() {
+        long start = System.currentTimeMillis();
+        String[] args = {
+                "jobName=Import data to hBase from mysql for hotel",
+                "hdfsOut=hdfs://localhost:9000/home/data/hadoop/flume/mysql/medias-hbase",
+                "jdbcDriver=com.mysql.jdbc.Driver",
+                "jdbcUrl=jdbc:mysql://192.168.2.145:3306/cloud",
+                "jdbcUsername=javaweb",
+                "jdbcPassword=123456",
+                "hBaseTable=box",
+                "jdbcSql=SELECT box.id as id,box.room_id as room_id,box.name as name,box.mac as mac,box.switch_time as switch_time,box.volum as volum,box.state as state,box.flag as flag,box.create_time as create_time,box.update_time as update_time from savor_box as box",
+                "writableClass=com.littlehotspot.hadoop.mr.hbase.io.BoxWritable"
+        };
+
+        try {
+            ToolRunner.run(this.conf, new Mysql2HBaseScheduler(), args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        long end = System.currentTimeMillis();
+
+        String printMessage = String.format(FORMAT_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), this.decimalFormat.format(end - start));
+        System.out.println(ansi().eraseScreen().fg(YELLOW).a(printMessage).reset());
+
+        String ansiPrintMessage = String.format(FORMAT_COLOR_PRINT_TIME_CONSUMING, Thread.currentThread().getStackTrace()[1].getMethodName(), this.decimalFormat.format(end - start));
+        System.out.println(ansi().eraseScreen().render(ansiPrintMessage));
+    }
 }
