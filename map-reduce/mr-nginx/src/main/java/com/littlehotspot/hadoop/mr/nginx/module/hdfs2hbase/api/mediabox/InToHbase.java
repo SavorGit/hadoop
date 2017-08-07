@@ -60,7 +60,7 @@ public class InToHbase extends Configured implements Tool {
 
     private static class MobileMapper extends Mapper<LongWritable, Text, ImmutableBytesWritable, Put> {
 
-        private static final Pattern PATTERN = Pattern.compile("^(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*)$");
+        private static final Pattern PATTERN = Pattern.compile("^(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*)$");
 
         @Override
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
@@ -76,14 +76,20 @@ public class InToHbase extends Configured implements Tool {
                 byte[] rowKeyBytes = Bytes.toBytes(matcher.group(1));
                 Put put = new Put(rowKeyBytes);// 设置rowkey
 
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("area_name"), version, Bytes.toBytes(matcher.group(2)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("hotel_name"), version, Bytes.toBytes(matcher.group(3)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("room_name"), version, Bytes.toBytes(matcher.group(4)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("mac"), version, Bytes.toBytes(matcher.group(5)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("tv_count"), version, Bytes.toBytes(matcher.group(6)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("play_count"), version, Bytes.toBytes(matcher.group(7)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("play_time"), version, Bytes.toBytes(matcher.group(8)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("play_date"), version, Bytes.toBytes(matcher.group(9)));
+                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("area_id"), version, Bytes.toBytes(matcher.group(2)));
+                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("area_name"), version, Bytes.toBytes(matcher.group(3)));
+                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("hotel_id"), version, Bytes.toBytes(matcher.group(4)));
+                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("hotel_name"), version, Bytes.toBytes(matcher.group(5)));
+                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("room_id"), version, Bytes.toBytes(matcher.group(6)));
+                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("room_name"), version, Bytes.toBytes(matcher.group(7)));
+                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("box_id"), version, Bytes.toBytes(matcher.group(8)));
+                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("box_name"), version, Bytes.toBytes(matcher.group(9)));
+                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("mac"), version, Bytes.toBytes(matcher.group(10)));
+                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("media_id"), version, Bytes.toBytes(matcher.group(11)));
+                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("media_name"), version, Bytes.toBytes(matcher.group(12)));
+                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("play_count"), version, Bytes.toBytes(matcher.group(13)));
+                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("play_time"), version, Bytes.toBytes(matcher.group(14)));
+                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("play_date"), version, Bytes.toBytes(matcher.group(15)));
 
 
                 ImmutableBytesWritable rowKey = new ImmutableBytesWritable(rowKeyBytes);

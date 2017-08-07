@@ -40,6 +40,11 @@ public class SourceBean {
      */
     private String area;
 
+    /**
+     * 区域Id
+     */
+    private String areaId;
+
 
     /**
      * 酒楼ID
@@ -79,6 +84,16 @@ public class SourceBean {
     private String mac;
 
     /**
+     * 机顶盒Id
+     */
+    private String boxId;
+
+    /**
+     * 机顶盒名称
+     */
+    private String boxName;
+
+    /**
      * 播放次数
      */
     private String playCount;
@@ -105,6 +120,11 @@ public class SourceBean {
      * 版本号
      */
     private String mediaId;
+
+    /**
+     * 版本号
+     */
+    private String mediaName;
 
 
     /**
@@ -149,14 +169,20 @@ public class SourceBean {
     public String rowLine2() {
         StringBuffer rowLine = new StringBuffer();
         rowLine.append(this.getRowKey() == null ? "" : this.getRowKey()).append(",");
+        rowLine.append(this.getAreaId() == null ? "" : this.getAreaId()).append(",");
         rowLine.append(this.getArea() == null ? "" : this.getArea()).append(",");
+        rowLine.append(this.getHotelId() == null ? "" : this.getHotelId()).append(",");
         rowLine.append(this.getHotelName() == null ? "" : this.getHotelName()).append(",");
+        rowLine.append(this.getRoomId() == null ? "" : this.getRoomId()).append(",");
         rowLine.append(this.getRoomName() == null ? "" : this.getRoomName()).append(",");
+        rowLine.append(this.getBoxId() == null ? "" : this.getBoxId()).append(",");
+        rowLine.append(this.getBoxName() == null ? "" : this.getBoxName()).append(",");
         rowLine.append(this.getMac() == null ? "" : this.getMac()).append(",");
-        rowLine.append(this.getTvCount() == null ? "" : this.getTvCount()).append(",");
+        rowLine.append(this.getMediaId() == null ? "" : this.getMediaId()).append(",");
+        rowLine.append(this.getMediaName() == null ? "" : this.getMediaName()).append(",");
         rowLine.append(this.getPlayCount() == null ? "" : this.getPlayCount()).append(",");
         rowLine.append(this.getPlayTime() == null ? "" : this.getPlayTime()).append(",");
-        rowLine.append(this.getPlayDate() == null ? "" : this.getPlayDate()).append(",");
+        rowLine.append(this.getPlayDate() == null ? "" : this.getPlayDate());
         return rowLine.toString();
     }
 

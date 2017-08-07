@@ -69,27 +69,37 @@ public class MediaStaModel implements Writable, DBWritable {
 
     @Override
     public void write(PreparedStatement preparedStatement) throws SQLException {
-        preparedStatement.setString(1,this.rowKey);
-        preparedStatement.setString(2,this.areaName);
-        preparedStatement.setString(3,this.hotelName);
-        preparedStatement.setString(4,this.roomName);
-        preparedStatement.setString(5,this.mac);
-        preparedStatement.setString(6,this.tvCount);
-        preparedStatement.setString(7,this.playTime);
-        preparedStatement.setString(8,this.playCount);
-        preparedStatement.setString(9,this.playDate);
+        try {
+            preparedStatement.setString(1,this.rowKey);
+            preparedStatement.setString(2,this.areaName);
+            preparedStatement.setString(3,this.hotelName);
+            preparedStatement.setString(4,this.roomName);
+            preparedStatement.setString(5,this.mac);
+            preparedStatement.setString(6,this.tvCount);
+            preparedStatement.setString(7,this.playTime);
+            preparedStatement.setString(8,this.playCount);
+            preparedStatement.setString(9,this.playDate);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     @Override
     public void readFields(ResultSet resultSet) throws SQLException {
-        this.rowKey=resultSet.getString("row_key");
-        this.areaName=resultSet.getString("area_name");
-        this.hotelName=resultSet.getString("hotel_name");
-        this.roomName=resultSet.getString("room_name");
-        this.mac=resultSet.getString("mac");
-        this.tvCount=resultSet.getString("tv_count");
-        this.playTime=resultSet.getString("play_time");
-        this.playCount=resultSet.getString("play_count");
-        this.playDate=resultSet.getString("play_date");
+        try {
+            this.rowKey=resultSet.getString("row_key");
+            this.areaName=resultSet.getString("area_name");
+            this.hotelName=resultSet.getString("hotel_name");
+            this.roomName=resultSet.getString("room_name");
+            this.mac=resultSet.getString("mac");
+            this.tvCount=resultSet.getString("tv_count");
+            this.playTime=resultSet.getString("play_time");
+            this.playCount=resultSet.getString("play_count");
+            this.playDate=resultSet.getString("play_date");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 }

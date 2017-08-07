@@ -55,28 +55,28 @@ public class InToMysql extends Configured implements Tool {
 
         @Override
         protected void map(ImmutableBytesWritable rowKey, Result result, Context context) throws IOException, InterruptedException {
-
-            String row = Bytes.toString(result.getRow());
-            String areaName = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("area_name")));
-            String hotelName = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("hotel_name")));
-            String roomName = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("room_name")));
-            String mac = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mac")));
-            String tvCount = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("tv_count")));
-            String playTime = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_time")));
-            String playCount = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_count")));
-            String playDate = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_date")));
-            SourceBean bean = new SourceBean();
-            bean.setRowKey(row);
-            bean.setArea(areaName);
-            bean.setHotelName(hotelName);
-            bean.setRoomName(roomName);
-            bean.setMac(mac);
-            bean.setTvCount(tvCount);
-            bean.setPlayTime(playTime);
-            bean.setPlayCount(playCount);
-            bean.setPlayDate(playDate);
-//        System.out.println("ROWKEY{"+row+"}"+":mda_type="+mediaType+":option_type="+optionType+":mda_id="+mediaId);
             try {
+                String row = Bytes.toString(result.getRow());
+                String areaName = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("area_name")));
+                String hotelName = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("hotel_name")));
+                String roomName = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("room_name")));
+                String mac = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mac")));
+                String tvCount = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("tv_count")));
+                String playTime = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_time")));
+                String playCount = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_count")));
+                String playDate = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_date")));
+                SourceBean bean = new SourceBean();
+                bean.setRowKey(row);
+                bean.setArea(areaName);
+                bean.setHotelName(hotelName);
+                bean.setRoomName(roomName);
+                bean.setMac(mac);
+                bean.setTvCount(tvCount);
+                bean.setPlayTime(playTime);
+                bean.setPlayCount(playCount);
+                bean.setPlayDate(playDate);
+//        System.out.println("ROWKEY{"+row+"}"+":mda_type="+mediaType+":option_type="+optionType+":mda_id="+mediaId);
+
 
                 context.write(new Text(row), new Text(bean.toString()));
 
@@ -94,6 +94,8 @@ public class InToMysql extends Configured implements Tool {
 
         @Override
         protected void reduce(Text key, Iterable<Text> value, Reducer<Text, Text, MediaStaModel, Text>.Context context) throws IOException, InterruptedException {
+            try {
+
             Iterator<Text> textIterator = value.iterator();
             MediaStaModel model = new MediaStaModel();
             while (textIterator.hasNext()) {
@@ -121,6 +123,9 @@ public class InToMysql extends Configured implements Tool {
 //                return;
 //            }
             context.write(model, new Text());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
 //            context.write(r, new Text(r.getName()));
         }
     }
@@ -148,7 +153,7 @@ public class InToMysql extends Configured implements Tool {
 
             if(null==scan) {
                 System.out.println("error : scan = null");
-                System.exit(1);
+                return 1;
             }
 
             // 避免报错：ClassNotFoundError hbaseConfiguration

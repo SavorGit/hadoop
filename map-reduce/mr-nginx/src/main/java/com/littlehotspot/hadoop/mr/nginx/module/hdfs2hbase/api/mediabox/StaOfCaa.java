@@ -182,18 +182,23 @@ public class StaOfCaa extends Configured implements Tool {
                     }
 
                     bean.setHotelName(matcher.group(2));
+                    bean.setRoomId(matcher.group(3));
                     bean.setRoomName(matcher.group(4));
                     bean.setMac(matcher.group(5));
                     bean.setPlayDate(matcher.group(8));
+                    bean.setHotelId(matcher.group(1));
                     if (StringUtils.isBlank(bean.getArea())){
                         SavorHotel hotel = this.readMysqlHotel(matcher.group(1));
                         SavorArea area = this.readMysqlArea(hotel.getArea_id().toString());
                         bean.setArea(area.getRegion_name());
+                        bean.setAreaId(Long.valueOf(area.getId()).toString());
                     }
                     if (StringUtils.isBlank(bean.getTvCount())){
                         SavorBox box = this.readMysqlBox(bean.getMac());
-                        Integer tvCount = this.readMysqlTv(box.getId());
-                        bean.setTvCount(tvCount.toString());
+//                        Integer tvCount = this.readMysqlTv(box.getId());
+//                        bean.setTvCount(tvCount.toString());
+                        bean.setBoxId(Long.valueOf(box.getId()).toString());
+                        bean.setBoxName(box.getName());
                     }
 
 
@@ -210,6 +215,8 @@ public class StaOfCaa extends Configured implements Tool {
                         System.out.println(item.toString() + ": RESULT IS EMPTY");
                         return;
                     }
+                    bean.setMediaId(matcher.group(6));
+
                     String duration = new String(medias.getValue(Bytes.toBytes("attr"), Bytes.toBytes("duration")));
                     if (StringUtils.isBlank(bean.getPlayTime())){
                         bean.setPlayTime(duration);
@@ -217,6 +224,10 @@ public class StaOfCaa extends Configured implements Tool {
                         Long playtime =Long.valueOf(bean.getPlayTime())+Long.valueOf(duration);
                         bean.setPlayTime(playtime.toString());
                     }
+                    String mediaName = new String(medias.getValue(Bytes.toBytes("attr"), Bytes.toBytes("name")));
+                    bean.setMediaName(mediaName);
+
+
                     count++;
 
                 }
@@ -334,7 +345,7 @@ public class StaOfCaa extends Configured implements Tool {
 
             if(null==scan) {
                 System.out.println("error : scan = null");
-                System.exit(1);
+                return 1;
             }
 
             filters.add(typefilter);
