@@ -94,7 +94,7 @@ public class RoomWritable extends AbstractWritable implements Writable, DBWritab
         }
         String familyName;
         long version = System.currentTimeMillis();
-        Put put = new Put(Bytes.toBytes(this.id));// 设置rowkey
+        Put put = new Put(Bytes.toBytes(this.id+""));// 设置rowkey
 
         // 基本属性
         familyName = "attr";

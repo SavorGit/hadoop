@@ -76,5 +76,45 @@
         </dependency>
 
     </dependencies>
-    
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <!-- jar -->
+                    <execution>
+                        <id>mysql2hbase</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>mysql2hbase</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hbase/hotel/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hbase/room/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hbase/box/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hbase/io/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.hbase.hotel.Mysql2HbaseMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

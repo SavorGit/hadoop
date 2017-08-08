@@ -20,7 +20,7 @@ public class DBInputRoomMapper extends Mapper<LongWritable, RoomWritable, Immuta
             if (value.getId() == null) {
                 return;
             }
-            byte[] rowKeyBytes = Bytes.toBytes(value.getId());
+            byte[] rowKeyBytes = Bytes.toBytes(value.getId()+"");
 
             ImmutableBytesWritable rowKey;
             rowKey = new ImmutableBytesWritable(rowKeyBytes);

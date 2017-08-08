@@ -140,7 +140,6 @@ public class HotelWritable extends AbstractWritable implements Writable, DBWrita
         this.setValue(HotelWritable.class, this, "hotelWifi", result, "hotelWifi");
         this.setValue(HotelWritable.class, this, "hotelWifiPassword", result, "hotelWifiPassword");
         this.setValue(HotelWritable.class, this, "billPer", result, "billPer");
-        this.setValue(HotelWritable.class, this, "id", result, "id");
         this.setValue(HotelWritable.class, this, "billTel", result, "billTel");
         this.setValue(HotelWritable.class, this, "collectionCompany", result, "collectionCompany");
         this.setValue(HotelWritable.class, this, "bankAccount", result, "bankAccount");
@@ -212,7 +211,7 @@ public class HotelWritable extends AbstractWritable implements Writable, DBWrita
         }
         String familyName;
         long version = System.currentTimeMillis();
-        Put put = new Put(Bytes.toBytes(this.id));// 设置rowkey
+        Put put = new Put(Bytes.toBytes(this.id+""));// 设置rowkey
 
         // 基本属性
         familyName = "attr";
@@ -227,14 +226,14 @@ public class HotelWritable extends AbstractWritable implements Writable, DBWrita
         this.addColumn(HotelWritable.class, this, "maintainer", put, familyName, "maintainer", version);
         this.addColumn(HotelWritable.class, this, "level", put, familyName, "level", version);
         this.addColumn(HotelWritable.class, this, "isKey", put, familyName, "iskey", version);
-        put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("install_date"), version, Bytes.toBytes(this.installDate));
+        put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("install_date"), version, Bytes.toBytes(this.installDate+""));
         this.addColumn(HotelWritable.class, this, "state", put, familyName, "state", version);
         this.addColumn(HotelWritable.class, this, "stateChangeReason", put, familyName, "state_change_reason", version);
         this.addColumn(HotelWritable.class, this, "gps", put, familyName, "gps", version);
         this.addColumn(HotelWritable.class, this, "remark", put, familyName, "remark", version);
         this.addColumn(HotelWritable.class, this, "boxType", put, familyName, "hotel_box_type", version);
-        put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("create_time"), version, Bytes.toBytes(this.createTime));
-        put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("update_time"), version, Bytes.toBytes(this.updateTime));
+        put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("create_time"), version, Bytes.toBytes(this.createTime+""));
+        put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("update_time"), version, Bytes.toBytes(this.updateTime+""));
         this.addColumn(HotelWritable.class, this, "flag", put, familyName, "flag", version);
         this.addColumn(HotelWritable.class, this, "techMaintainer", put, familyName, "tech_maintainer", version);
         this.addColumn(HotelWritable.class, this, "remoteId", put, familyName, "remote_id", version);
