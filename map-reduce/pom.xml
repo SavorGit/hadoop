@@ -33,6 +33,7 @@
         <module>mr-user</module>
         <module>hdfs</module>
         <module>hbase</module>
+        <module>mr-user-tag</module>
     </modules>
 
 </project>
