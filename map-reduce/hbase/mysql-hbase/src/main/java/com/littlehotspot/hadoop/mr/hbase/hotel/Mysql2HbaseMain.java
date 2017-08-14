@@ -12,7 +12,7 @@ import java.util.Locale;
  */
 public class Mysql2HbaseMain {
     public static void main(String[] args) throws Exception {
-        if (args.length < 9) {
+        if (args.length < 2) {
             throw new IOException("please write input path and output path...");
         }
 
