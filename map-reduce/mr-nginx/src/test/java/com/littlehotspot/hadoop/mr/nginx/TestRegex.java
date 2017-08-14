@@ -13,6 +13,8 @@ package com.littlehotspot.hadoop.mr.nginx;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.CommonVariables;
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.regex.Matcher;
 
 /**
@@ -36,6 +38,20 @@ public class TestRegex {
             System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
         } else {
             System.out.println(System.currentTimeMillis() - start + "\t" + matcher.groupCount() + "\t" + matcher.group(21));
+        }
+    }
+
+    @Test
+    public void testTime() {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(sdf.parse("2017-08-01"));
+            calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH) - 1, 0, 0, 0);
+            System.out.println(calendar.getTime() + "\t" + calendar.getTime().getTime());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
