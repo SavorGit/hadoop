@@ -100,15 +100,7 @@ public class JDBCTool {
 //        return flag;
 //    }
 
-    /**
-     * 执行查询操作
-     *
-     * @param sql    sql语句
-     * @param params 执行参数
-     * @return List
-     * @throws SQLException Sql 异常
-     */
-    public List<Map<String, Object>> findResult(String sql, Object... params) throws SQLException {
+    public ResultSet executeSQL(String sql, Object... params) throws SQLException {
         if (sql == null) {
             throw new IllegalArgumentException("The argument[sql] is null");
         }
@@ -123,7 +115,21 @@ public class JDBCTool {
                 this.preparedStatement.setObject(argIndex++, params[index]);
             }
         }
-        resultSet = this.preparedStatement.executeQuery();
+        this.resultSet = this.preparedStatement.executeQuery();
+        return this.resultSet;
+    }
+
+    /**
+     * 执行查询操作
+     *
+     * @param sql    sql语句
+     * @param params 执行参数
+     * @return List
+     * @throws SQLException Sql 异常
+     */
+    public List<Map<String, Object>> findResult(String sql, Object... params) throws SQLException {
+        ResultSet resultSet = this.executeSQL(sql, params);
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
         int columnCount = resultSetMetaData.getColumnCount();
         while (resultSet.next()) {
