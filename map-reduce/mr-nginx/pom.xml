@@ -646,6 +646,31 @@
                         </configuration>
                     </execution>
 
+                    <!-- 用户按天统计 -->
+                    <execution>
+                        <id>user_date</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>user_date</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/userDate/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.userDate.UserByDateMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
                     <!-- 机顶盒用户索引表 -->
                     <execution>
                         <id>user_box-index</id>
