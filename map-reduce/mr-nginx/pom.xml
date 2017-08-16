@@ -72,6 +72,11 @@
             <version>JL.SPRING.4.1.1.0.1.0.0</version>
         </dependency>
         <dependency>
+            <groupId>net.lizhaoweb.spring.hadoop.commons</groupId>
+            <artifactId>utils</artifactId>
+            <version>JL.SPRING.4.1.2.0.1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>net.lizhaoweb.spring.hadoop.hbase</groupId>
             <artifactId>util</artifactId>
             <version>JL.SPRING.4.2.1.0.1.0.0</version>
@@ -83,7 +88,7 @@
             <artifactId>jxl</artifactId>
             <version>2.6.10</version>
         </dependency>
-        
+
     </dependencies>
 
     <properties>
@@ -110,13 +115,17 @@
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>
+                                    **/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*
+                                </include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/cdf/*</include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserDemaMain</mainClass>
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserDemaMain
+                                    </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
                                 </manifest>
@@ -138,15 +147,20 @@
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>
+                                    **/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*
+                                </include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*
+                                </include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserReadMain</mainClass>
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserReadMain
+                                    </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
                                 </manifest>
@@ -168,15 +182,20 @@
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>
+                                    **/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*
+                                </include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*
+                                </include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserDemaMain</mainClass>
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserDemaMain
+                                    </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
                                 </manifest>
@@ -198,15 +217,20 @@
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>
+                                    **/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*
+                                </include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*
+                                </include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserProMain</mainClass>
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserProMain
+                                    </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
                                 </manifest>
@@ -228,15 +252,20 @@
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>
+                                    **/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*
+                                </include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*
+                                </include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserOptionMain</mainClass>
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserOptionMain
+                                    </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
                                 </manifest>
@@ -259,15 +288,19 @@
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>
+                                    **/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*
+                                </include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*
+                                </include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.MobileUserMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.MobileUserMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
@@ -290,15 +323,19 @@
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>
+                                    **/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*
+                                </include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*
+                                </include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.BoxUserMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.BoxUserMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
@@ -321,15 +358,19 @@
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>
+                                    **/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*
+                                </include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*
+                                </include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.NgxUserMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.NgxUserMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
@@ -352,15 +393,19 @@
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>
+                                    **/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*
+                                </include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*
+                                </include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.AllUserMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.AllUserMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
@@ -383,16 +428,20 @@
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>
+                                    **/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*
+                                </include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*
+                                </include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserFinalMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.UserFinalMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
@@ -415,7 +464,9 @@
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*</include>
+                                <include>
+                                    **/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*
+                                </include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
                             </includes>
@@ -449,12 +500,16 @@
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/sad/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/sad/demand/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/sad/projection/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/sad/demand/*
+                                </include>
+                                <include>
+                                    **/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/sad/projection/*
+                                </include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.SadActMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.SadActMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
@@ -482,12 +537,16 @@
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/sad/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/sad/demand/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/sad/projection/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/sad/demand/*
+                                </include>
+                                <include>
+                                    **/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/sad/projection/*
+                                </include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.UserSadMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.sad.UserSadMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
@@ -516,7 +575,8 @@
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.ReadStartMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.ReadStartMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
@@ -576,7 +636,8 @@
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.ReadDurationMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read.ReadDurationMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
@@ -606,7 +667,8 @@
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.boxindex.BoxUserIndexMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.boxindex.BoxUserIndexMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
@@ -634,7 +696,8 @@
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/mysql/model/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/resources/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/resources/*
+                                </include>
                             </includes>
                             <archive>
                                 <manifest>
@@ -665,11 +728,13 @@
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/mysql/model/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/resources/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/resources/*
+                                </include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.resources.ResourceMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.resources.ResourceMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
@@ -730,7 +795,8 @@
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mediabox.InToHbaseMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mediabox.InToHbaseMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
@@ -760,7 +826,8 @@
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mediabox.StaOfCaaMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mediabox.StaOfCaaMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
@@ -790,7 +857,8 @@
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mediabox.InToMysqlMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mediabox.InToMysqlMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
@@ -814,11 +882,13 @@
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/heartbeat/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/heartbeat/*
+                                </include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.heartbeat.InToHbaseMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.heartbeat.InToHbaseMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
@@ -842,11 +912,13 @@
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
-                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/mobilelog/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/mobilelog/*
+                                </include>
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mobilelog.MobileToHbaseMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mobilelog.MobileToHbaseMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
@@ -875,7 +947,8 @@
                             </includes>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.BootRateMain
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.BootRateMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
