@@ -14,7 +14,7 @@ public class TestUserDate {
     public void test(){
         String[] args=new String[]{
                 "actType=DEMAND",
-                "date=20170612",
+                "date=2017-06-12",
                 "hBaseTableSource=user_demand",
                 "hBaseTable=user_date",
                 "hdfsOut=hdfs://devpd1:8020/home/data/hadoop/flume/TEST",
@@ -31,7 +31,7 @@ public class TestUserDate {
     public void test1(){
         String[] args=new String[]{
                 "actType=PROJECTION",
-                "date=20170612",
+                "date=2017-06-12",
                 "hBaseTableSource=user_projection",
                 "hBaseTable=user_date",
                 "hdfsOut=hdfs://devpd1:8020/home/data/hadoop/flume/TEST",
@@ -48,7 +48,7 @@ public class TestUserDate {
     public void test2(){
         String[] args=new String[]{
                 "actType=READ",
-                "date=20170612",
+                "date=2017-06-12",
                 "hBaseTableSource=user_read",
                 "hBaseTable=user_date",
                 "hdfsOut=hdfs://devpd1:8020/home/data/hadoop/flume/TEST",
