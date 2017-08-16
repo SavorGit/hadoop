@@ -51,7 +51,7 @@ public class UserDateScheduler extends Configured implements Tool {
 
     private static final Argument tableSource = new Argument("hBaseTableSource", null, null);
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
     public int run(String[] args) throws Exception {
