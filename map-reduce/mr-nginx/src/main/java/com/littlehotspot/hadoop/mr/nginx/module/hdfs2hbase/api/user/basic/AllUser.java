@@ -133,10 +133,12 @@ public class AllUser extends Configured implements Tool {
 
             // 获取参数
             String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
-            String hdfsInputPath1 = CommonVariables.getParameterValue(Argument.BoxInputPath);
-            String hdfsInputPath2 = CommonVariables.getParameterValue(Argument.MobInputPath);
-            String hdfsInputPath3 = CommonVariables.getParameterValue(Argument.NgxInputPath);
-            String hdfsInputPath4 = CommonVariables.getParameterValue(Argument.RqInputPath);
+//            String hdfsInputPath1 = CommonVariables.getParameterValue(Argument.BoxInputPath);
+//            String hdfsInputPath2 = CommonVariables.getParameterValue(Argument.MobInputPath);
+//            String hdfsInputPath3 = CommonVariables.getParameterValue(Argument.NgxInputPath);
+//            String hdfsInputPath4 = CommonVariables.getParameterValue(Argument.RqInputPath);
+            String hdfsInputPath1 = CommonVariables.getParameterValue(Argument.OldInputPath);
+            String hdfsInputPath2 = CommonVariables.getParameterValue(Argument.NewInputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
             Job job = Job.getInstance(this.getConf(), AllUser.class.getSimpleName());
@@ -145,12 +147,12 @@ public class AllUser extends Configured implements Tool {
             /**作业输入*/
             Path inputPath1 = new Path(hdfsInputPath1);
             Path inputPath2 = new Path(hdfsInputPath2);
-            Path inputPath3 = new Path(hdfsInputPath3);
-            Path inputPath4 = new Path(hdfsInputPath4);
+//            Path inputPath3 = new Path(hdfsInputPath3);
+//            Path inputPath4 = new Path(hdfsInputPath4);
             FileInputFormat.addInputPath(job, inputPath1);
             FileInputFormat.addInputPath(job, inputPath2);
-            FileInputFormat.addInputPath(job, inputPath3);
-            FileInputFormat.addInputPath(job, inputPath4);
+//            FileInputFormat.addInputPath(job, inputPath3);
+//            FileInputFormat.addInputPath(job, inputPath4);
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);

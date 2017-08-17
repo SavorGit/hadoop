@@ -8,12 +8,11 @@
  * @EMAIL 404644381@qq.com
  * @Time : 15:38
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mobilelog;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.contentlog;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
-import org.apache.hadoop.conf.Configuration;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mediabox.CommonVariables;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.client.HTable;
@@ -28,7 +27,6 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.filecache.DistributedCache;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
@@ -41,12 +39,12 @@ import java.util.regex.Pattern;
 /**
  * 手机日志
  */
-public class MobileInToHbase extends Configured implements Tool {
+public class ContentInToHbase extends Configured implements Tool {
 
 
     private static class MobileMapper extends Mapper<LongWritable, Text, ImmutableBytesWritable, Put> {
 
-        private static final Pattern PATTERN = Pattern.compile("^(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*)$");
+        private static final Pattern PATTERN = Pattern.compile("^(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*)$");
 
         @Override
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
@@ -60,7 +58,7 @@ public class MobileInToHbase extends Configured implements Tool {
                 long version = System.currentTimeMillis();
                 String familyName = "attr";
                 Long l =(9999999999999l-Long.valueOf(matcher.group(4)));
-                byte[] rowKeyBytes = Bytes.toBytes(matcher.group(9)+"|"+l.toString());
+                byte[] rowKeyBytes = Bytes.toBytes(matcher.group(7)+"|"+matcher.group(5)+"|"+l.toString());
                 Put put = new Put(rowKeyBytes);// 设置rowkey
 
                 put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("uuid"), version, Bytes.toBytes(matcher.group(1)));
@@ -104,12 +102,12 @@ public class MobileInToHbase extends Configured implements Tool {
 
             // 获取参数
             String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);
-//            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
+            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
-            Job job = Job.getInstance(this.getConf(), MobileInToHbase.class.getSimpleName());
-            job.setJarByClass(MobileInToHbase.class);
+            Job job = Job.getInstance(this.getConf(), ContentInToHbase.class.getSimpleName());
+            job.setJarByClass(ContentInToHbase.class);
 
             // 避免报错：ClassNotFoundError hbaseConfiguration
 //            Configuration jobConf = job.getConfiguration();

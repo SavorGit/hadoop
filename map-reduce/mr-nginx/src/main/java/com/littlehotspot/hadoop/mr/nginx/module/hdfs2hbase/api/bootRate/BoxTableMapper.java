@@ -38,9 +38,16 @@ public class BoxTableMapper extends TableMapper<Text, Text> {
         sourceRareBean.setRoomName(roomName);
         sourceRareBean.setPlayDate(stampToDate(timestamps));
         sourceRareBean.setMediaType(mediaType);
+        Integer hour=Integer.parseInt(stampToHour(timestamps));
+        boolean flag=true;
+        if (hour<10||hour>23){
+            flag=false;
+        }else if (hour==16){
+            flag=false;
+        }
 //        System.out.println("ROWKEY{"+row+"}"+":mda_type="+mediaType+":option_type="+optionType+":mda_id="+mediaId);
         try {
-            if (!StringUtils.isBlank(mediaId)){
+            if (!StringUtils.isBlank(mediaId)&&flag){
                 context.write(new Text(mac+sourceRareBean.getPlayDate()), new Text(sourceRareBean.rowLine1()));
             }else {
                 return;
@@ -54,6 +61,14 @@ public class BoxTableMapper extends TableMapper<Text, Text> {
     public static String stampToDate(String s){
         String res;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        long lt = new Long(s);
+        Date date = new Date(lt);
+        res = simpleDateFormat.format(date);
+        return res;
+    }
+    public static String stampToHour(String s){
+        String res;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH");
         long lt = new Long(s);
         Date date = new Date(lt);
         res = simpleDateFormat.format(date);

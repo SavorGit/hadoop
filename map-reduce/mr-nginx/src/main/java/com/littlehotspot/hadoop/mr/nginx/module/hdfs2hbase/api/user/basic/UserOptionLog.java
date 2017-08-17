@@ -153,6 +153,8 @@ public class UserOptionLog extends Configured implements Tool {
             String hdfsInputPath1 = CommonVariables.getParameterValue(Argument.ProInputPath);
             String hdfsInputPath2 = CommonVariables.getParameterValue(Argument.DemaInputPath);
             String hdfsInputPath3 = CommonVariables.getParameterValue(Argument.ReadInputPath);
+//            String hdfsInputPath1 = CommonVariables.getParameterValue(Argument.OldInputPath);
+//            String hdfsInputPath2 = CommonVariables.getParameterValue(Argument.NewInputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
             Job job = Job.getInstance(this.getConf(), UserOptionLog.class.getSimpleName());

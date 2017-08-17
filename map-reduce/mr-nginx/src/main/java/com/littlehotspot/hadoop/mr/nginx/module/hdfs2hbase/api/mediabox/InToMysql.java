@@ -10,39 +10,43 @@
  */
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mediabox;
 
-import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.BoxTableMapper;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.SourceRareBean;
-import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
-import org.apache.hadoop.hbase.mapreduce.*;
-import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.filecache.DistributedCache;
-import org.apache.hadoop.mapreduce.lib.db.DBConfiguration;
-import org.apache.hadoop.mapreduce.lib.db.DBOutputFormat;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.Tool;
+    import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
+    import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.JDBCTool;
+    import net.lizhaoweb.spring.hadoop.commons.utils.IJDBCTools;
+    import net.lizhaoweb.spring.hadoop.commons.utils.impl.JDBCTools;
+    import org.apache.commons.lang.StringUtils;
+    import org.apache.hadoop.conf.Configuration;
+    import org.apache.hadoop.conf.Configured;
+    import org.apache.hadoop.fs.FileStatus;
+    import org.apache.hadoop.fs.FileSystem;
+    import org.apache.hadoop.fs.Path;
+    import org.apache.hadoop.hbase.client.Result;
+    import org.apache.hadoop.hbase.client.Scan;
+    import org.apache.hadoop.hbase.filter.CompareFilter;
+    import org.apache.hadoop.hbase.filter.Filter;
+    import org.apache.hadoop.hbase.filter.FilterList;
+    import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
+    import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
+    import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
+    import org.apache.hadoop.hbase.mapreduce.TableMapper;
+    import org.apache.hadoop.hbase.util.Bytes;
+    import org.apache.hadoop.io.Text;
+    import org.apache.hadoop.mapreduce.Job;
+    import org.apache.hadoop.mapreduce.Reducer;
+    import org.apache.hadoop.mapreduce.filecache.DistributedCache;
+    import org.apache.hadoop.mapreduce.lib.db.DBConfiguration;
+    import org.apache.hadoop.mapreduce.lib.db.DBOutputFormat;
+    import org.apache.hadoop.util.Tool;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+    import java.io.IOException;
+    import java.net.URI;
+    import java.text.SimpleDateFormat;
+    import java.util.ArrayList;
+    import java.util.Calendar;
+    import java.util.Iterator;
+    import java.util.List;
+    import java.util.regex.Matcher;
+    import java.util.regex.Pattern;
 
 /**
  * 手机日志
@@ -121,20 +125,60 @@ public class InToMysql extends Configured implements Tool {
                 }
 
                 model.setRowKey(matcher.group(1));
-                model.setAreaId(matcher.group(2));
+                try {
+                    model.setAreaId(Integer.parseInt(matcher.group(2)));
+                }catch (Exception e){
+                    e.printStackTrace();
+                    model.setAreaId(0);
+                }
+                try {
+                    model.setHotelId(Long.valueOf(matcher.group(4)));
+                }catch (Exception e){
+                    e.printStackTrace();
+                    model.setHotelId(0);
+                }
+                try {
+                    model.setRoomId(Long.valueOf(matcher.group(6)));
+                }catch (Exception e){
+                    e.printStackTrace();
+                    model.setRoomId(0);
+                }
+                try {
+                    model.setBoxId(Long.valueOf(matcher.group(8)));
+                }catch (Exception e){
+                    e.printStackTrace();
+                    model.setBoxId(0);
+                }
+               try {
+                   model.setMediaId(Long.valueOf(matcher.group(11)));
+               }catch (Exception e){
+                   model.setMediaId(0);
+               }
+               try {
+                   model.setPlayCount(Integer.parseInt(matcher.group(13)));
+               }catch (Exception e){
+                   e.printStackTrace();
+                   model.setPlayCount(0);
+               }
+                try {
+                    model.setPlayTime(Integer.parseInt(matcher.group(14)));
+                }catch (Exception e){
+                    e.printStackTrace();
+                    model.setPlayTime(0);
+                }
+                try {
+                    model.setPlayDate(Integer.parseInt(matcher.group(15).trim()));
+                }catch (Exception e){
+                    e.printStackTrace();
+                    model.setPlayDate(0);
+                }
                 model.setAreaName(matcher.group(3));
-                model.setHotelId(matcher.group(4));
                 model.setHotelName(matcher.group(5));
-                model.setRoomId(matcher.group(6));
                 model.setRoomName(matcher.group(7));
-                model.setBoxId(matcher.group(8));
                 model.setBoxName(matcher.group(9));
                 model.setMac(matcher.group(10));
-                model.setMediaId(matcher.group(11));
                 model.setMediaName(matcher.group(12));
-                model.setPlayTime(matcher.group(13));
-                model.setPlayCount(matcher.group(14));
-                model.setPlayDate(matcher.group(15));
+
             }
 //            Matcher matcher = MEDIA_PATTERN.matcher(line);
 //            if (!matcher.find()) {
@@ -158,17 +202,38 @@ public class InToMysql extends Configured implements Tool {
             String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);
             String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
+            String jdbcUrl = CommonVariables.getParameterValue(Argument.JdbcUrl);
+            String mysqlUser = CommonVariables.getParameterValue(Argument.MysqlUser);
+            String mysqlPassWord = CommonVariables.getParameterValue(Argument.MysqlPassWord);
+            String before = CommonVariables.getParameterValue(Argument.Before);
+            String time = CommonVariables.getParameterValue(Argument.Time);
+            String sql = CommonVariables.getParameterValue(Argument.Sql);
 //            String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
-
+//            JDBCTool jdbcTool = new JDBCTool("com.mysql.jdbc.Driver",jdbcUrl,mysqlUser,mysqlPassWord);
+            IJDBCTools jdbcTool = new JDBCTools("com.mysql.jdbc.Driver",jdbcUrl,mysqlUser,mysqlPassWord) ;
 
 //            this.getConf().set("mapred.job.tracker", "localhost:9001");
-            DBConfiguration.configureDB(this.getConf(), "com.mysql.jdbc.Driver", "jdbc:mysql://192.168.2.145:3306/cloud?useSSL=false&useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&zeroDateTimeBehavior=convertToNull", "javaweb", "123456");
+            DBConfiguration.configureDB(this.getConf(), "com.mysql.jdbc.Driver", jdbcUrl, mysqlUser, mysqlPassWord);
 
             Job job = Job.getInstance(this.getConf(), this.getClass().getSimpleName());
             job.setJarByClass(this.getClass());
 
             Scan scan = new Scan();
+            //设置过滤器
+            List<Filter> filters= new ArrayList<Filter>();
+            if (!StringUtils.isBlank(time)&&!StringUtils.isBlank(before)){
+                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+                Calendar now =Calendar.getInstance();
+                now.setTime(format.parse(time));
+                now.set(Calendar.DATE,now.get(Calendar.DATE)-Integer.parseInt(before));
+                String day = format.format(now.getTime());
+                jdbcTool.executeUpdate(sql,Integer.parseInt(day),Integer.parseInt(time));
+//                jdbcTool.updateSQL(sql,Integer.parseInt(day),Integer.parseInt(time));
+                SingleColumnValueFilter timefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                        Bytes.toBytes("date_time"), CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes(day+"00"));
+                filters.add(timefilter);
+            }
 
             if(null==scan) {
                 System.out.println("error : scan = null");
@@ -189,6 +254,8 @@ public class InToMysql extends Configured implements Tool {
                 DistributedCache.addArchiveToClassPath(archive, jobConf, fs);
             }//
 
+            FilterList filterList = new FilterList(filters);
+            scan.setFilter(filterList);
             TableMapReduceUtil.initTableMapperJob("media_sta", scan, MobileMapper.class, Text.class, Text.class, job,false);
 
             /**作业输出*/
@@ -204,7 +271,7 @@ public class InToMysql extends Configured implements Tool {
             job.setOutputFormatClass(DBOutputFormat.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
-            DBOutputFormat.setOutput(job, "medias_sta", "rowKey", "area_name", "hotel_name", "room_name", "mac", "tv_count", "play_time", "play_count", "play_date");
+            DBOutputFormat.setOutput(job, "savor_medias_sta", "rowKey","area_id", "area_name","hotel_id", "hotel_name","room_id", "room_name", "box_id","box_name","mac", "media_id","media_name", "play_time", "play_count", "play_date");
 
             boolean status = job.waitForCompletion(true);
             if (!status) {

@@ -39,9 +39,10 @@ public class TestReadScheduler {
                 "hdfsCluster=hdfs://devpd1:8020",
 //                "hdfsIn=/home/data/hadoop/flume/test-mr/read_text",
 //                "hdfsOut=/home/data/hadoop/flume/test-mr/test-read_end",
-                "hdfsInStart=/home/data/hadoop/flume/test-mr/test-read_start",
-                "hdfsInEnd=/home/data/hadoop/flume/test-mr/test-read_end",
+                "hdfsInStart=/home/data/hadoop/flume/test-mr/test1",
+                "hdfsInEnd=/home/data/hadoop/flume/test-mr/test2",
                 "hdfsOut=/home/data/hadoop/flume/test-mr/test-read_duration",
+                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase",
 //                "inRegex=^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$",
                 "hbaseRoot=hdfs://devpd1:8020/hbase",
                 "hbaseZookeeper=devpd1"

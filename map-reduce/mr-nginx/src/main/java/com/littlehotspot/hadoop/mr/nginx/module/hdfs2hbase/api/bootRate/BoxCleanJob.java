@@ -12,8 +12,10 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.client.Scan;
@@ -22,6 +24,7 @@ import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.filecache.DistributedCache;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
@@ -46,19 +49,16 @@ public class BoxCleanJob extends Configured implements Tool {
         try {
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
 
-//            String hbaseRoot = CommonVariables.getParameterValue(Argument.HbaseRoot);
-//            String hbaseZoo = CommonVariables.getParameterValue(Argument.HbaseZookeeper);
-//            String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);
+            String hbaseRoot = CommonVariables.getParameterValue(Argument.HbaseRoot);
+            String hbaseZoo = CommonVariables.getParameterValue(Argument.HbaseZookeeper);
+            String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);
 //
-//            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
+            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
-            String columnFamily = CommonVariables.getParameterValue(Argument.ColumnFamily);
-            String columnName = CommonVariables.getParameterValue(Argument.ColumnName);
 
-            Configuration conf = new Configuration();
-            conf.set("columnFamily",columnFamily);
-            conf.set("columnName",columnName);
+            String startTime = CommonVariables.getParameterValue(Argument.StartTime);
+            String endTime = CommonVariables.getParameterValue(Argument.EndTime);
 
 
 //            HTable hTable = new HTable(this.getConf(),"box_log");
@@ -67,20 +67,20 @@ public class BoxCleanJob extends Configured implements Tool {
             job.setJarByClass(BoxCleanJob.class);
 
             // 避免报错：ClassNotFoundError hbaseConfiguration
-//            Configuration jobConf = job.getConfiguration();
-//            FileSystem hdfs = FileSystem.get(new URI(hdfsCluster), jobConf);
-//            if (StringUtils.isNotBlank(hbaseSharePath)) {
-//                Path hBaseSharePath = new Path(hbaseSharePath);
-//                FileStatus[] hBaseShareJars = hdfs.listStatus(hBaseSharePath);
-//                for (FileStatus fileStatus : hBaseShareJars) {
-//                    if (!fileStatus.isFile()) {
-//                        continue;
-//                    }
-//                    Path archive = fileStatus.getPath();
-//                    FileSystem fs = archive.getFileSystem(jobConf);
-//                    DistributedCache.addArchiveToClassPath(archive, jobConf, fs);
-//                }//
-//            }
+            Configuration jobConf = job.getConfiguration();
+            FileSystem hdfs = FileSystem.get(new URI(hdfsCluster), jobConf);
+            if (StringUtils.isNotBlank(hbaseSharePath)) {
+                Path hBaseSharePath = new Path(hbaseSharePath);
+                FileStatus[] hBaseShareJars = hdfs.listStatus(hBaseSharePath);
+                for (FileStatus fileStatus : hBaseShareJars) {
+                    if (!fileStatus.isFile()) {
+                        continue;
+                    }
+                    Path archive = fileStatus.getPath();
+                    FileSystem fs = archive.getFileSystem(jobConf);
+                    DistributedCache.addArchiveToClassPath(archive, jobConf, fs);
+                }//
+            }
             Scan scan = new Scan();
 //            scan.setCaching(500);
 //            scan.setCacheBlocks(false);
@@ -89,15 +89,15 @@ public class BoxCleanJob extends Configured implements Tool {
 
             //设置过滤器
             List<Filter> filters= new ArrayList<Filter>();
-            RegexStringComparator comp = new RegexStringComparator("(ads)|(pro)");
+            RegexStringComparator comp = new RegexStringComparator("^(ads)|(pro)$");
             SingleColumnValueFilter typefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
                     Bytes.toBytes("mda_type"), CompareFilter.CompareOp.EQUAL,comp);
             SingleColumnValueFilter optionfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
                     Bytes.toBytes("option_type"), CompareFilter.CompareOp.EQUAL,new BinaryComparator(Bytes.toBytes("end")));
             SingleColumnValueFilter bigfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                    Bytes.toBytes("timestamps"), CompareFilter.CompareOp.LESS_OR_EQUAL,new BinaryComparator(Bytes.toBytes("1500134399")));
+                    Bytes.toBytes("date_time"), CompareFilter.CompareOp.LESS,new BinaryComparator(Bytes.toBytes(endTime)));
             SingleColumnValueFilter smallfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                    Bytes.toBytes("timestamps"), CompareFilter.CompareOp.GREATER_OR_EQUAL,new BinaryComparator(Bytes.toBytes("1498838400")));
+                    Bytes.toBytes("date_time"), CompareFilter.CompareOp.GREATER_OR_EQUAL,new BinaryComparator(Bytes.toBytes(startTime)));
 
             if(null==scan) {
                 System.out.println("error : scan = null");
@@ -107,11 +107,12 @@ public class BoxCleanJob extends Configured implements Tool {
 
             filters.add(typefilter);
             filters.add(optionfilter);
-//            filters.add(bigfilter);
-//            filters.add(smallfilter);
+            filters.add(bigfilter);
+            filters.add(smallfilter);
             FilterList filterList = new FilterList(filters);
             scan.setFilter(filterList);
-            TableMapReduceUtil.initTableMapperJob("box_log", scan, BoxTableMapper.class, Text.class, Text.class, job,false);
+            TableMapReduceUtil.initTableMapperJob("box_log", scan, BoxTableMapper.class, Text.class, Text.class, job);
+
 
 
             /**作业输出*/

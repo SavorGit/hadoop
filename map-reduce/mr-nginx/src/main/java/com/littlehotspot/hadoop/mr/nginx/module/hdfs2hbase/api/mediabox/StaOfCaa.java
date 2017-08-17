@@ -193,23 +193,8 @@ public class StaOfCaa extends Configured implements Tool {
                         bean.setArea(area.getRegion_name());
                         bean.setAreaId(Long.valueOf(area.getId()).toString());
                     }
-                    if (StringUtils.isBlank(bean.getTvCount())){
-                        SavorBox box = this.readMysqlBox(bean.getMac());
-//                        Integer tvCount = this.readMysqlTv(box.getId());
-//                        bean.setTvCount(tvCount.toString());
-                        bean.setBoxId(Long.valueOf(box.getId()).toString());
-                        bean.setBoxName(box.getName());
-                    }
-
 
                     Result medias=hBaseHelper.getOneRecord("medias", matcher.group(6));
-//                    if ("ads".equals(matcher.group(7))){
-//                        medias=hBaseHelper.getOneRecord("resources", matcher.group(6)+ Constant.ROWKEY_SPLIT_CHAR+resourceType.ADS.getValue());
-//                    }else if ("adv".equals(matcher.group(7))){
-//                        medias=hBaseHelper.getOneRecord("resources", matcher.group(6)+ Constant.ROWKEY_SPLIT_CHAR+resourceType.ADV.getValue());
-//                    }else if ("pro".equals(matcher.group(7))){
-//                        medias=hBaseHelper.getOneRecord("resources", matcher.group(6)+ Constant.ROWKEY_SPLIT_CHAR+resourceType.PRO.getValue());
-//                    }
 
                     if (medias.isEmpty()){
                         System.out.println(item.toString() + ": RESULT IS EMPTY");
@@ -299,6 +284,7 @@ public class StaOfCaa extends Configured implements Tool {
             String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
             String time = CommonVariables.getParameterValue(Argument.Time);
+            String before = CommonVariables.getParameterValue(Argument.Before);
 
             // 查询mysql
             findByMysql();
@@ -336,16 +322,28 @@ public class StaOfCaa extends Configured implements Tool {
                     Bytes.toBytes("mda_type"), CompareFilter.CompareOp.EQUAL,comp);
             SingleColumnValueFilter optionfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
                     Bytes.toBytes("option_type"), CompareFilter.CompareOp.EQUAL,new BinaryComparator(Bytes.toBytes("start")));
-            if (!StringUtils.isBlank(time)){
-                RegexStringComparator comps = new RegexStringComparator("^"+time);
+//            if (!StringUtils.isBlank(time)){
+//                RegexStringComparator comps = new RegexStringComparator("^"+"201704");
+//                SingleColumnValueFilter timefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+//                        Bytes.toBytes("date_time"), CompareFilter.CompareOp.EQUAL,comps);
+//                filters.add(timefilter);
+//            }
+
+            if (!StringUtils.isBlank(time)&&!StringUtils.isBlank(before)){
+                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+                Calendar now =Calendar.getInstance();
+                now.setTime(format.parse(time));
+                now.set(Calendar.DATE,now.get(Calendar.DATE)-Integer.parseInt(before));
+                String day = format.format(now.getTime());
                 SingleColumnValueFilter timefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                        Bytes.toBytes("date_time"), CompareFilter.CompareOp.EQUAL,comps);
+                        Bytes.toBytes("date_time"), CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes(day+"00"));
                 filters.add(timefilter);
             }
 
             if(null==scan) {
                 System.out.println("error : scan = null");
                 return 1;
+
             }
 
             filters.add(typefilter);

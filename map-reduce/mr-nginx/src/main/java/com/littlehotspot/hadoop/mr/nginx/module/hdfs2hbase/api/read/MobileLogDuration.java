@@ -16,6 +16,7 @@ import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.JDBCTool;
 import com.littlehotspot.hadoop.mr.nginx.mysql.JdbcReader;
 import com.littlehotspot.hadoop.mr.nginx.mysql.MysqlCommonVariables;
 import com.littlehotspot.hadoop.mr.nginx.mysql.model.*;
+import com.littlehotspot.hadoop.mr.nginx.util.JSONUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -31,6 +32,7 @@ import org.apache.hadoop.mapreduce.filecache.DistributedCache;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
+import org.codehaus.jettison.json.JSONException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -48,6 +50,14 @@ import java.util.regex.Matcher;
  * 手机日志
  */
 public class MobileLogDuration extends Configured implements Tool {
+
+    private String hotels;
+
+    private String rooms;
+
+    private String contents;
+
+    private String categorys;
 
 
     private static class MobileMapper extends Mapper<LongWritable, Text, Text, Text> {
@@ -86,6 +96,35 @@ public class MobileLogDuration extends Configured implements Tool {
         protected void setup(Context context) throws IOException, InterruptedException {
             Configuration conf = context.getConfiguration();
             this.hBaseHelper = new HBaseHelper(conf);
+            String hotels = conf.get("hotels");
+            String rooms = conf.get("rooms");
+            String contents = conf.get("contents");
+            String categorys = conf.get("categorys");
+
+            List<Object> hotelList = JSONUtil.JSONArrayToList(hotels, SavorHotel.class);
+            for (Object o : hotelList) {
+                SavorHotel hotel = (SavorHotel) o;
+                this.hotelMap.put(String.valueOf(hotel.getId()), hotel);
+            }
+
+            List<Object> tvList = JSONUtil.JSONArrayToList(rooms, SavorRoom.class);
+            for (Object o : tvList) {
+                SavorRoom room = (SavorRoom) o;
+                this.roomMap.put(String.valueOf(room.getId()), room);
+            }
+
+            List<Object> boxList = JSONUtil.JSONArrayToList(contents, Content.class);
+            for (Object o : boxList) {
+                Content content = (Content) o;
+                this.contentMap.put(String.valueOf(content.getId()), content);
+            }
+
+            List<Object> areaList = JSONUtil.JSONArrayToList(categorys, Category.class);
+            for (Object o : areaList) {
+                Category category = (Category) o;
+                this.categoryMap.put(String.valueOf(category.getId()), category);
+            }
+
         }
 
         @Override
@@ -203,26 +242,10 @@ public class MobileLogDuration extends Configured implements Tool {
          */
         public SavorHotel readMysqlHotel(String hotelId) throws Exception{
             if (this.hotelMap == null || this.hotelMap.get(hotelId) == null || this.hotelMap.size() <= 0) {
-                findHotel();
+                return null;
             }
             return (SavorHotel) this.hotelMap.get(hotelId);
 
-        }
-
-        private void findHotel() throws SQLException {
-            String sql = "select id,name from savor_hotel";
-            JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
-            jdbcUtil.getConnection();
-            try {
-                List<SavorHotel> result = jdbcUtil.findResult(SavorHotel.class, sql);
-                for (SavorHotel hotel : result) {
-                    this.hotelMap.put(String.valueOf(hotel.getId()), hotel);
-                }
-            } catch (SQLException e) {
-                throw e;
-            } finally {
-                jdbcUtil.releaseConnection();
-            }
         }
 
         /**
@@ -231,26 +254,10 @@ public class MobileLogDuration extends Configured implements Tool {
          */
         public SavorRoom readMysqlRoom(String roomId) throws Exception{
             if (this.contentMap == null || this.contentMap.get(roomId) == null || this.contentMap.size() <= 0) {
-                findHotel();
+                return null;
             }
             return (SavorRoom) this.roomMap.get(roomId);
 
-        }
-
-        private void findRoom() throws SQLException {
-            String sql = "select id,name from savor_room";
-            JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
-            jdbcUtil.getConnection();
-            try {
-                List<SavorRoom> result = jdbcUtil.findResult(SavorRoom.class, sql);
-                for (SavorRoom room : result) {
-                    this.roomMap.put(String.valueOf(room.getId()), room);
-                }
-            } catch (SQLException e) {
-                throw e;
-            } finally {
-                jdbcUtil.releaseConnection();
-            }
         }
 
         /**
@@ -260,55 +267,25 @@ public class MobileLogDuration extends Configured implements Tool {
          */
         public Content readMysqlContent(String contentId) throws Exception{
             if (this.contentMap == null || this.contentMap.get(contentId) == null || this.contentMap.size() <= 0) {
-                findContent();
+                return null;
             }
             return (Content) this.contentMap.get(contentId);
 
         }
 
-        private void findContent() throws SQLException {
-            String sql = "select id,title,content from savor_mb_content";
-            JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
-            jdbcUtil.getConnection();
-            try {
-                List<Content> result = jdbcUtil.findResult(Content.class, sql);
-                for (Content content : result) {
-                    this.contentMap.put(String.valueOf(content.getId()), content);
-                }
-            } catch (SQLException e) {
-                throw e;
-            } finally {
-                jdbcUtil.releaseConnection();
-            }
-        }
 
         /**
          * 查询包间信息
          * @throws Exception
          */
         public Category readMysqlCategory(String categoryId) throws Exception{
-            if (this.contentMap == null || this.contentMap.get(categoryId) == null || this.contentMap.size() <= 0) {
-                findCategory();
+            if (this.categoryMap == null || this.categoryMap.get(categoryId) == null || this.categoryMap.size() <= 0) {
+                return null;
             }
             return (Category) this.categoryMap.get(categoryId);
 
         }
 
-        private void findCategory() throws SQLException {
-            String sql = "select id,name from savor_mb_category";
-            JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
-            jdbcUtil.getConnection();
-            try {
-                List<Category> result = jdbcUtil.findResult(Category.class, sql);
-                for (Category category : result) {
-                    this.categoryMap.put(String.valueOf(category.getId()), category);
-                }
-            } catch (SQLException e) {
-                throw e;
-            } finally {
-                jdbcUtil.releaseConnection();
-            }
-        }
     }
 
     @Override
@@ -323,6 +300,13 @@ public class MobileLogDuration extends Configured implements Tool {
             String hdfsInputStart = CommonVariables.getParameterValue(Argument.InputPathStart);
             String hdfsInputEnd = CommonVariables.getParameterValue(Argument.InputPathEnd);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
+
+            // 查询mysql
+            findByMysql();
+            this.getConf().set("hotels", this.hotels);
+            this.getConf().set("rooms", this.rooms);
+            this.getConf().set("contents", this.contents);
+            this.getConf().set("categorys", this.categorys);
 
             Job job = Job.getInstance(this.getConf(), MobileLogDuration.class.getSimpleName());
             job.setJarByClass(MobileLogDuration.class);
@@ -387,5 +371,54 @@ public class MobileLogDuration extends Configured implements Tool {
             e.printStackTrace();
         }
         return isYesterday;
+    }
+
+    /**
+     * 查询mysql数据库
+     * @throws SQLException
+     * @throws IOException
+     * @throws JSONException
+     */
+    private void findByMysql() throws SQLException, IOException, JSONException {
+        JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
+        jdbcUtil.getConnection();
+        try {
+            findHotels(jdbcUtil);
+            findRooms(jdbcUtil);
+            findContents(jdbcUtil);
+            findCategorys(jdbcUtil);
+        } catch (SQLException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (JSONException e) {
+            throw e;
+        } finally {
+            jdbcUtil.releaseConnection();
+        }
+    }
+
+    private void findHotels(JDBCTool jdbcUtil) throws IOException, JSONException, SQLException {
+        String sql = "select id,name from savor_hotel";
+        List<SavorHotel> result = jdbcUtil.findResult(SavorHotel.class, sql);
+        this.hotels = JSONUtil.listToJsonArray(result).toString();
+    }
+
+    private void findRooms(JDBCTool jdbcUtil) throws IOException, JSONException, SQLException {
+        String sql = "select id,name from savor_room";
+        List<SavorRoom> result = jdbcUtil.findResult(SavorRoom.class, sql);
+        this.rooms = JSONUtil.listToJsonArray(result).toString();
+    }
+
+    private void findContents(JDBCTool jdbcUtil) throws IOException, JSONException, SQLException {
+        String sql = "select id,title,content from savor_mb_content";
+        List<Content> result = jdbcUtil.findResult(Content.class, sql);
+        this.contents = JSONUtil.listToJsonArray(result).toString();
+    }
+
+    private void findCategorys(JDBCTool jdbcUtil) throws IOException, JSONException, SQLException {
+        String sql = "select id,name from savor_mb_category";
+        List<Category> result = jdbcUtil.findResult(Category.class, sql);
+        this.categorys = JSONUtil.listToJsonArray(result).toString();
     }
 }

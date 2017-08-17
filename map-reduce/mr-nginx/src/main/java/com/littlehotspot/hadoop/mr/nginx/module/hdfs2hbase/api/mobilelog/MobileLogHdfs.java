@@ -64,7 +64,7 @@ public class MobileLogHdfs extends Configured implements Tool {
         @Override
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
-                context.write(key, new Text());
+                context.write(new Text(key.toString().trim()+","+","), new Text());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -78,7 +78,6 @@ public class MobileLogHdfs extends Configured implements Tool {
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
 
             // 获取参数
-            String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
@@ -87,7 +86,7 @@ public class MobileLogHdfs extends Configured implements Tool {
 
             /**作业输入*/
             Path inputPath = new Path(hdfsInputPath);
-            FileInputFormat.addInputPath(job, inputPath);
+            FileInputFormat.setInputPaths(job, inputPath);
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);

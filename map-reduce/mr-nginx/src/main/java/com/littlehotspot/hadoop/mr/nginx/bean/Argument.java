@@ -34,6 +34,8 @@ public enum Argument {
     DemaInputPath("hdfsDemaIn", null),
     ReadInputPath("hdfsReadIn", null),
     ProInputPath("hdfsProIn",null),
+    OldInputPath("hdfsOldIn",null),
+    NewInputPath("hdfsNewIn",null),
     UserInputPath("hdfsUserIn", null),
     ActInputPath("hdfsActIn", null),
     NgxInputPath("hdfsNgxIn", null),
@@ -65,8 +67,16 @@ public enum Argument {
     ColumnFamily("columnFamily",""),// 列族名
     ColumnName("columnName",""),// 列名
 
+    JdbcUrl("jdbcUrl", null),
+    MysqlUser("mysqlUser", null),
+    MysqlPassWord("mysqlPassWord", null),
+    Sql("sql", null),
 
     Time("time", null),
+    Before("before", null),
+
+    StartTime("startTime", null),
+    EndTime("endTime", null),
     ;
 
     @Getter

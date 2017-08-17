@@ -82,11 +82,10 @@ public class TestBoxLogScheduler {
                 "hdfsOut=/home/data/hadoop/flume/text-mr/test-medias",
                 "hbaseRoot=hdfs://devpd1:8020/hbase",
                 "hbaseZookeeper=devpd1",
-                "hbaseRoot=hdfs://devpd1:8020/hbase",
-                "hbaseZookeeper=devpd1",
                 "hdfsCluster=hdfs://devpd1:8020",
                 "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase",
-                "time=201707011210"
+                "time=2017071500",
+                "before=7"
 
 
 //                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase"
@@ -158,7 +157,13 @@ public class TestBoxLogScheduler {
                 "hbaseRoot=hdfs://devpd1:8020/hbase",
                 "hbaseZookeeper=devpd1",
                 "hdfsCluster=hdfs://devpd1:8020",
-                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase"
+                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase",
+                "jdbcUrl=jdbc:mysql://192.168.2.145:3306/cloud?useSSL=false&useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&zeroDateTimeBehavior=convertToNull",
+                "mysqlUser=javaweb",
+                "mysqlPassWord=123456",
+                "sql=delete from savor_medias_sta where play_date >= ? AND play_date <= ?",
+                "time=20170616",
+                "before=7"
 
 
 //                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase"
@@ -247,7 +252,7 @@ public class TestBoxLogScheduler {
 
 //		distributedCache
         try {
-            ToolRunner.run(conf, new com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.heartbeat.InToHbase(), args);
+            ToolRunner.run(conf, new InToHbase(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }

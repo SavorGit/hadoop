@@ -151,7 +151,7 @@ public class UserProjectLog extends Configured implements Tool {
 
             /**作业输入*/
             Path inputPath = new Path(hdfsInputPath);
-            FileInputFormat.addInputPath(job, inputPath);
+            FileInputFormat.setInputPaths(job, inputPath);
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
