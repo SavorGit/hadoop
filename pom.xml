@@ -217,6 +217,7 @@
     <modules>
         <module>map-reduce</module>
         <module>storm</module>
+        <module>hadoop-web</module>
     </modules>
 
 </project>
