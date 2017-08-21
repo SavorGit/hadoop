@@ -30,8 +30,9 @@ public class TestService implements ITestService {
         scan.setFilter(filterList);
 
         List<Map<String,Object>> list = new ArrayList<>();
+        HTable hTable = null;
         try {
-            HTable hTable = new HTable(conf, "user_date");
+            hTable = new HTable(conf, "user_date");
             ResultScanner ResultScannerFilterList = hTable.getScanner(scan);
             for (Result result : ResultScannerFilterList) {
                 Map<String,Object> map = new HashedMap();
@@ -47,8 +48,15 @@ public class TestService implements ITestService {
 //                String dc = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("device_id")));
 //                System.out.println(dc);
             }
+            ResultScannerFilterList.close();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                hTable.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return list;
