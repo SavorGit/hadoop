@@ -13,6 +13,11 @@ import java.util.List;
 @Getter
 @Setter
 public class SearchModel {
+    private String tableName;
+    private String startRow; //从哪一行开始查
+    private int pageSize; //每一个多少行
+    private int pageIndex; //第几页
+
     private String rela;
     private List<Model1> cons;
 

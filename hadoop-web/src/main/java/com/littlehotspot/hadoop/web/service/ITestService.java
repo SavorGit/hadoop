@@ -10,5 +10,5 @@ import java.util.Map;
  * Created by Administrator on 2017-08-17 下午 3:04.
  */
 public interface ITestService {
-    public List<Map<String,Object>> getService(FilterList filterList);
+    public List<Map<String,Object>> getService(FilterList filterList, String startRow, int pageSize, int pageIndex, String tableName);
 }

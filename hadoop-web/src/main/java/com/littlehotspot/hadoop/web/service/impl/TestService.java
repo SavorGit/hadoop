@@ -4,8 +4,12 @@ import com.littlehotspot.hadoop.web.service.ITestService;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.KeyValue;
-import org.apache.hadoop.hbase.client.*;
-import org.apache.hadoop.hbase.filter.*;
+import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.filter.FilterList;
+import org.apache.hadoop.hbase.filter.PageFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.stereotype.Service;
 
@@ -21,32 +25,40 @@ import java.util.Map;
 @Service
 public class TestService implements ITestService {
     @Override
-    public List<Map<String,Object>> getService(FilterList filterList) {
+    public List<Map<String, Object>> getService(FilterList filterList, String startRow, int pageSize, int pageIndex, String tableName) {
 //        System.setProperty("hadoop.home.dir", "E:\\GreenProfram\\HadoopEcosphere\\applications\\hadoop2.6_x64-for-win");
 
         Configuration conf = new Configuration();
         Scan scan = new Scan();
-        //设置过滤器
-        scan.setFilter(filterList);
 
-        List<Map<String,Object>> list = new ArrayList<>();
+        PageFilter pageFilter;
+        if (startRow == null) {// 如果不知道startRow，那么要查询0-pageSize * pageIndex条数据，结果按页取
+            pageFilter = new PageFilter(pageSize * pageIndex);
+        } else {//默认包含开始行，多查询一条，结果去掉最前面一行
+            pageFilter = new PageFilter(pageSize + 1);
+            scan.setStartRow(Bytes.toBytes(startRow));
+        }
+
+        //设置过滤器
+        if (filterList != null) {
+            filterList.addFilter(pageFilter);
+            scan.setFilter(filterList);
+        } else {
+            scan.setFilter(pageFilter);
+        }
+
+        List<Map<String, Object>> list = new ArrayList<>();
         HTable hTable = null;
         try {
-            hTable = new HTable(conf, "user_date");
+            hTable = new HTable(conf, tableName);
             ResultScanner ResultScannerFilterList = hTable.getScanner(scan);
             for (Result result : ResultScannerFilterList) {
-                Map<String,Object> map = new HashedMap();
+                Map<String, Object> map = new HashedMap();
                 for (KeyValue kv : result.raw()) {
-                    map.put(Bytes.toString(kv.getQualifier()),Bytes.toString(kv.getValue()));
-                    System.out.println(String.format("row:%s, family:%s, qualifier:%s, qualifiervalue:%s",
-                            Bytes.toString(kv.getRow()),
-                            Bytes.toString(kv.getFamily()),
-                            Bytes.toString(kv.getQualifier()),
-                            Bytes.toString(kv.getValue())));
+                    map.put(Bytes.toString(kv.getQualifier()), Bytes.toString(kv.getValue()));
                 }
+                map.put("rowKey", Bytes.toString(result.getRow()));
                 list.add(map);
-//                String dc = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("device_id")));
-//                System.out.println(dc);
             }
             ResultScannerFilterList.close();
         } catch (IOException e) {
@@ -59,6 +71,19 @@ public class TestService implements ITestService {
             }
         }
 
-        return list;
+        // 处理结果
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        if (list.size() > 0) {
+            if (startRow != null) {
+                list.remove(0);
+                resultList = list;
+            } else {
+                for (int i = pageSize * (pageIndex - 1); i < list.size(); i++) {
+                    resultList.add(list.get(i));
+                }
+            }
+        }
+
+        return resultList;
     }
 }
