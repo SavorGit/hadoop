@@ -18,12 +18,12 @@ import java.util.Map;
 public class HBasePageModel implements Serializable {
     private static final long serialVersionUID = 330410716100946538L;
 
-    private int pageSize = 10;
-    private int pageIndex = 0;
+    private long pageSize = 10;
+    private long pageIndex = 0;
     private String startRowKey = null;
 
-    private int pageCount = 0;
-    private int totalCount = 0;
+    private long pageCount = 0;
+    private long totalCount = 0;
     private boolean hasNextPage = true;
     private String endRowKey = null;
     private List<Map<String, Object>> resultList = new ArrayList<>();

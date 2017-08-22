@@ -5,6 +5,7 @@ import com.littlehotspot.hadoop.web.model.Model1;
 import com.littlehotspot.hadoop.web.model.Model2;
 import com.littlehotspot.hadoop.web.model.SearchModel;
 import com.littlehotspot.hadoop.web.service.ITestService;
+import com.littlehotspot.hadoop.web.util.HBaseUtil;
 import com.littlehotspot.hadoop.web.util.StatusCode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.filter.*;
@@ -101,8 +102,13 @@ public class TestController {
             HBasePageModel model = new HBasePageModel(pageSize);
             model.setPageSize(pageSize);
             model.setPageIndex(pageIndex);
-            model.setPageCount(3);
-            model.setTotalCount(3);
+            long totalCount = HBaseUtil.rowCount(searchModel.getTableName());
+            model.setTotalCount(totalCount);
+            long pageCount = totalCount/pageSize;
+            if(totalCount%pageSize > 0){
+                pageCount += 1;
+            }
+            model.setPageCount(pageCount);
 
             if (startRow != null) {
                 model.setStartRowKey(startRow);
