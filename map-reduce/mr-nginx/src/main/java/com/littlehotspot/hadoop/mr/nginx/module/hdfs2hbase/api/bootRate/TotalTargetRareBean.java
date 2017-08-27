@@ -75,7 +75,7 @@ public class TotalTargetRareBean {
     /**
      * 播放总秒数
      */
-    @HBaseColumn(name = "play_count")
+    @HBaseColumn(name = "play_days")
     private String playCount;
 
     /**

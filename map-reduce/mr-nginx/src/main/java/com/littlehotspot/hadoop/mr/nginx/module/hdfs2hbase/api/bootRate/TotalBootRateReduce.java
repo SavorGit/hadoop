@@ -37,11 +37,11 @@ public class TotalBootRateReduce extends Reducer<Text, Text, Text, Text> {
     }
 
     @Override
-    protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
+    protected void reduce(Text key, Iterable<Text> value, Reducer<Text, Text, Text, Text>.Context context) throws IOException, InterruptedException {
         try {
-                Iterator<Text> textIterator = value.iterator();
+            Iterator<Text> textIterator = value.iterator();
             TotalTargetRareBean bean = new TotalTargetRareBean();
-
+            TargetTotalBootRateBean rateBean = new TargetTotalBootRateBean();
             Integer count=0;
                 while (textIterator.hasNext()) {
                     Text item = textIterator.next();
@@ -54,25 +54,50 @@ public class TotalBootRateReduce extends Reducer<Text, Text, Text, Text> {
                     if (!matcher.find()){
                         return;
                     }
-                if (!StringUtils.isBlank(matcher.group(11))){
+                    String production = matcher.group(11).substring(0,matcher.group(11).length()-1);
+                if (!StringUtils.isBlank(production)){
                     if (!StringUtils.isBlank(bean.getProduction())){
-                        Double v = Double.valueOf(bean.getProduction()) + Double.valueOf(matcher.group(11));
-                        bean.setProduction(v.toString());
+                        Double v = Double.valueOf(bean.getProduction()) + Double.valueOf(production);
+                        String s1 = String.format("%.2f", v);
+                        bean.setProduction(s1);
                     }else {
-                        bean.setProduction(matcher.group(11));
+                        String s1 = String.format("%.2f", Double.valueOf(production));
+                        bean.setProduction(s1);
                     }
                 }
-
-
+                bean.setArea(matcher.group(1));
+                bean.setHotelName(matcher.group(2));
+                bean.setAddr(matcher.group(3));
+                bean.setRoomName(matcher.group(4));
+                bean.setMaintenMan(matcher.group(5));
+                bean.setIsKey(matcher.group(6));
+                bean.setMac(matcher.group(8));
                 count++;
 
             }
             Double v = Double.valueOf(bean.getProduction()) / count;
-            bean.setAvProduction(v.toString());
+            String s1 = String.format("%.2f", v);
+            bean.setAvProduction(s1);
             bean.setPlayCount(count.toString());
+            rateBean.setRowKey(key.toString());
+            rateBean.setTotalTargetRareBean(bean);
+            if (Integer.parseInt(bean.getPlayCount())>=7){
+                if (bean.getAddr().equals("大厅")){
+                    if ((Double.valueOf(bean.getAvProduction())-0.8)>=0.00){
+                        hBaseHelper.insert(rateBean);
+                    }
 
-//            hBaseHelper.insert(bootBean);
-//            context.write(new Text(bean.rowLine()), new Text());
+                }else if (bean.getAddr().equals("包间")){
+                    if (Double.valueOf(bean.getAvProduction())>=0.40){
+                        hBaseHelper.insert(rateBean);
+                    }
+                }else if (bean.getAddr().equals("等候区")){
+                    if ((Double.valueOf(bean.getAvProduction())-0.8)>=0.00){
+                        hBaseHelper.insert(rateBean);
+                    }
+                }
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * <h1> 酒店model </h1>
@@ -20,7 +22,8 @@ public class Content {
     private int id;
     private String title;
     private String content;
-
+    private String operators;
+    private Timestamp create_time;
 
 
 }

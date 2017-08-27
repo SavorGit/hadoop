@@ -8,11 +8,10 @@
  * @EMAIL 404644381@qq.com
  * @Time : 15:38
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.read;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.contentdetail;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -29,15 +28,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 手机日志
  */
-public class MobileLogStart extends Configured implements Tool {
+public class ConFinalHdfs extends Configured implements Tool {
 
     private static class MobileMapper extends Mapper<LongWritable, Text, Text, Text> {
 
@@ -54,16 +51,10 @@ public class MobileLogStart extends Configured implements Tool {
                 if (StringUtils.isBlank(matcher.group(9))) {
                     return;
                 }
-//                String timestemps = matcher.group(5);
-//                if (!isYesterday(Long.valueOf(timestemps))){
-//                    return;
-//                }
-                if (StringUtils.isBlank(matcher.group(5))||!matcher.group(5).equals("start")){
+                if (StringUtils.isBlank(matcher.group(6))&&!matcher.group(6).equals("content")){
                     return;
                 }
-                if (StringUtils.isBlank(matcher.group(6))||!matcher.group(6).equals("content")){
-                    return;
-                }
+
                 context.write(value, new Text());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -76,7 +67,7 @@ public class MobileLogStart extends Configured implements Tool {
         @Override
         protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
             try {
-                context.write(key, new Text());
+                context.write(new Text(key.toString()), new Text());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -91,15 +82,22 @@ public class MobileLogStart extends Configured implements Tool {
 
             // 获取参数
             String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
-            String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
+            String hdfsInputPath1 = CommonVariables.getParameterValue(Argument.allCountInputPath);
+            String hdfsInputPath2 = CommonVariables.getParameterValue(Argument.uvCountInputPath);
+            String hdfsInputPath3 = CommonVariables.getParameterValue(Argument.durationInputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
-            Job job = Job.getInstance(this.getConf(), MobileLogStart.class.getSimpleName());
-            job.setJarByClass(MobileLogStart.class);
+            Job job = Job.getInstance(this.getConf(), ConFinalHdfs.class.getSimpleName());
+            job.setJarByClass(ConFinalHdfs.class);
 
             /**作业输入*/
-            Path inputPath = new Path(hdfsInputPath);
-            FileInputFormat.setInputPaths(job, inputPath);
+            Path inputPath1 = new Path(hdfsInputPath1);
+            FileInputFormat.setInputPaths(job, inputPath1);
+            Path inputPath2 = new Path(hdfsInputPath2);
+            FileInputFormat.setInputPaths(job, inputPath2);
+            Path inputPath3 = new Path(hdfsInputPath3);
+            FileInputFormat.setInputPaths(job, inputPath3);
+
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);

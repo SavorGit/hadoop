@@ -137,31 +137,39 @@ public class TestTagsScheduler {
 
 
     @Test
-    public void allUser() {
+    public void tagLists() {
         String[] args = {
+                "hdfsIn=/home/data/hadoop/flume/text-mr/test-tag",
+                "hdfsOut=/home/data/hadoop/flume/text-mr/test-taglist",
+                "hbaseRoot=hdfs://devpd1:8020/hbase",
+                "hbaseZookeeper=devpd1",
                 "hdfsCluster=hdfs://devpd1:8020",
-//                "hdfsIn=/home/data/hadoop/flume/nginx_log/export/2017-05-31",
-//                "hdfsOut=/home/data/hadoop/flume/nginx_log/export/test-hbase",
-                "hdfsUserIn=/home/data/hadoop/flume/test-mr/mob_user",
-                "hdfsProIn=/home/data/hadoop/flume/test-mr/mob_user",
-                "hdfsDemaIn=/home/data/hadoop/flume/test-mr/mob_user",
-                "hdfsReadIn=/home/data/hadoop/flume/test-mr/mob_user",
-                "hdfsOut=/home/data/hadoop/flume/test-mr/test-user",
-//                "inRegex=^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$",
-                "table=user"
+                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase"
         };
         System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
         Configuration conf = new Configuration();
-//        conf.set("fs.defaultFS", "hdfs://devpd1:8020");
-//        conf.set("fs.defaultFS", "file:///");
-//        conf.set("hbase.master", "devpd1:9000");
-//        conf.set("hbase.zookeeper.quorum", "devpd1");
-//        conf.set("hbase.zookeeper.property.clientPort", "2181");
-//        conf.set("hbase.rootdir", "hdfs://devpd1:9000/hbase");
 
-//		distributedCache
         try {
-            ToolRunner.run(conf, new MobileUser(), args);
+            ToolRunner.run(conf, new com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.tags.TagList(), args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void tag() {
+        String[] args = {
+                "hdfsOut=/home/data/hadoop/flume/text-mr/test-tag",
+                "hbaseRoot=hdfs://devpd1:8020/hbase",
+                "hbaseZookeeper=devpd1",
+                "hdfsCluster=hdfs://devpd1:8020",
+                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase"
+        };
+        System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
+        Configuration conf = new Configuration();
+
+        try {
+            ToolRunner.run(conf, new TagsLog(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }

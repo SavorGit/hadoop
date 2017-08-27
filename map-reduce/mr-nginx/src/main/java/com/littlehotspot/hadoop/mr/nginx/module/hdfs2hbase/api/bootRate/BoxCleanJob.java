@@ -111,7 +111,7 @@ public class BoxCleanJob extends Configured implements Tool {
             filters.add(smallfilter);
             FilterList filterList = new FilterList(filters);
             scan.setFilter(filterList);
-            TableMapReduceUtil.initTableMapperJob("box_log", scan, BoxTableMapper.class, Text.class, Text.class, job);
+            TableMapReduceUtil.initTableMapperJob("box_log", scan, BoxTableMapper.class, Text.class, Text.class, job,false);
 
 
 

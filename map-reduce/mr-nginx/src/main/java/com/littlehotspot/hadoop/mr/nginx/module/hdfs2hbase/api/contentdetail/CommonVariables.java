@@ -8,7 +8,7 @@
  * @EMAIL 404644381@qq.com
  * @Time : 15:25
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.contentdetail;
 
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
 import com.littlehotspot.hadoop.mr.nginx.util.Constant;
@@ -30,11 +30,12 @@ public class CommonVariables extends Constant.CommonVariables {
     /**
      * Mapper 输入时正则过滤
      */
-    public static Pattern MAPPER_INPUT_FORMAT_REGEX = Pattern.compile("^(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)\u0001(.*)$");
 
     public static Pattern MAPPER_LOG_FORMAT_REGEX = Pattern.compile("^(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*)$");
 
-    public static Pattern MAPPER_RATE_LOG_FORMAT_REGEX = Pattern.compile("^(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*)$");
+    public static Pattern MAPPER_FORMAT_REGEX = Pattern.compile("^(.*),(.*),(.*),(.*),(.*),(.*)$");
+
+    public static Pattern MAPPER_FORMAT_REGEX2 = Pattern.compile("^(.*),(.*),(.*),(.*)$");
 
     public static HBaseHelper hBaseHelper;
 }

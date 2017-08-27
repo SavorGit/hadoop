@@ -6,19 +6,17 @@
  * @Package : com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
- * @Time : 09:43
+ * @Time : 09:40
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.tags;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate;
 
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseFamily;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseRowKey;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseTable;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
 
 /**
- * <h1>模型 - [源] 用户</h1>
+ * <h1>模型 - [目标] 用户</h1>
  *
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
@@ -28,14 +26,16 @@ import java.util.regex.Matcher;
  * Date of last commit:$Date$<br>
  */
 @Data
-@NoArgsConstructor
-public class TagSourceBean {
+@HBaseTable(name = "total_boot_rate")
+public class TargetTotalBootRateBean {
 
+    @HBaseRowKey
+    private String rowKey;
     /**
+     * 设备标识
      */
-    private List<Map<String,String>> resources;
+    @HBaseFamily(name="attr")
+    private TotalTargetRareBean totalTargetRareBean;
 
-    private String tag_id;
 
-    private String tag_name;
 }

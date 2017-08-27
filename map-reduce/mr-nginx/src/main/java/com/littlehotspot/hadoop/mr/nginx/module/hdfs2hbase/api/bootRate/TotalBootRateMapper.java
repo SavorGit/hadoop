@@ -44,7 +44,7 @@ public class TotalBootRateMapper extends TableMapper<Text, Text> {
 
 //        System.out.println("ROWKEY{"+row+"}"+":mda_type="+mediaType+":option_type="+optionType+":mda_id="+mediaId);
         try {
-            if (!StringUtils.isBlank(mac)&&(Double.valueOf(production)-0.1>=0)){
+            if (!StringUtils.isBlank(mac)&&(Double.valueOf(production.substring(0,production.length()-1))-0.1>=0)){
                 context.write(new Text(mac), new Text(bean.rowLine()));
             }else {
                 return;

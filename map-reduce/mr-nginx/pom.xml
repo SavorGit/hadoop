@@ -445,6 +445,41 @@
                         </configuration>
                     </execution>
 
+                    <!--所有用户 -->
+                    <execution>
+                        <id>scan-user</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>scan-user</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>
+                                    **/com/littlehotspot/hadoop/mr/nginx/com.littlehotspot.hadoop.mr.nginx.mysql.service.mapper/*
+                                </include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/user/basic/*
+                                </include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.basic.ScanUserMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
                     <!--用户详情 -->
                     <execution>
                         <id>user-final</id>
@@ -725,6 +760,37 @@
                                 <manifest>
                                     <mainClass>
                                         com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.boxindex.BoxUserIndexMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <!-- 机顶盒用户索引表 -->
+                    <execution>
+                        <id>user_box-hbase</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>user_box-hbase</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/boxindex/*</include>
+
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.boxindex.IndexHbaseMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>

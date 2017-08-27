@@ -45,6 +45,10 @@ public enum Argument {
     HbaseZookeeper("hbaseZookeeper", null),
     HBaseSharePath("hbaseSharePath", null),
 
+    allCountInputPath("hdfsAllCountIn",null),
+    uvCountInputPath("hdfsUvIn",null),
+    durationInputPath("hdfsDurationIn", null),
+
 
     VersionName("versionname", ""),// 版本名称
     VersionCode("versioncode", ""),// 版本号

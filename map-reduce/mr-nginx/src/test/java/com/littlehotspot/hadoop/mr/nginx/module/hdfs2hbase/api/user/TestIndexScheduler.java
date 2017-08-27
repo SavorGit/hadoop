@@ -43,11 +43,12 @@ public class TestIndexScheduler {
                 "hdfsCluster=hdfs://devpd1:8020",
 //                "hdfsIn=/home/data/hadoop/flume/nginx_log/export/2017-05-31",
 //                "hdfsOut=/home/data/hadoop/flume/nginx_log/export/test-hbase",
-                "hdfsIn=/home/data/hadoop/flume/test-mr/box_user",
-                "hdfsOut=/home/data/hadoop/flume/test-mr/test-nginx_user",
+//                "hdfsIn=/home/data/hadoop/flume/test-mr/box_user",
+                "hdfsOut=/home/data/hadoop/flume/test-mr/test-box_index_user",
 //                "inRegex=^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$",
                 "hbaseRoot=hdfs://devpd1:8020/hbase",
-                "hbaseZookeeper=devpd1"
+                "hbaseZookeeper=devpd1",
+                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase"
         };
         System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
         Configuration conf = new Configuration();

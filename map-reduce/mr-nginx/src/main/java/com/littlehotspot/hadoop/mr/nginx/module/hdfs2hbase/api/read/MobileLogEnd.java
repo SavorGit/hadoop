@@ -97,7 +97,7 @@ public class MobileLogEnd extends Configured implements Tool {
 
             /**作业输入*/
             Path inputPath = new Path(hdfsInputPath);
-            FileInputFormat.addInputPath(job, inputPath);
+            FileInputFormat.setInputPaths(job, inputPath);
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
@@ -108,6 +108,8 @@ public class MobileLogEnd extends Configured implements Tool {
             if (fileSystem.exists(outputPath)) {
                 fileSystem.delete(outputPath, true);
             }
+
+
             FileOutputFormat.setOutputPath(job, outputPath);
             job.setReducerClass(MobileReduce.class);
             job.setOutputKeyClass(Text.class);

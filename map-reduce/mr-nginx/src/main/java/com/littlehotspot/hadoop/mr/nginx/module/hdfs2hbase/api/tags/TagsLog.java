@@ -12,9 +12,12 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.tags;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.heartbeat.FromMysql;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.heartbeat.HeartBeatModel;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
@@ -22,6 +25,9 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.filecache.DistributedCache;
+import org.apache.hadoop.mapreduce.lib.db.DBConfiguration;
+import org.apache.hadoop.mapreduce.lib.db.DBInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
@@ -43,124 +49,84 @@ import java.util.regex.Matcher;
 public class TagsLog extends Configured implements Tool {
 
 
-    private static class MobileMapper extends Mapper<LongWritable, Text, Text, Text> {
+    private static class MobileMapper extends Mapper<LongWritable, TagModel, Text, Text> {
 
         @Override
-        protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+        protected void map(LongWritable key, TagModel value, Context context) throws IOException, InterruptedException {
             /**数据清洗=========开始*/
             try {
-                String msg = value.toString();
-                Matcher tagMatcher = CommonVariables.MAPPER_TAG_LOG_FORMAT_REGEX.matcher(msg);
-                Matcher taglistMatcher = CommonVariables.MAPPER_TAGLIST_LOG_FORMAT_REGEX.matcher(msg);
-                if (tagMatcher.find()) {
-                    context.write(new Text(tagMatcher.group(1)), value);
-                }else if (taglistMatcher.find()){
-                    context.write(new Text(taglistMatcher.group(1)), value);
-                }else {
-                    return;
-                }
-
+                System.out.println(value.toString());
+                context.write(new Text(value.toString()), new Text());
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private static class MobileReduce extends Reducer<Text, Text, Text, Text> {
-
-
-        @Override
-        protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
-            try {
-
-                Configuration conf = context.getConfiguration();
-                Iterator<Text> textIterator = value.iterator();
-                TargetTagBean targetTagBean = new TargetTagBean();
-                TargetTagAttrBean targetTagAttrBean = new TargetTagAttrBean();
-                List<TagSourceBean> list = new ArrayList<>();
-                while (textIterator.hasNext()) {
-                    TagSourceBean tagSourceBean = new TagSourceBean();
-                    Text item = textIterator.next();
-                    if (item == null) {
-                        continue;
-                    }
-                    String rowLineContent = item.toString();
-                    Matcher tagMatcher = CommonVariables.MAPPER_TAG_LOG_FORMAT_REGEX.matcher(rowLineContent);
-                    Matcher taglistMatcher = CommonVariables.MAPPER_TAGLIST_LOG_FORMAT_REGEX.matcher(rowLineContent);
-                    if (taglistMatcher.find()) {
-                        targetTagBean.setRowKey(taglistMatcher.group(1));
-                        targetTagAttrBean.setName(taglistMatcher.group(2));
-                    }else if (tagMatcher.find()){
-                        if (!StringUtils.isBlank(tagMatcher.group(1))){
-                            tagSourceBean.setResource_id(tagMatcher.group(1));
-                        }
-
-                        if (!StringUtils.isBlank(tagMatcher.group(1))){
-                            tagSourceBean.setResource_type("0x0001");
-                        }
-
-
-
-                    }
-                    if (null!=tagSourceBean.getResource_id()||null!=tagSourceBean.getResource_type()){
-                        list.add(tagSourceBean);
-                    }
-
-                }
-                if (list.size()>0){
-                    targetTagAttrBean.setResources(JSON.toString(list));
-                }
-                targetTagBean.setTargetTagAttrBean(targetTagAttrBean);
-                CommonVariables.hBaseHelper.insert(targetTagBean);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
 
     @Override
     public int run(String[] args) throws Exception {
         try {
 
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
-            CommonVariables.hBaseHelper = new HBaseHelper(this.getConf());
 
             // 获取参数
             String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
-            String hdfsInputStart = CommonVariables.getParameterValue(Argument.InputPathStart);
-            String hdfsInputEnd = CommonVariables.getParameterValue(Argument.InputPathEnd);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
+            String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);
+            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
 
-            Job job = Job.getInstance(this.getConf(), TagsLog.class.getSimpleName());
-            job.setJarByClass(TagsLog.class);
-
-            /**作业输入*/
-            Path inputPath1 = new Path(hdfsInputStart);
-            FileInputFormat.addInputPath(job, inputPath1);
-            Path inputPath2 = new Path(hdfsInputEnd);
-            FileInputFormat.addInputPath(job, inputPath2);
-            job.setMapperClass(MobileMapper.class);
-            job.setMapOutputKeyClass(Text.class);
-            job.setMapOutputValueClass(Text.class);
+            this.getConf().set("mapred.job.tracker", "localhost:9001");
+            DBConfiguration.configureDB(this.getConf(), "com.mysql.jdbc.Driver", "jdbc:mysql://rr-2zevja6lfg5718e3ko.mysql.rds.aliyuncs.com:3306/cloud?useSSL=false&useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&zeroDateTimeBehavior=convertToNull", "java_api_read", "KESs23DRZVX7hrqe");
 
             /**作业输出*/
             Path outputPath = new Path(hdfsOutputPath);
-            FileSystem fileSystem = FileSystem.get(URI.create(outputPath.toString()), this.getConf());
+
+            // 如果输出路径已经存在，则删除
+            FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());
             if (fileSystem.exists(outputPath)) {
                 fileSystem.delete(outputPath, true);
             }
 
+            Job job = Job.getInstance(this.getConf(), FromMysql.class.getSimpleName());
+            job.setJarByClass(FromMysql.class);
+
+
+            // 避免报错：ClassNotFoundError hbaseConfiguration
+            Configuration jobConf = job.getConfiguration();
+            FileSystem hdfs = FileSystem.get(new URI(hdfsCluster), jobConf);
+            Path hBaseSharePath = new Path(hbaseSharePath);
+            FileStatus[] hBaseShareJars = hdfs.listStatus(hBaseSharePath);
+            for (FileStatus fileStatus : hBaseShareJars) {
+                if (!fileStatus.isFile()) {
+                    continue;
+                }
+                Path archive = fileStatus.getPath();
+                FileSystem fs = archive.getFileSystem(jobConf);
+                DistributedCache.addArchiveToClassPath(archive, jobConf, fs);
+            }//
+
+
             FileOutputFormat.setOutputPath(job, outputPath);
-            job.setReducerClass(MobileReduce.class);
+            job.setInputFormatClass(DBInputFormat.class);
+            job.setMapperClass(MobileMapper.class);
+            job.setMapOutputKeyClass(Text.class);
+            job.setMapOutputValueClass(Text.class);
+
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(Text.class);
+
+            String fieldSQL = "SELECT article_id,tagid,tagname from savor_tag";
+            String countSQL = "SELECT COUNT(*) FROM savor_tag";
+            DBInputFormat.setInput(job, TagModel.class, fieldSQL, countSQL);
+            FileOutputFormat.setOutputPath(job, outputPath);
 
             boolean status = job.waitForCompletion(true);
             if (!status) {
                 throw new Exception("MapReduce task execute failed.........");
             }
+
+
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -168,19 +134,4 @@ public class TagsLog extends Configured implements Tool {
         }
     }
 
-    public static boolean isYesterday(long time) {
-        boolean isYesterday = false;
-        Date date;
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            date = sdf.parse(sdf.format(new Date()));
-            if (time < date.getTime() && time > (date.getTime() - 24*60*60*1000)) {
-                isYesterday = true;
-            }
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return isYesterday;
-    }
 }

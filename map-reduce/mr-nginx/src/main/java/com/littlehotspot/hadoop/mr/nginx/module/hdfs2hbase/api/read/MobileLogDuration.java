@@ -329,7 +329,7 @@ public class MobileLogDuration extends Configured implements Tool {
             Path inputPath1 = new Path(hdfsInputStart);
             FileInputFormat.addInputPath(job, inputPath1);
             Path inputPath2 = new Path(hdfsInputEnd);
-            FileInputFormat.addInputPath(job, inputPath2);
+            FileInputFormat.setInputPaths(job, inputPath2);
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
