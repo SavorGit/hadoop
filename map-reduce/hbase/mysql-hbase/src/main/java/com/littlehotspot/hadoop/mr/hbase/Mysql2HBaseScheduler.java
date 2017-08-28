@@ -10,8 +10,14 @@
  */
 package com.littlehotspot.hadoop.mr.hbase;
 
+import com.littlehotspot.hadoop.mr.hbase.box.BoxWritable;
+import com.littlehotspot.hadoop.mr.hbase.box.DBInputBoxMapper;
 import com.littlehotspot.hadoop.mr.hbase.hotel.DBInputHotelMapper;
 import com.littlehotspot.hadoop.mr.hbase.hotel.HotelWritable;
+import com.littlehotspot.hadoop.mr.hbase.hotelBoxIndex.DBInputHotelBoxIndexMapper;
+import com.littlehotspot.hadoop.mr.hbase.hotelBoxIndex.HotelBoxIndexWritable;
+import com.littlehotspot.hadoop.mr.hbase.room.DBInputRoomMapper;
+import com.littlehotspot.hadoop.mr.hbase.room.RoomWritable;
 import net.lizhaoweb.common.util.argument.ArgumentFactory;
 import net.lizhaoweb.spring.hadoop.commons.argument.MapReduceConstant;
 import net.lizhaoweb.spring.hadoop.commons.argument.model.Argument;
@@ -50,8 +56,6 @@ import java.util.regex.Pattern;
  */
 public class Mysql2HBaseScheduler extends Configured implements Tool {
 
-//    public static final Argument WritableClass = new Argument("writableClass", null, null);// MR 读写器
-
     @Override
     public int run(String[] args) throws Exception {
         try {
@@ -81,15 +85,11 @@ public class Mysql2HBaseScheduler extends Configured implements Tool {
             String hTableName = ArgumentFactory.getParameterValue(Argument.HbaseTable);
             ArgumentFactory.printInputArgument(Argument.HbaseTable, hTableName, false);
 
-//            String writableClassName = ArgumentFactory.getParameterValue(WritableClass);
-//            ArgumentFactory.printInputArgument(WritableClass, writableClassName, false);
-
             // 准备工作
             ArgumentFactory.checkNullValueForArgument(Argument.JDBCUrl, jdbcUrl);
             ArgumentFactory.checkNullValueForArgument(Argument.JDBCSql, jdbcSql);
             ArgumentFactory.checkNullValueForArgument(Argument.OutputPath, hdfsOutputPath);
             ArgumentFactory.checkNullValueForArgument(Argument.HbaseTable, hTableName);
-//            ArgumentFactory.checkNullValueForArgument(WritableClass, writableClassName);
             if (StringUtils.isBlank(jobName)) {
                 jobName = this.getClass().getName();
             }
@@ -98,19 +98,19 @@ public class Mysql2HBaseScheduler extends Configured implements Tool {
             }
             Class<?> writableClass = HotelWritable.class;
             Class<?> mapperClass = DBInputHotelMapper.class;
-//            if (hTableName.equals("hotel")) {
-//                writableClass = HotelWritable.class;
-//                mapperClass = DBInputHotelMapper.class;
-//            }else if (hTableName.equals("room")){
-//                writableClass = RoomWritable.class;
-//                mapperClass = DBInputRoomMapper.class;
-//            }else if (hTableName.equals("box")){
-//                writableClass = BoxWritable.class;
-//                mapperClass = DBInputBoxMapper.class;
-//            }else if (hTableName.equals("hotel_box_index")){
-//                writableClass = HotelBoxIndexWritable.class;
-//                mapperClass = DBInputHotelBoxIndexMapper.class;
-//            }
+            if (hTableName.equals("hotel")) {
+                writableClass = HotelWritable.class;
+                mapperClass = DBInputHotelMapper.class;
+            }else if (hTableName.equals("room")){
+                writableClass = RoomWritable.class;
+                mapperClass = DBInputRoomMapper.class;
+            }else if (hTableName.equals("box")){
+                writableClass = BoxWritable.class;
+                mapperClass = DBInputBoxMapper.class;
+            }else if (hTableName.equals("hotel_box_index")){
+                writableClass = HotelBoxIndexWritable.class;
+                mapperClass = DBInputHotelBoxIndexMapper.class;
+            }
 
             Path outputPath = new Path(hdfsOutputPath);
 
