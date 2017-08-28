@@ -74,6 +74,8 @@ public class CleanByRegexScheduler extends Configured implements Tool {
             String hdfsOutputPath = ArgumentFactory.getParameterValue(Argument.OutputPath);
             ArgumentFactory.printInputArgument(Argument.OutputPath, hdfsOutputPath, false);
 
+            System.out.println(this.getConf().getLong("mapreduce.input.fileinputformat.split.maxsize", -1L));
+
 
             // 准备工作
             ArgumentFactory.checkNullValueForArgument(Argument.MapperInputFormatRegex, matcherRegex);
