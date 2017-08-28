@@ -1,6 +1,5 @@
 package com.littlehotspot.hadoop.mr.hbase.room;
 
-import com.littlehotspot.hadoop.mr.hbase.io.RoomWritable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.util.Bytes;

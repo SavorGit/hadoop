@@ -105,7 +105,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        com.littlehotspot.hadoop.mr.hbase.hotel.Mysql2HbaseMain
+                                        com.littlehotspot.hadoop.mr.hbase.Mysql2HbaseMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>

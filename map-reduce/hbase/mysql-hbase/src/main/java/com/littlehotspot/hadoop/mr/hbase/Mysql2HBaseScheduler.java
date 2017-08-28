@@ -8,9 +8,10 @@
  * @EMAIL 404644381@qq.com
  * @Time : 10:56
  */
-package com.littlehotspot.hadoop.mr.hbase.hotel;
+package com.littlehotspot.hadoop.mr.hbase;
 
-import com.littlehotspot.hadoop.mr.hbase.io.HotelWritable;
+import com.littlehotspot.hadoop.mr.hbase.hotel.DBInputHotelMapper;
+import com.littlehotspot.hadoop.mr.hbase.hotel.HotelWritable;
 import net.lizhaoweb.common.util.argument.ArgumentFactory;
 import net.lizhaoweb.spring.hadoop.commons.argument.MapReduceConstant;
 import net.lizhaoweb.spring.hadoop.commons.argument.model.Argument;

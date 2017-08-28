@@ -10,7 +10,6 @@
  */
 package com.littlehotspot.hadoop.mr.hbase.hotel;
 
-import com.littlehotspot.hadoop.mr.hbase.io.HotelWritable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.util.Bytes;

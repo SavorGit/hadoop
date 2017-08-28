@@ -1,6 +1,5 @@
 package com.littlehotspot.hadoop.mr.hbase.hotelBoxIndex;
 
-import com.littlehotspot.hadoop.mr.hbase.io.HotelBoxIndexWritable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.util.Bytes;

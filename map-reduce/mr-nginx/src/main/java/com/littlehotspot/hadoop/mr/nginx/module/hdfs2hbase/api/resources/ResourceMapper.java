@@ -22,8 +22,12 @@ public class ResourceMapper extends Mapper<LongWritable, Text, Text, Text> {
             return;
         }
 
-        String keyString = rowLineContent.substring(0,rowLineContent.indexOf(Constant.VALUE_SPLIT_CHAR));
+        try {
+            String keyString = rowLineContent.substring(0,rowLineContent.indexOf(Constant.VALUE_SPLIT_CHAR));
+            context.write(new Text(keyString), value);
+        }catch (Exception e){
+            return;
+        }
 
-        context.write(new Text(keyString), value);
     }
 }

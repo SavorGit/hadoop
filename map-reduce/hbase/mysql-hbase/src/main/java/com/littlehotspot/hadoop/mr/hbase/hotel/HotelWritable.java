@@ -8,8 +8,9 @@
  * @EMAIL 404644381@qq.com
  * @Time : 15:49
  */
-package com.littlehotspot.hadoop.mr.hbase.io;
+package com.littlehotspot.hadoop.mr.hbase.hotel;
 
+import com.littlehotspot.hadoop.mr.hbase.AbstractWritable;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.hadoop.hbase.client.Put;

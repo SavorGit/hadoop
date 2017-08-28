@@ -1,5 +1,6 @@
-package com.littlehotspot.hadoop.mr.hbase.io;
+package com.littlehotspot.hadoop.mr.hbase.box;
 
+import com.littlehotspot.hadoop.mr.hbase.AbstractWritable;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.hadoop.hbase.client.Put;

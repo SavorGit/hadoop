@@ -1,4 +1,4 @@
-package com.littlehotspot.hadoop.mr.hbase.hotel;
+package com.littlehotspot.hadoop.mr.hbase;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
