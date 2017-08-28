@@ -23,6 +23,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.util.ToolRunner;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -40,6 +41,11 @@ import java.util.List;
  */
 public class TestBootRateScheduler {
 
+    @Before
+    public void init(){
+        System.setProperty("hadoop.home.dir", "D:\\GreenProfram\\HadoopEcosphere\\applications\\hadoop2.6_x64-for-win");
+    }
+
 
     @Test
     public void run() throws IOException, WriteException {
@@ -56,7 +62,6 @@ public class TestBootRateScheduler {
 //                "inRegex=^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$",
 //                "table=user"
         };
-        System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
         Configuration conf = new Configuration();
 
         Constant.CommonVariables.initMapReduce(conf, args);
@@ -139,12 +144,11 @@ public class TestBootRateScheduler {
                 "hbaseZookeeper=onlinemain",
                 "hdfsCluster=hdfs://onlinemain:8020",
                 "hbaseSharePath=/user/oozie/share/lib/lib_20170512162404/hbase",
-                "startTime=2017080100",
-                "endTime=2017081600"
+                "startTime=2017070100",
+                "endTime=2017071600"
 
 
         };
-        System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
         Configuration conf = new Configuration();
 
         try {
@@ -171,7 +175,6 @@ public class TestBootRateScheduler {
 //                "inRegex=^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$",
 //                "table=user"
         };
-        System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
         Configuration conf = new Configuration();
         try {
             ToolRunner.run(conf, new TotalBootRate(), args);
@@ -195,7 +198,6 @@ public class TestBootRateScheduler {
 //                "inRegex=^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$",
 //                "table=user"
         };
-        System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
         Configuration conf = new Configuration();
 //        conf.set("fs.defaultFS", "hdfs://devpd1:8020");
 //        conf.set("fs.defaultFS", "file:///");
