@@ -15,11 +15,12 @@ import java.io.IOException;
  * Created by Administrator on 2017-07-04 下午 5:36.
  */
 public class JdbcToHdfsMapper extends MapReduceBase implements Mapper<LongWritable, Model, LongWritable, Text> {
-
+    LongWritable lkey=new LongWritable();
+    Text tvalue=new Text();
     @Override
     public void map(LongWritable longWritable, Model value, OutputCollector<LongWritable, Text> collector, Reporter reporter) throws IOException {
-
-            collector.collect(new LongWritable(Long.valueOf(value.getId())), new Text(value
-                    .toString()));
+            lkey.set(Long.valueOf(value.getId()));
+            tvalue.set(value.toString());
+            collector.collect(lkey,tvalue);
     }
 }

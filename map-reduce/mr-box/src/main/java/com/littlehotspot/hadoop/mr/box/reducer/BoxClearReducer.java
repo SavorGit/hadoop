@@ -10,21 +10,21 @@
  */
 package com.littlehotspot.hadoop.mr.box.reducer;
 
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 /**
  * 清洗机顶盒日志文件reducer
  */
-public class BoxClearReducer extends Reducer<Text, Text, Text, Text> {
+public class BoxClearReducer extends Reducer<Text, Text, Text, NullWritable> {
 
     @Override
     protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
         try {
-            context.write(key,new Text());
+            context.write(key,NullWritable.get());
         } catch (Exception e) {
             e.printStackTrace();
         }

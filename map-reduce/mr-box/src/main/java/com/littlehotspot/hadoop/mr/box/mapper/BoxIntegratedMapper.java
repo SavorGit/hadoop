@@ -1,10 +1,11 @@
 package com.littlehotspot.hadoop.mr.box.mapper;
 
-import com.littlehotspot.hadoop.mr.box.common.CommonVariables;
 import com.littlehotspot.hadoop.mr.box.mysql.model.Hotel;
+import com.littlehotspot.hadoop.mr.box.common.CommonVariables;
 import com.littlehotspot.hadoop.mr.box.mysql.model.Media;
 import com.littlehotspot.hadoop.mr.box.mysql.model.Room;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
@@ -14,8 +15,8 @@ import java.util.regex.Matcher;
 /**
  * 整合数据mapper
  */
-public class BoxIntegratedMapper extends Mapper<LongWritable, Text, Text, Text> {
-
+public class BoxIntegratedMapper extends Mapper<LongWritable, Text, Text, NullWritable> {
+    Text ikey=new Text();
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         try {
@@ -38,7 +39,8 @@ public class BoxIntegratedMapper extends Mapper<LongWritable, Text, Text, Text> 
             buffer.append(roomName);
             buffer.append(",");
             buffer.append(mediaName);
-            context.write(new Text(buffer.toString()), new Text());
+            ikey.set(buffer.toString());
+            context.write(ikey,NullWritable.get());
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -1,7 +1,7 @@
 package com.littlehotspot.hadoop.mr.box.hbase.scheduler;
 
-import com.littlehotspot.hadoop.mr.box.common.Argument;
 import com.littlehotspot.hadoop.mr.box.hbase.mapper.BoxToHbaseMapper;
+import com.littlehotspot.hadoop.mr.box.common.Argument;
 import com.littlehotspot.hadoop.mr.box.hbase.reducer.BoxToHbaseReducer;
 import com.littlehotspot.hadoop.mr.box.util.Constant;
 import org.apache.hadoop.conf.Configuration;

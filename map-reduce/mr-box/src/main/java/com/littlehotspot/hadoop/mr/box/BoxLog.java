@@ -10,7 +10,6 @@
  */
 package com.littlehotspot.hadoop.mr.box;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -25,7 +24,6 @@ import org.apache.hadoop.util.Tool;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**

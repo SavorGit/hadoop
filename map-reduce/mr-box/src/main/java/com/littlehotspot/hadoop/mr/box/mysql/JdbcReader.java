@@ -1,9 +1,9 @@
 package com.littlehotspot.hadoop.mr.box.mysql;
 
 import com.littlehotspot.hadoop.mr.box.common.CommonVariables;
+import com.littlehotspot.hadoop.mr.box.mysql.model.SelectModel;
 import com.littlehotspot.hadoop.mr.box.mapper.JdbcToHdfsMapper;
 import com.littlehotspot.hadoop.mr.box.mapper.JdbcToMapMapper;
-import com.littlehotspot.hadoop.mr.box.mysql.model.SelectModel;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;

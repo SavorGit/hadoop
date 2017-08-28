@@ -1,8 +1,7 @@
 package com.littlehotspot.hadoop.mr.box.scheduler;
 
-import com.littlehotspot.hadoop.mr.box.mysql.model.Media;
-import com.littlehotspot.hadoop.mr.box.mysql.model.Room;
 import com.littlehotspot.hadoop.mr.box.mysql.model.SelectModel;
+import com.littlehotspot.hadoop.mr.box.mysql.model.Media;
 
 /**
  *@Author 刘飞飞

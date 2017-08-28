@@ -2,7 +2,6 @@ package com.littlehotspot.hadoop.mr.box.mapper;
 
 import com.littlehotspot.hadoop.mr.box.mysql.JdbcCommonVariables;
 import com.littlehotspot.hadoop.mr.box.mysql.model.Model;
-import com.littlehotspot.hadoop.mr.box.mysql.model.ModelFactory;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -12,9 +11,6 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <h1> title </h1>

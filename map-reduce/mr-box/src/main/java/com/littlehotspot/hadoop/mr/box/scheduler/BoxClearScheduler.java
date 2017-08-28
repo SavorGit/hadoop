@@ -11,14 +11,16 @@
 package com.littlehotspot.hadoop.mr.box.scheduler;
 
 import com.littlehotspot.hadoop.mr.box.common.Argument;
-import com.littlehotspot.hadoop.mr.box.mapper.BoxClearMapper;
 import com.littlehotspot.hadoop.mr.box.reducer.BoxClearReducer;
 import com.littlehotspot.hadoop.mr.box.util.Constant;
+import com.littlehotspot.hadoop.mr.box.mapper.BoxClearMapper;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.CombineTextInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
@@ -37,7 +39,7 @@ public class BoxClearScheduler extends Configured implements Tool {
             // 获取参数
             String hdfsInputPath = Constant.CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = Constant.CommonVariables.getParameterValue(Argument.OutputPath);
-
+            this.getConf().setLong("mapreduce.input.fileinputformat.split.maxsize",128*1024*1024);
             Job job = Job.getInstance(this.getConf(), this.getClass().getSimpleName());
             job.setJarByClass(this.getClass());
 
@@ -47,7 +49,7 @@ public class BoxClearScheduler extends Configured implements Tool {
             FileInputFormat.setInputPaths(job, inputPath);
             job.setMapperClass(BoxClearMapper.class);
             job.setMapOutputKeyClass(Text.class);
-            job.setMapOutputValueClass(Text.class);
+            job.setMapOutputValueClass(NullWritable.class);
 
             /**作业输出*/
             Path outputPath = new Path(hdfsOutputPath);
@@ -56,9 +58,10 @@ public class BoxClearScheduler extends Configured implements Tool {
                 fileSystem.delete(outputPath, true);
             }
             FileOutputFormat.setOutputPath(job, outputPath);
+            job.setInputFormatClass(CombineTextInputFormat.class);
             job.setReducerClass(BoxClearReducer.class);
             job.setOutputKeyClass(Text.class);
-            job.setOutputValueClass(Text.class);
+            job.setOutputValueClass(NullWritable.class);
 
             boolean status = job.waitForCompletion(true);
             if (!status) {

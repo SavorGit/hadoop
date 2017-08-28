@@ -10,6 +10,7 @@
  */
 package com.littlehotspot.hadoop.mr.box.reducer;
 
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
@@ -19,11 +20,11 @@ import java.util.Iterator;
 /**
  * 整合数据reducer
  */
-public class BoxIntegratedReducer extends Reducer<Text, Text, Text, Text> {
+public class BoxIntegratedReducer extends Reducer<Text, Text, Text, NullWritable> {
     @Override
     protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
         try {
-            context.write(key,new Text());
+            context.write(key,NullWritable.get());
         } catch (Exception e) {
             e.printStackTrace();
         }

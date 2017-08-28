@@ -1,5 +1,6 @@
 package com.littlehotspot.hadoop.mr.box.main;
 
+import com.littlehotspot.hadoop.mr.box.hbase.scheduler.BoxToHFileScheduler;
 import com.littlehotspot.hadoop.mr.box.hbase.scheduler.BoxToHbaseScheduler;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
@@ -14,7 +15,7 @@ public class BoxToHbaseMain {
         }
         Configuration conf = new Configuration();
         try {
-            ToolRunner.run(conf, new BoxToHbaseScheduler(), args);
+            ToolRunner.run(conf, new BoxToHFileScheduler(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }

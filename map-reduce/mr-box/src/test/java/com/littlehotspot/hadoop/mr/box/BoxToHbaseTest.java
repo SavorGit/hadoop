@@ -1,14 +1,10 @@
 package com.littlehotspot.hadoop.mr.box;
 
+import com.littlehotspot.hadoop.mr.box.hbase.scheduler.BoxToHFileScheduler;
 import com.littlehotspot.hadoop.mr.box.hbase.scheduler.BoxToHbaseDistScheduler;
-import com.littlehotspot.hadoop.mr.box.hbase.scheduler.BoxToHbaseScheduler;
-import com.littlehotspot.hadoop.mr.box.util.PathUtil;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.ToolRunner;
 import org.junit.Test;
-
-import java.util.List;
 
 public class BoxToHbaseTest {
 
@@ -24,7 +20,7 @@ public class BoxToHbaseTest {
             args[4]="hbaseZookeeper=devpd1";
             args[5]="hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase";
 //            ToolRunner.run(conf, new BoxToHbaseScheduler(), args);
-            ToolRunner.run(conf, new BoxToHbaseDistScheduler(), args);
+            ToolRunner.run(conf, new BoxToHFileScheduler(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }

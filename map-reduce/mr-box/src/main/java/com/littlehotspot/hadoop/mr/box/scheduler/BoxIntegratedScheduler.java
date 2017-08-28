@@ -10,10 +10,10 @@
  */
 package com.littlehotspot.hadoop.mr.box.scheduler;
 
+import com.littlehotspot.hadoop.mr.box.mysql.JdbcCommonVariables;
 import com.littlehotspot.hadoop.mr.box.common.Argument;
 import com.littlehotspot.hadoop.mr.box.mapper.BoxIntegratedMapper;
 import com.littlehotspot.hadoop.mr.box.mysql.JDBCTool;
-import com.littlehotspot.hadoop.mr.box.mysql.JdbcCommonVariables;
 import com.littlehotspot.hadoop.mr.box.mysql.JdbcReader;
 import com.littlehotspot.hadoop.mr.box.mysql.model.Hotel;
 import com.littlehotspot.hadoop.mr.box.mysql.model.Media;
@@ -25,6 +25,7 @@ import com.littlehotspot.hadoop.mr.box.util.PathUtil;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
@@ -49,7 +50,7 @@ public class BoxIntegratedScheduler extends Configured implements Tool {
             String hdfsInputPath = Constant.CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = Constant.CommonVariables.getParameterValue(Argument.OutputPath);
 
-            JDBCTool jdbcTool=JdbcReader.createSimpleJdbc();
+            JDBCTool jdbcTool= JdbcReader.createSimpleJdbc();
             //查询hotel
             integQuery(jdbcTool,Hotel.class,"select id,name from savor_hotel");
             //查询room
@@ -59,7 +60,7 @@ public class BoxIntegratedScheduler extends Configured implements Tool {
             JdbcReader.closeJdbc();
 
             //封装数据
-            for(Map.Entry<String,String> entry:JdbcCommonVariables.modelMaps.entrySet()){
+            for(Map.Entry<String,String> entry: JdbcCommonVariables.modelMaps.entrySet()){
                 this.getConf().set(entry.getKey(),entry.getValue());
             }
 
@@ -71,7 +72,7 @@ public class BoxIntegratedScheduler extends Configured implements Tool {
             FileInputFormat.setInputPaths(job, inputPath);
             job.setMapperClass(BoxIntegratedMapper.class);
             job.setMapOutputKeyClass(Text.class);
-            job.setMapOutputValueClass(Text.class);
+            job.setMapOutputValueClass(NullWritable.class);
 
             /**作业输出*/
             Path outputPath = new Path(hdfsOutputPath);
@@ -82,7 +83,7 @@ public class BoxIntegratedScheduler extends Configured implements Tool {
             FileOutputFormat.setOutputPath(job, outputPath);
             job.setReducerClass(BoxIntegratedReducer.class);
             job.setOutputKeyClass(Text.class);
-            job.setOutputValueClass(Text.class);
+            job.setOutputValueClass(NullWritable.class);
 
             boolean status = job.waitForCompletion(true);
             if (!status) {

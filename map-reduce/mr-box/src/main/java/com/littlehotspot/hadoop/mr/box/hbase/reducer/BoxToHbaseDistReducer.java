@@ -10,10 +10,10 @@
  */
 package com.littlehotspot.hadoop.mr.box.hbase.reducer;
 
-import com.littlehotspot.hadoop.mr.box.hbase.HBaseHelper;
 import com.littlehotspot.hadoop.mr.box.hbase.model.SourceBoxBean;
 import com.littlehotspot.hadoop.mr.box.hbase.model.TargetBoxAttrBean;
 import com.littlehotspot.hadoop.mr.box.hbase.model.TargetBoxBean;
+import com.littlehotspot.hadoop.mr.box.hbase.HBaseHelper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;

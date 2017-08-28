@@ -1,8 +1,5 @@
 package com.littlehotspot.hadoop.mr.box.mysql;
 
-import com.littlehotspot.hadoop.mr.box.mysql.model.Model;
-
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
