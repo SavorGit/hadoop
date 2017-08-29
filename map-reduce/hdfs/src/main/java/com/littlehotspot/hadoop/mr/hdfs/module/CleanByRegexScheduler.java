@@ -96,7 +96,7 @@ public class CleanByRegexScheduler extends Configured implements Tool {
 
             this.getConf().setLong("mapreduce.input.fileinputformat.split.maxsize", BYTES_128M);
             this.getConf().setPattern(CleanByRegexConstant.HadoopConfig.Key.MAPPER_INPUT_FORMAT_REGEX_PATTERN, Pattern.compile(matcherRegex));// 配置 Mapper 输入的正则匹配对象
-            System.out.println(this.getConf().getLong("mapreduce.input.fileinputformat.split.maxsize", -1));
+//            System.out.println(this.getConf().getLong("mapreduce.input.fileinputformat.split.maxsize", -1));
 
             Job job = Job.getInstance(this.getConf(), jobName);
             job.setJarByClass(this.getClass());
@@ -164,8 +164,8 @@ public class CleanByRegexScheduler extends Configured implements Tool {
 //            this.getConf().setLong("dfs.block.size", BYTES_128M);
 
         // Mapper Buffer
-        this.getConf().setInt("io.sort.mb", BYTES_256M);
-//            this.getConf().setLong("mapreduce.task.io.sort.mb", BYTES_256M);
+//        this.getConf().setInt("io.sort.mb", BYTES_256M);
+////            this.getConf().setLong("mapreduce.task.io.sort.mb", BYTES_256M);
         this.getConf().setDouble("io.sort.spill.percent", 0.8);
 
         // Mapper Merge
@@ -175,9 +175,9 @@ public class CleanByRegexScheduler extends Configured implements Tool {
         // Mapper Combine
         this.getConf().setLong("min.num.spill.for.combine", 3);
 
-        // Mapper 输出中间数据到磁盘
-        this.getConf().setBoolean("mapred.compress.map.output", true);
-        this.getConf().set("mapred.map.output.compression.codec", "GzipCodec");
+//        // Mapper 输出中间数据到磁盘
+//        this.getConf().setBoolean("mapred.compress.map.output", true);
+//        this.getConf().set("mapred.map.output.compression.codec", "GzipCodec");
 
 
         this.getConf().setLong("mapred.tasktracker.map.tasks.maximum", 2);

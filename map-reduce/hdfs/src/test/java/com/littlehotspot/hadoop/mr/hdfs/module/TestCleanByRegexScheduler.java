@@ -50,11 +50,13 @@ public class TestCleanByRegexScheduler {
         this.decimalFormat = new DecimalFormat();
 
         this.conf = new Configuration();
+
+//        this.conf.setBoolean("dfs.permissions", false);
 //        this.conf.set("mapred.job.tracker", "local");
 //        this.conf.set("mapreduce.framework.name", "yarn");
 //        this.conf.set("yarn.resoucemanager.hostname", "localhost");
-//        this.conf.set("yarn.resourcemanager.address", "localhost:8032");
 //        this.conf.set("yarn.resourcemanager.scheduler.address", "localhost:8030");
+//        this.conf.set("yarn.resourcemanager.address", "localhost:8032");
 //        this.conf.set("yarn.resourcemanager.resource-tracker.address", "localhost:8035");
 //        this.conf.set("yarn.resourcemanager.admin.address", "localhost:8033");
     }
@@ -68,8 +70,8 @@ public class TestCleanByRegexScheduler {
 //                    "hdfsCluster=hdfs://devpd1:8020",
 //                    "hdfsIn=/home/data/hadoop/flume/box_source/2017-06-28",
 //                    "hdfsOut=/home/data/hadoop/flume/box_export/2017-06-28",
-                    "hdfsIn=hdfs://devpd1:8020/home/data/hadoop/flume/box_source/2017-06-28",
-                    "hdfsOut=hdfs://devpd1:8020/home/data/hadoop/flume/box_export/2017-06-28",
+                    "hdfsIn=hdfs://devpd1:8020/home/data/hadoop/flume/box/source/command/2017080",
+                    "hdfsOut=hdfs://localhost:9000/home/data/hadoop/flume/box/export/2017-08-00",
                     "inMapperRegex=^.+,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.+,.*,?$"
             };
             ToolRunner.run(this.conf, new CleanByRegexScheduler(), args);
