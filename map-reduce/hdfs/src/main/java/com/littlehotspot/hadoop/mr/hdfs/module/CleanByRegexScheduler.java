@@ -82,7 +82,8 @@ public class CleanByRegexScheduler extends Configured implements Tool {
             if (StringUtils.isBlank(jobName)) {
                 jobName = this.getClass().getName();
             }
-            this.getConf().setLong("mapreduce.input.fileinputformat.split.maxsize", 134217728L);
+            this.getConf().setLong("mapreduce.input.fileinputformat.split.maxsize", 134217728);
+            System.out.println(this.getConf().getLong("mapreduce.input.fileinputformat.split.maxsize", -1));
 
             this.getConf().setPattern(CleanByRegexConstant.HadoopConfig.Key.MAPPER_INPUT_FORMAT_REGEX_PATTERN, Pattern.compile(matcherRegex));// 配置 Mapper 输入的正则匹配对象
             Job job = Job.getInstance(this.getConf(), jobName);
