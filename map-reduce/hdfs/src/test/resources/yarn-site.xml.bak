@@ -14,35 +14,39 @@
 -->
 <configuration>
     <property>
-       <name>yarn.nodemanager.aux-services</name>
-       <value>mapreduce_shuffle</value>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
     </property>
     <property>
-       <name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
-       <value>org.apache.hadoop.mapred.ShuffleHandler</value>
+        <name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
+        <value>org.apache.hadoop.mapred.ShuffleHandler</value>
     </property>
-	<property>
-		<name>yarn.resourcemanager.address</name>
-		<value>localhost:8032</value>
-		<description>The address of the applications manager interface in the RM.</description>
-	</property>
-	<property>
-		<name>yarn.resourcemanager.scheduler.address</name>
-		<value>localhost:8030</value>
-		<description>The address of the scheduler interface.</description>
-	</property>
-	<property>
-		<name>yarn.resourcemanager.resource-tracker.address</name>
-		<value>localhost:8035</value>
-		<description>The address of the resource tracker interface.</description>
-	</property>
-	<property>
-		<name>yarn.resourcemanager.admin.address</name>
-		<value>localhost:8033</value>
-	</property>
-	<property>
-		<name>yarn.resourcemanager.webapp.address</name>
-		<value>localhost:8088</value>
-		<description>The address of the RM web application.</description>
-	</property>
+    <property>
+        <name>yarn.resoucemanager.hostname</name>
+        <value>localhost</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.address</name>
+        <value>localhost:8032</value>
+        <description>The address of the applications manager interface in the RM.</description>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.scheduler.address</name>
+        <value>localhost:8030</value>
+        <description>The address of the scheduler interface.</description>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.resource-tracker.address</name>
+        <value>localhost:8035</value>
+        <description>The address of the resource tracker interface.</description>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.admin.address</name>
+        <value>localhost:8033</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.webapp.address</name>
+        <value>localhost:8088</value>
+        <description>The address of the RM web application.</description>
+    </property>
 </configuration>

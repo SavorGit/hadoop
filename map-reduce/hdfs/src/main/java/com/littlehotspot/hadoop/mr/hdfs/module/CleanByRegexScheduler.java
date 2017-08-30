@@ -103,11 +103,11 @@ public class CleanByRegexScheduler extends Configured implements Tool {
 
 
             // 作业输入
-            job.setInputFormatClass(CombineTextInputFormat.class);
             for (String hdfsInputPath : hdfsInputPathArray) {
                 Path inputPath = new Path(hdfsInputPath);
                 FileInputFormat.addInputPath(job, inputPath);
             }
+            job.setInputFormatClass(CombineTextInputFormat.class);
             job.setMapperClass(CleanByRegexMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
@@ -151,8 +151,8 @@ public class CleanByRegexScheduler extends Configured implements Tool {
         // Reduce Reduce
         this.getConf().setDouble("mapred.job.reduce.input.buffer.percent", 0.0);
 
-        this.getConf().setLong("mapred.reduce.tasks", 1);
-        this.getConf().setLong("mapred.tasktracker.reduce.tasks.maximum", 2);
+//        this.getConf().setLong("mapred.reduce.tasks", 1);
+//        this.getConf().setLong("mapred.tasktracker.reduce.tasks.maximum", 2);
         this.getConf().setDouble("mapred.reduce.slowstart.completed.maps", 0.05);
     }
 
