@@ -41,6 +41,8 @@ import java.util.regex.Pattern;
  */
 public class CleanByRegexScheduler extends Configured implements Tool {
 
+    private static final int BYTES_5M = 5 * 1024 * 1024;
+    private static final int BYTES_10M = 10 * 1024 * 1024;
     private static final int BYTES_64M = 128 * 1024 * 1024;
     private static final int BYTES_128M = 128 * 1024 * 1024;
     private static final int BYTES_256M = 256 * 1024 * 1024;
@@ -94,9 +96,10 @@ public class CleanByRegexScheduler extends Configured implements Tool {
             this.setReduceConfig();
 
 
-            this.getConf().setLong("mapreduce.input.fileinputformat.split.maxsize", BYTES_128M);
+            this.getConf().setLong("mapreduce.input.fileinputformat.split.maxsize", BYTES_5M);
             this.getConf().setPattern(CleanByRegexConstant.HadoopConfig.Key.MAPPER_INPUT_FORMAT_REGEX_PATTERN, Pattern.compile(matcherRegex));// 配置 Mapper 输入的正则匹配对象
-//            System.out.println(this.getConf().getLong("mapreduce.input.fileinputformat.split.maxsize", -1));
+//            System.out.println(this.getConf().get("mapreduce.input.fileinputformat.split.maxsize"));
+//            System.out.println(this.getConf().get("mapreduce.job.inputformat.class"));
 
             Job job = Job.getInstance(this.getConf(), jobName);
             job.setJarByClass(this.getClass());
@@ -180,6 +183,6 @@ public class CleanByRegexScheduler extends Configured implements Tool {
 //        this.getConf().set("mapred.map.output.compression.codec", "GzipCodec");
 
 
-        this.getConf().setLong("mapred.tasktracker.map.tasks.maximum", 2);
+//        this.getConf().setLong("mapred.tasktracker.map.tasks.maximum", 2);
     }
 }
