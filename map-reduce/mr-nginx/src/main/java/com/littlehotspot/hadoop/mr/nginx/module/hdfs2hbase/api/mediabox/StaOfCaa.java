@@ -322,12 +322,12 @@ public class StaOfCaa extends Configured implements Tool {
                     Bytes.toBytes("mda_type"), CompareFilter.CompareOp.EQUAL,comp);
             SingleColumnValueFilter optionfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
                     Bytes.toBytes("option_type"), CompareFilter.CompareOp.EQUAL,new BinaryComparator(Bytes.toBytes("start")));
-//            if (!StringUtils.isBlank(time)){
-//                RegexStringComparator comps = new RegexStringComparator("^"+"201704");
-//                SingleColumnValueFilter timefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-//                        Bytes.toBytes("date_time"), CompareFilter.CompareOp.EQUAL,comps);
-//                filters.add(timefilter);
-//            }
+            if (!StringUtils.isBlank(time)){
+                RegexStringComparator comps = new RegexStringComparator("^"+"time");
+                SingleColumnValueFilter timefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                        Bytes.toBytes("date_time"), CompareFilter.CompareOp.EQUAL,comps);
+                filters.add(timefilter);
+            }
 
             if (!StringUtils.isBlank(time)&&!StringUtils.isBlank(before)){
                 SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");

@@ -1172,14 +1172,14 @@
 
                     <!-- 开机率报表清洗 -->
                     <execution>
-                        <id>box_log-clean</id>
+                        <id>boot_rate</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
                         <phase>package</phase>
                         <configuration>
                             <!--<finalName>nginx-log</finalName>-->
-                            <classifier>box_log-clean</classifier>
+                            <classifier>boot_rate</classifier>
                             <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
@@ -1194,6 +1194,38 @@
                                 <manifest>
                                     <mainClass>
                                         com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.BootRateMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <!-- 开机率报表清洗 -->
+                    <execution>
+                        <id>total_boot_rate</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>total_boot_rate</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/mysql/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/mysql/model/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/bootRate/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.TotalBootRateMain
                                     </mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>

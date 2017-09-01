@@ -1,11 +1,14 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate;
 
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableMapper;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -15,6 +18,7 @@ import java.util.Date;
  * Created by gy on 2017/7/18.
  */
 public class BoxTableMapper extends TableMapper<Text, Text> {
+
 
 
     @Override
@@ -61,7 +65,7 @@ public class BoxTableMapper extends TableMapper<Text, Text> {
     public static String stampToDate(String s){
         String res;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        long lt = new Long(s);
+        long lt = Long.valueOf(s);
         Date date = new Date(lt);
         res = simpleDateFormat.format(date);
         return res;
@@ -69,7 +73,7 @@ public class BoxTableMapper extends TableMapper<Text, Text> {
     public static String stampToHour(String s){
         String res;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH");
-        long lt = new Long(s);
+        long lt = Long.valueOf(s);
         Date date = new Date(lt);
         res = simpleDateFormat.format(date);
         return res;
