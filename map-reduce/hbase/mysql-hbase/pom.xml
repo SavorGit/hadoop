@@ -99,6 +99,8 @@
                                 <include>**/com/littlehotspot/hadoop/mr/hbase/hotel/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/hbase/room/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/hbase/box/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hbase/medias/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hbase/resources/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/hbase/hotelBoxIndex/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/hbase/io/*</include>
                             </includes>

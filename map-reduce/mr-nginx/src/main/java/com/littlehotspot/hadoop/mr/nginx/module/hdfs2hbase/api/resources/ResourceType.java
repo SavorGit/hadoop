@@ -12,10 +12,10 @@ public enum ResourceType {
      * 0x0102：宣传片，
      * 0x0103：节目
      */
-    CON(0x0001),
-    ADS(0x0101),
-    ADV(0x0102),
-    PRO(0x0103)
+    CON(0x0001), // 1
+    ADS(0x0101), // 257
+    ADV(0x0102), // 258
+    PRO(0x0103) // 259
 
     ;
     private int value;

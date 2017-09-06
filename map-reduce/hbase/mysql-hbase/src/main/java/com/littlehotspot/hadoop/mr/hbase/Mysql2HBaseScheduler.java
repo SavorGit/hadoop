@@ -16,6 +16,10 @@ import com.littlehotspot.hadoop.mr.hbase.hotel.DBInputHotelMapper;
 import com.littlehotspot.hadoop.mr.hbase.hotel.HotelWritable;
 import com.littlehotspot.hadoop.mr.hbase.hotelBoxIndex.DBInputHotelBoxIndexMapper;
 import com.littlehotspot.hadoop.mr.hbase.hotelBoxIndex.HotelBoxIndexWritable;
+import com.littlehotspot.hadoop.mr.hbase.medias.DBInputMediasMapper;
+import com.littlehotspot.hadoop.mr.hbase.medias.MediasWritable;
+import com.littlehotspot.hadoop.mr.hbase.resources.DBInputResourcesMapper;
+import com.littlehotspot.hadoop.mr.hbase.resources.ResourcesWritable;
 import com.littlehotspot.hadoop.mr.hbase.room.DBInputRoomMapper;
 import com.littlehotspot.hadoop.mr.hbase.room.RoomWritable;
 import net.lizhaoweb.common.util.argument.ArgumentFactory;
@@ -110,6 +114,12 @@ public class Mysql2HBaseScheduler extends Configured implements Tool {
             }else if (hTableName.equals("hotel_box_index")){
                 writableClass = HotelBoxIndexWritable.class;
                 mapperClass = DBInputHotelBoxIndexMapper.class;
+            }else if (hTableName.equals("medias")){
+                writableClass = MediasWritable.class;
+                mapperClass = DBInputMediasMapper.class;
+            }else if (hTableName.equals("resources")){
+                writableClass = ResourcesWritable.class;
+                mapperClass = DBInputResourcesMapper.class;
             }
 
             Path outputPath = new Path(hdfsOutputPath);

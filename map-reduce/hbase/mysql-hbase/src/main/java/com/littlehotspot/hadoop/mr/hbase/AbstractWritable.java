@@ -37,17 +37,25 @@ public abstract class AbstractWritable {
             ResultSetMetaData resultSetMetaData = result.getMetaData();
 //            String ColumnClassName = resultSetMetaData.getColumnClassName(columnIndex);
             String ColumnTypeName = resultSetMetaData.getColumnTypeName(columnIndex);
-            Object value;
+            Object value = null;
             if ("TINYINT".equalsIgnoreCase(ColumnTypeName)) {
                 value = result.getInt(columnIndex);
             } else if ("TIMESTAMP".equalsIgnoreCase(ColumnTypeName)) {
-                value = result.getTimestamp(columnIndex).getTime();
+                if(result.getTimestamp(columnIndex) != null) {
+                    value = result.getTimestamp(columnIndex).getTime();
+                }
             } else if ("DATETIME".equalsIgnoreCase(ColumnTypeName)) {
-                value = result.getTimestamp(columnIndex).getTime();
+                if(result.getTimestamp(columnIndex) != null) {
+                    value = result.getTimestamp(columnIndex).getTime();
+                }
             } else if ("DATE".equalsIgnoreCase(ColumnTypeName)) {
-                value = result.getDate(columnIndex).getTime();
+                if(result.getDate(columnIndex) != null) {
+                    value = result.getDate(columnIndex).getTime();
+                }
             } else if ("TIME".equalsIgnoreCase(ColumnTypeName)) {
-                value = result.getTime(columnIndex).getTime();
+                if(result.getTime(columnIndex) != null) {
+                    value = result.getTime(columnIndex).getTime();
+                }
             } else {
                 value = result.getObject(columnIndex);
             }
