@@ -15,14 +15,25 @@ import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.CommonVariab
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.NgxSrcUserBean;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.user.UserActBean;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.filter.*;
+import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
+import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
+import org.apache.hadoop.hbase.mapreduce.TableMapper;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.filecache.DistributedCache;
+import org.apache.hadoop.mapreduce.lib.input.CombineTextInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
@@ -31,8 +42,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 
 /**
@@ -40,23 +53,21 @@ import java.util.regex.Matcher;
  */
 public class UserProjectLog extends Configured implements Tool {
 
-    private static class MobileMapper extends Mapper<LongWritable, Text, Text, Text> {
+    private static class MobileMapper extends TableMapper<Text, Text> {
 
 
         @Override
-        protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+        protected void map(ImmutableBytesWritable rowKey, Result result, Mapper.Context context) throws IOException, InterruptedException {
             /**数据清洗=========开始*/
             try {
-                String msg = value.toString();
-                Matcher matcher = CommonVariables.MAPPER_PROJECTION_FORMAT_REGEX.matcher(msg);
-                if (!matcher.find()) {
+                String row = Bytes.toString(result.getRow());
+                String mobile_id = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mobile_id")));
+                String timestamps = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("timestamps")));
+                String mda = Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mda_type")));
+                if (StringUtils.isBlank(mobile_id)){
                     return;
                 }
-                if (StringUtils.isBlank(matcher.group(8))) {
-                    return;
-                }
-
-                context.write(new Text(matcher.group(8)), value);
+                context.write(new Text(mobile_id), new Text(mobile_id+","+timestamps));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -77,15 +88,15 @@ public class UserProjectLog extends Configured implements Tool {
                         continue;
                     }
                     String rowLineContent = item.toString();
-                    Matcher matcher = CommonVariables.MAPPER_BOX_LOG_FORMAT_REGEX.matcher(rowLineContent);
+                    Matcher matcher = CommonVariables.MAPPER_BOX_Hbase_FORMAT_REGEX.matcher(rowLineContent);
                     if (!matcher.find()) {
                         return;
                     }
-                    userActBean.setDeviceId(matcher.group(8));
+                    userActBean.setDeviceId(matcher.group(1));
                     if (StringUtils.isBlank(userActBean.getTime())){
-                        userActBean.setTime(matcher.group(4));
-                    }else if (Long.valueOf(userActBean.getTime())>=Long.valueOf(matcher.group(4))){
-                        userActBean.setTime(matcher.group(4));
+                        userActBean.setTime(matcher.group(2));
+                    }else if (Long.valueOf(userActBean.getTime())>=Long.valueOf(matcher.group(2))){
+                        userActBean.setTime(matcher.group(2));
                     }
                     count ++;
                 }
@@ -142,19 +153,70 @@ public class UserProjectLog extends Configured implements Tool {
             CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
 
             // 获取参数
-            String matcherRegex = CommonVariables.getParameterValue(Argument.MapperInputFormatRegex);
-            String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
+            String hbaseRoot = CommonVariables.getParameterValue(Argument.HbaseRoot);
+            String hbaseZoo = CommonVariables.getParameterValue(Argument.HbaseZookeeper);
+            String hbaseSharePath = CommonVariables.getParameterValue(Argument.HBaseSharePath);
+//
+            String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
-            Job job = Job.getInstance(this.getConf(), UserProjectLog.class.getSimpleName());
-            job.setJarByClass(UserProjectLog.class);
+            String startTime = CommonVariables.getParameterValue(Argument.StartTime);
+            String endTime = CommonVariables.getParameterValue(Argument.EndTime);
 
-            /**作业输入*/
-            Path inputPath = new Path(hdfsInputPath);
-            FileInputFormat.setInputPaths(job, inputPath);
-            job.setMapperClass(MobileMapper.class);
-            job.setMapOutputKeyClass(Text.class);
-            job.setMapOutputValueClass(Text.class);
+            Job job = Job.getInstance(this.getConf(), UserDemaLog.class.getSimpleName());
+            job.setJarByClass(UserDemaLog.class);
+
+            // 避免报错：ClassNotFoundError hbaseConfiguration
+            Configuration jobConf = job.getConfiguration();
+            FileSystem hdfs = FileSystem.get(new URI(hdfsCluster), jobConf);
+            if (StringUtils.isNotBlank(hbaseSharePath)) {
+                Path hBaseSharePath = new Path(hbaseSharePath);
+                FileStatus[] hBaseShareJars = hdfs.listStatus(hBaseSharePath);
+                for (FileStatus fileStatus : hBaseShareJars) {
+                    if (!fileStatus.isFile()) {
+                        continue;
+                    }
+                    Path archive = fileStatus.getPath();
+                    FileSystem fs = archive.getFileSystem(jobConf);
+                    DistributedCache.addArchiveToClassPath(archive, jobConf, fs);
+                }//
+            }
+            Scan scan = new Scan();
+
+            List<Filter> filters= new ArrayList<Filter>();
+//            RegexStringComparator comp = new RegexStringComparator("^\\s*&");
+            SingleColumnValueFilter mda_id=new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                    Bytes.toBytes("mobile_id"), CompareFilter.CompareOp.NOT_EQUAL,new RegexStringComparator("^\\s*$"));
+            SingleColumnValueFilter typefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                    Bytes.toBytes("mda_type"), CompareFilter.CompareOp.EQUAL,Bytes.toBytes("projection"));
+
+            if (!StringUtils.isBlank(startTime)) {
+                String s = dateToStamp(startTime);
+                SingleColumnValueFilter startfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                        Bytes.toBytes("timestamps"), CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes(s));
+                filters.add(startfilter);
+            }
+            if (!StringUtils.isBlank(endTime)) {
+                String s = dateToStamp(startTime);
+                SingleColumnValueFilter endfilter=new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                        Bytes.toBytes("timestamps"),CompareFilter.CompareOp.LESS_OR_EQUAL,Bytes.toBytes(s));
+                filters.add(endfilter);
+            }
+
+            if(null==scan) {
+                System.out.println("error : scan = null");
+                System.exit(1);
+            }
+
+
+            filters.add(mda_id);
+            filters.add(typefilter);
+
+            FilterList filterList = new FilterList(filters);
+            scan.setFilter(filterList);
+
+            TableMapReduceUtil.initTableMapperJob("box_log", scan, MobileMapper.class, Text.class, Text.class, job,false);
+
 
             job.setCombinerClass(Combiner.class);
 
@@ -180,19 +242,16 @@ public class UserProjectLog extends Configured implements Tool {
         }
     }
 
-    public static boolean isYesterday(long time) {
-        boolean isYesterday = false;
-        Date date;
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            date = sdf.parse(sdf.format(new Date()));
-            if (time < date.getTime() && time > (date.getTime() - 24*60*60*1000)) {
-                isYesterday = true;
-            }
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return isYesterday;
+
+    /*
+    * 将时间转换为时间戳
+    */
+    public static String dateToStamp(String s) throws ParseException {
+        String res;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+        Date date = simpleDateFormat.parse(s+"00000");
+        long ts = date.getTime();
+        res = String.valueOf(ts);
+        return res;
     }
 }

@@ -8,7 +8,7 @@
  * @EMAIL 404644381@qq.com
  * @Time : 15:31
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.zhengwei;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
 import org.apache.commons.lang.StringUtils;
@@ -28,7 +28,10 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
 import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,7 +44,7 @@ import java.util.List;
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class TotalBootRate extends Configured implements Tool {
+public class Validate extends Configured implements Tool {
 
     @Override
     public int run(String[] args) throws Exception {
@@ -55,20 +58,15 @@ public class TotalBootRate extends Configured implements Tool {
             String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
-            String columnFamily = CommonVariables.getParameterValue(Argument.ColumnFamily);
-            String columnName = CommonVariables.getParameterValue(Argument.ColumnName);
 
-            String start = CommonVariables.getParameterValue(Argument.StartTime);
-            String end = CommonVariables.getParameterValue(Argument.EndTime);
+            String startTime = CommonVariables.getParameterValue(Argument.StartTime);
+            String endTime = CommonVariables.getParameterValue(Argument.EndTime);
 
-            Configuration conf = new Configuration();
 
 //            HTable hTable = new HTable(this.getConf(),"box_log");
 //            Job job = new Job(hTable.getConfiguration(),this.getClass().getName());
-            this.getConf().set("issue", start+end);
-
-            Job job = Job.getInstance(this.getConf(), TotalBootRate.class.getSimpleName());
-            job.setJarByClass(TotalBootRate.class);
+            Job job = Job.getInstance(this.getConf(), Validate.class.getSimpleName());
+            job.setJarByClass(Validate.class);
 
             // 避免报错：ClassNotFoundError hbaseConfiguration
             Configuration jobConf = job.getConfiguration();
@@ -87,26 +85,40 @@ public class TotalBootRate extends Configured implements Tool {
             }
             Scan scan = new Scan();
 
+            //设置过滤器
+            List<Filter> filters= new ArrayList<Filter>();
+            RegexStringComparator comp = new RegexStringComparator("^(ads)|(pro)$");
+            SingleColumnValueFilter typefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                    Bytes.toBytes("mda_type"), CompareFilter.CompareOp.EQUAL,comp);
+            SingleColumnValueFilter optionfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                    Bytes.toBytes("option_type"), CompareFilter.CompareOp.EQUAL,new BinaryComparator(Bytes.toBytes("end")));
+            if(!StringUtils.isBlank(endTime)){
+                String s = dateToStamp(endTime);
+                SingleColumnValueFilter bigfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                        Bytes.toBytes("timestamps"), CompareFilter.CompareOp.LESS,new BinaryComparator(Bytes.toBytes(s)));
+                filters.add(bigfilter);
+            }
+            if (!StringUtils.isBlank(startTime)){
+                String s = dateToStamp(startTime);
+                SingleColumnValueFilter smallfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                        Bytes.toBytes("timestamps"), CompareFilter.CompareOp.GREATER_OR_EQUAL,new BinaryComparator(Bytes.toBytes(s)));
+                filters.add(smallfilter);
+            }
+
             if(null==scan) {
                 System.out.println("error : scan = null");
                 System.exit(1);
             }
-            //设置过滤器
-            List<Filter> filters= new ArrayList<Filter>();
-            if (!StringUtils.isBlank(start)){
-                SingleColumnValueFilter startfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                        Bytes.toBytes("play_date"), CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes(start));
-                filters.add(startfilter);
-            }
-            if (!StringUtils.isBlank(end)){
-                SingleColumnValueFilter endfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                        Bytes.toBytes("play_date"), CompareFilter.CompareOp.LESS,Bytes.toBytes(end));
-                filters.add(endfilter);
-            }
+
+
+            filters.add(typefilter);
+            filters.add(optionfilter);
+
 
             FilterList filterList = new FilterList(filters);
             scan.setFilter(filterList);
-            TableMapReduceUtil.initTableMapperJob("boot_rate", scan, TotalBootRateMapper.class, Text.class, Text.class, job,false);
+            TableMapReduceUtil.initTableMapperJob("box_log", scan, ValidateMapper.class, Text.class, Text.class, job,false);
+
 
 
             /**作业输出*/
@@ -116,7 +128,7 @@ public class TotalBootRate extends Configured implements Tool {
                 fileSystem.delete(outputPath, true);
             }
             FileOutputFormat.setOutputPath(job, outputPath);
-            job.setReducerClass(TotalBootRateReduce.class);
+            job.setReducerClass(ValidateReduce.class);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(Text.class);
 //            job.setNumReduceTasks(0);
@@ -131,6 +143,17 @@ public class TotalBootRate extends Configured implements Tool {
             e.printStackTrace();
             return 1;
         }
+    }
+    /*
+     * 将时间转换为时间戳
+     */
+    public static String dateToStamp(String s) throws ParseException {
+        String res;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+        Date date = simpleDateFormat.parse(s+"00000");
+        long ts = date.getTime();
+        res = String.valueOf(ts);
+        return res;
     }
 
 }

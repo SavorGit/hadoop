@@ -228,10 +228,10 @@ public class InToMysql extends Configured implements Tool {
                 now.setTime(format.parse(time));
                 now.set(Calendar.DATE,now.get(Calendar.DATE)-Integer.parseInt(before));
                 String day = format.format(now.getTime());
-                jdbcTool.executeUpdate(sql,Integer.parseInt(day),Integer.parseInt(time));
+//                jdbcTool.executeUpdate(sql,Integer.parseInt(day),Integer.parseInt(time));
 //                jdbcTool.updateSQL(sql,Integer.parseInt(day),Integer.parseInt(time));
                 SingleColumnValueFilter timefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                        Bytes.toBytes("date_time"), CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes(day+"00"));
+                        Bytes.toBytes("play_date"), CompareFilter.CompareOp.EQUAL,Bytes.toBytes(day));
                 filters.add(timefilter);
             }
 

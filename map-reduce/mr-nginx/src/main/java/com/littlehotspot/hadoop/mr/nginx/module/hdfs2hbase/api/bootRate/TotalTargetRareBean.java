@@ -91,6 +91,13 @@ public class TotalTargetRareBean {
     @HBaseColumn(name = "av_production")
     private String avProduction;
 
+    /**
+     * 期号
+     *
+     */
+    @HBaseColumn(name = "issue")
+    private String issue;
+
 
     private String cleanValue(String value) {
         if (value == null) {

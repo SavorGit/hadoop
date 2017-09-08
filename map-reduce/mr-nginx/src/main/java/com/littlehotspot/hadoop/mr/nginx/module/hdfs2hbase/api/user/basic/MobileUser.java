@@ -23,6 +23,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.CombineTextInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
@@ -125,12 +126,15 @@ public class MobileUser extends Configured implements Tool {
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
 
+            this.getConf().setLong("mapreduce.input.fileinputformat.split.maxsize",64 * 1024 * 1024);
+
             Job job = Job.getInstance(this.getConf(), MobileUser.class.getSimpleName());
             job.setJarByClass(MobileUser.class);
 
             /**作业输入*/
             Path inputPath = new Path(hdfsInputPath);
             FileInputFormat.setInputPaths(job, inputPath);
+            job.setInputFormatClass(CombineTextInputFormat.class);
             job.setMapperClass(MobileMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);

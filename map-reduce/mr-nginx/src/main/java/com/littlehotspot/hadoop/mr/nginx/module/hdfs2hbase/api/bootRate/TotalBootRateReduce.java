@@ -29,11 +29,14 @@ public class TotalBootRateReduce extends Reducer<Text, Text, Text, Text> {
 
     private HBaseHelper hBaseHelper;
 
+    private String issue;
+
 
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
         Configuration conf = context.getConfiguration();
         this.hBaseHelper = new HBaseHelper(conf);
+        issue = conf.get("issue");
     }
 
     @Override
@@ -79,7 +82,8 @@ public class TotalBootRateReduce extends Reducer<Text, Text, Text, Text> {
             String s1 = String.format("%.2f", v);
             bean.setAvProduction(s1);
             bean.setPlayCount(count.toString());
-            rateBean.setRowKey(key.toString());
+            bean.setIssue(issue);
+            rateBean.setRowKey(key.toString()+issue);
             rateBean.setTotalTargetRareBean(bean);
             if (Integer.parseInt(bean.getPlayCount())>=7){
                 if (bean.getAddr().equals("大厅")){

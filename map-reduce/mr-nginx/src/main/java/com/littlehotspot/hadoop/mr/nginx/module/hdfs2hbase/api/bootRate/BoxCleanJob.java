@@ -29,7 +29,10 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
 import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -82,6 +85,7 @@ public class BoxCleanJob extends Configured implements Tool {
                 }//
             }
             Scan scan = new Scan();
+
 //            scan.setCaching(500);
 //            scan.setCacheBlocks(false);
 //            scan.addColumn(Bytes.toBytes("attr"),Bytes.toBytes("mda_type"));
@@ -94,10 +98,18 @@ public class BoxCleanJob extends Configured implements Tool {
                     Bytes.toBytes("mda_type"), CompareFilter.CompareOp.EQUAL,comp);
             SingleColumnValueFilter optionfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
                     Bytes.toBytes("option_type"), CompareFilter.CompareOp.EQUAL,new BinaryComparator(Bytes.toBytes("end")));
-            SingleColumnValueFilter bigfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                    Bytes.toBytes("date_time"), CompareFilter.CompareOp.LESS,new BinaryComparator(Bytes.toBytes(endTime)));
-            SingleColumnValueFilter smallfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                    Bytes.toBytes("date_time"), CompareFilter.CompareOp.GREATER_OR_EQUAL,new BinaryComparator(Bytes.toBytes(startTime)));
+            if(!StringUtils.isBlank(endTime)){
+                String s = dateToStamp(endTime);
+                SingleColumnValueFilter bigfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                        Bytes.toBytes("timestamps"), CompareFilter.CompareOp.LESS,Bytes.toBytes(s));
+                filters.add(bigfilter);
+            }
+            if (!StringUtils.isBlank(startTime)){
+                String s = dateToStamp(endTime);
+                SingleColumnValueFilter smallfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                        Bytes.toBytes("timestamps"), CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes(s));
+                filters.add(smallfilter);
+            }
 
             if(null==scan) {
                 System.out.println("error : scan = null");
@@ -107,8 +119,8 @@ public class BoxCleanJob extends Configured implements Tool {
 
             filters.add(typefilter);
             filters.add(optionfilter);
-            filters.add(bigfilter);
-            filters.add(smallfilter);
+
+
             FilterList filterList = new FilterList(filters);
             scan.setFilter(filterList);
             TableMapReduceUtil.initTableMapperJob("box_log", scan, BoxTableMapper.class, Text.class, Text.class, job,false);
@@ -137,6 +149,17 @@ public class BoxCleanJob extends Configured implements Tool {
             e.printStackTrace();
             return 1;
         }
+    }
+    /*
+     * 将时间转换为时间戳
+     */
+    public static String dateToStamp(String s) throws ParseException {
+        String res;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+        Date date = simpleDateFormat.parse(s+"00000");
+        long ts = date.getTime();
+        res = String.valueOf(ts);
+        return res;
     }
 
 }

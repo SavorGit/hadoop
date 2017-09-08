@@ -185,7 +185,7 @@ public class StaOfCaa extends Configured implements Tool {
                     bean.setRoomId(matcher.group(3));
                     bean.setRoomName(matcher.group(4));
                     bean.setMac(matcher.group(5));
-                    bean.setPlayDate(matcher.group(8));
+                    bean.setPlayDate(StringUtils.trim(matcher.group(8)));
                     bean.setHotelId(matcher.group(1));
                     if (StringUtils.isBlank(bean.getArea())){
                         SavorHotel hotel = this.readMysqlHotel(matcher.group(1));
@@ -322,12 +322,12 @@ public class StaOfCaa extends Configured implements Tool {
                     Bytes.toBytes("mda_type"), CompareFilter.CompareOp.EQUAL,comp);
             SingleColumnValueFilter optionfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
                     Bytes.toBytes("option_type"), CompareFilter.CompareOp.EQUAL,new BinaryComparator(Bytes.toBytes("start")));
-            if (!StringUtils.isBlank(time)){
-                RegexStringComparator comps = new RegexStringComparator("^"+"time");
-                SingleColumnValueFilter timefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                        Bytes.toBytes("date_time"), CompareFilter.CompareOp.EQUAL,comps);
-                filters.add(timefilter);
-            }
+//            if (!StringUtils.isBlank(time)){
+//                RegexStringComparator comps = new RegexStringComparator("^"+"time");
+//                SingleColumnValueFilter timefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+//                        Bytes.toBytes("date_time"), CompareFilter.CompareOp.EQUAL,comps);
+//                filters.add(timefilter);
+//            }
 
             if (!StringUtils.isBlank(time)&&!StringUtils.isBlank(before)){
                 SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
@@ -337,6 +337,11 @@ public class StaOfCaa extends Configured implements Tool {
                 String day = format.format(now.getTime());
                 SingleColumnValueFilter timefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
                         Bytes.toBytes("date_time"), CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes(day+"00"));
+                filters.add(timefilter);
+            }else if (!StringUtils.isBlank(time)&&StringUtils.isBlank(before)){
+                RegexStringComparator comps = new RegexStringComparator("^"+"time");
+                SingleColumnValueFilter timefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                        Bytes.toBytes("date_time"), CompareFilter.CompareOp.EQUAL,comps);
                 filters.add(timefilter);
             }
 
