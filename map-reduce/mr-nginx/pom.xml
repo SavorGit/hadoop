@@ -1266,6 +1266,99 @@
                         </configuration>
                     </execution>
 
+                    <!-- ng_content_log hdfs -->
+                    <execution>
+                        <id>ng_content_log2hdfs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>ng_content_log2hdfs</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/ngContentLog/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/ngContentLog/io/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.ngContentLog.NgContentLogToHdfsMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <!-- ng_content_log hbase -->
+                    <execution>
+                        <id>ng_content_log2hbase</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>ng_content_log2hbase</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/ngContentLog/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/ngContentLog/io/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.ngContentLog.ContentLogToHbaseMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
+                    <!-- ng_content_log hbase2Mysql -->
+                    <execution>
+                        <id>ng_content_log-hbase2Mysql</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--<finalName>nginx-log</finalName>-->
+                            <classifier>ng_content_log-hbase2Mysql</classifier>
+                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/util/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/bean/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/reducer/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/ngContentLog/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/nginx/module/hdfs2hbase/api/ngContentLog/io/*</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>
+                                        com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.ngContentLog.HBaseToMysqlMain
+                                    </mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
 
                 </executions>
             </plugin>

@@ -76,29 +76,29 @@ public class JDBCTool {
         return this.connection;
     }
 
-//    /**
-//     * 执行更新操作
-//     *
-//     * @param sql    sql语句
-//     * @param params 执行参数
-//     * @return 执行结果
-//     * @throws SQLException
-//     */
-//    public boolean updateByPreparedStatement(String sql, List<?> params) throws SQLException {
-//        boolean flag = false;
-//        int result = -1;// 表示当用户执行添加删除和修改的时候所影响数据库的行数
-//        this.preparedStatement = this.connection.prepareStatement(sql);
-//        int index = 1;
-//        // 填充sql语句中的占位符
-//        if (params != null && !params.isEmpty()) {
-//            for (int i = 0; i < params.size(); i++) {
-//                this.preparedStatement.setObject(index++, params.get(i));
-//            }
-//        }
-//        result = this.preparedStatement.executeUpdate();
-//        flag = result > 0 ? true : false;
-//        return flag;
-//    }
+    /**
+     * 执行更新操作
+     *
+     * @param sql    sql语句
+     * @param params 执行参数
+     * @return 执行结果
+     * @throws SQLException
+     */
+    public boolean updateByPreparedStatement(String sql, List<?> params) throws SQLException {
+        boolean flag = false;
+        int result = -1;// 表示当用户执行添加删除和修改的时候所影响数据库的行数
+        this.preparedStatement = this.connection.prepareStatement(sql);
+        int index = 1;
+        // 填充sql语句中的占位符
+        if (params != null && !params.isEmpty()) {
+            for (int i = 0; i < params.size(); i++) {
+                this.preparedStatement.setObject(index++, params.get(i));
+            }
+        }
+        result = this.preparedStatement.executeUpdate();
+        flag = result > 0 ? true : false;
+        return flag;
+    }
 
     public ResultSet executeSQL(String sql, Object... params) throws SQLException {
         if (sql == null) {
