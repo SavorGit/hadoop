@@ -10,10 +10,10 @@
  */
 package com.littlehotspot.hadoop.mr.box.scheduler;
 
-import com.littlehotspot.hadoop.mr.box.mysql.JdbcCommonVariables;
 import com.littlehotspot.hadoop.mr.box.common.Argument;
 import com.littlehotspot.hadoop.mr.box.mapper.BoxIntegratedMapper;
 import com.littlehotspot.hadoop.mr.box.mysql.JDBCTool;
+import com.littlehotspot.hadoop.mr.box.mysql.JdbcCommonVariables;
 import com.littlehotspot.hadoop.mr.box.mysql.JdbcReader;
 import com.littlehotspot.hadoop.mr.box.mysql.model.Hotel;
 import com.littlehotspot.hadoop.mr.box.mysql.model.Media;
@@ -28,6 +28,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.CombineTextInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
@@ -41,7 +42,6 @@ import java.util.Map;
  * 调度器 - 机顶盒日志
  */
 public class BoxIntegratedScheduler extends Configured implements Tool {
-
     @Override
     public int run(String[] args) throws Exception {
         try {
@@ -81,6 +81,7 @@ public class BoxIntegratedScheduler extends Configured implements Tool {
                 fileSystem.delete(outputPath, true);
             }
             FileOutputFormat.setOutputPath(job, outputPath);
+            job.setInputFormatClass(CombineTextInputFormat.class);
             job.setReducerClass(BoxIntegratedReducer.class);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(NullWritable.class);

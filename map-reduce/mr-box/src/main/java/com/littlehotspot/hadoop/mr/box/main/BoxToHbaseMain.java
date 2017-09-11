@@ -1,7 +1,6 @@
 package com.littlehotspot.hadoop.mr.box.main;
 
 import com.littlehotspot.hadoop.mr.box.hbase.scheduler.BoxToHFileScheduler;
-import com.littlehotspot.hadoop.mr.box.hbase.scheduler.BoxToHbaseScheduler;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 

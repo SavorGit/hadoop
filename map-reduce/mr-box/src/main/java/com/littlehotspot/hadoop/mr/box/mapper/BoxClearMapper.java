@@ -31,4 +31,5 @@ public class BoxClearMapper extends Mapper<LongWritable, Text, Text, NullWritabl
             e.printStackTrace();
         }
     }
+
 }

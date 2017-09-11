@@ -71,9 +71,9 @@
 
         <!-- 自定义插件 -->
         <dependency>
-            <groupId>com.littlehotspot.hadoop.util</groupId>
+            <groupId>net.lizhaoweb.spring.hadoop.commons</groupId>
             <artifactId>argument</artifactId>
-            <version>LHS.HADOOP.1.1.0.0.1.0.0-SNAPSHOT</version>
+            <version>JL.SPRING.4.1.1.0.1.0.0</version>
         </dependency>
 
     </dependencies>
@@ -183,6 +183,8 @@
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/box/util/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/box/common/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/mysql/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/box/mysql/model/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/box/hbase/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/box/hbase/model/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/box/hbase/mapper/*</include>
