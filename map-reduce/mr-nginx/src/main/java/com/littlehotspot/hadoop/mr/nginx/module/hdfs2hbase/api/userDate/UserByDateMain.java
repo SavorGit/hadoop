@@ -11,7 +11,7 @@ import java.io.IOException;
  */
 public class UserByDateMain {
     public static void main(String[] args) throws Exception {
-        if (args.length < 5) {
+        if (args.length < 4) {
             throw new IOException("please write input path and output path...");
         }
         Configuration conf = new Configuration();

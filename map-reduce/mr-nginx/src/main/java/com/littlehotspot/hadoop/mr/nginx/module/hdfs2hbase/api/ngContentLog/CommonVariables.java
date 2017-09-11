@@ -22,7 +22,7 @@ public class CommonVariables extends Constant.CommonVariables {
     static Pattern MAPPER_HTTP_REQUEST = Pattern.compile("\\/content\\/(\\d{1,})\\.html\\?app=.*&(channel=[^\\s\\?\\\\]*)(\\\\x.*)?\\s.*");
 
     static Pattern MAPPER_WX = Pattern.compile("MicroMessenger\\/");
-    static Pattern MAPPER_NET_TYPE = Pattern.compile("NetType\\/(.*) ");
+    static Pattern MAPPER_NET_TYPE = Pattern.compile("NetType\\/([a-zA-Z\\d]*) ");
     static Pattern MAPPER_DEVICE_iPhone = Pattern.compile("CPU iPhone OS \\d{1,}(_\\d{1,}){0,}");
     static Pattern MAPPER_DEVICE_Android = Pattern.compile("Android \\d{1,}(\\.\\d{1,}){0,};");
     static Pattern MAPPER_DEVICE_MAC = Pattern.compile("Intel Mac OS X \\d{1,}(_\\d{1,}){0,}");

@@ -13,6 +13,7 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.userDate;
 import net.lizhaoweb.common.util.argument.ArgumentFactory;
 import net.lizhaoweb.spring.hadoop.commons.argument.MapReduceConstant;
 import net.lizhaoweb.spring.hadoop.commons.argument.model.Argument;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -36,12 +37,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * <h1>调度器 - 用户按天统计 [API]</h1>
- *
  */
 public class UserDateScheduler extends Configured implements Tool {
 
@@ -60,10 +61,6 @@ public class UserDateScheduler extends Configured implements Tool {
 
             String hdfsOutputPath = ArgumentFactory.getParameterValue(Argument.OutputPath);
 
-            String date = ArgumentFactory.getParameterValue(dateArg);
-            this.getConf().set("date", date);
-            long startTime = dateFormat.parse(date).getTime();
-            long endTime = startTime + 1 * 24 * 60 * 60 * 1000;
 
             String tableSourceName = ArgumentFactory.getParameterValue(tableSource);
             String hTableName = ArgumentFactory.getParameterValue(Argument.HbaseTable);
@@ -76,24 +73,33 @@ public class UserDateScheduler extends Configured implements Tool {
 
             Scan scan = new Scan();
             scan.addColumn(Bytes.toBytes("attr"), Bytes.toBytes("device_id"));
+            scan.addColumn(Bytes.toBytes("attr"), Bytes.toBytes("start"));
             scan.addColumn(Bytes.toBytes("attr"), Bytes.toBytes("p_time"));
             scan.addColumn(Bytes.toBytes("attr"), Bytes.toBytes("v_time"));
 
-            //设置过滤器
-            List<Filter> filters = new ArrayList<Filter>();
 
-            BinaryComparator comp = new BinaryComparator(Bytes.toBytes(startTime + ""));
-            SingleColumnValueFilter startFilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                    Bytes.toBytes("start"), CompareFilter.CompareOp.GREATER_OR_EQUAL, comp);
+            String date = ArgumentFactory.getParameterValue(dateArg);
+            if (StringUtils.isNotBlank(date)) {
+                this.getConf().set("date", date);
+                long startTime = dateFormat.parse(date).getTime();
+                long endTime = startTime + 1 * 24 * 60 * 60 * 1000;
 
-            BinaryComparator comp1 = new BinaryComparator(Bytes.toBytes(endTime + ""));
-            SingleColumnValueFilter endFilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                    Bytes.toBytes("start"), CompareFilter.CompareOp.LESS, comp1);
-            filters.add(startFilter);
-            filters.add(endFilter);
+                //设置过滤器
+                List<Filter> filters = new ArrayList<Filter>();
+                BinaryComparator comp = new BinaryComparator(Bytes.toBytes(startTime + ""));
+                SingleColumnValueFilter startFilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                        Bytes.toBytes("start"), CompareFilter.CompareOp.GREATER_OR_EQUAL, comp);
 
-            FilterList filterList = new FilterList(filters);
-            scan.setFilter(filterList);
+                BinaryComparator comp1 = new BinaryComparator(Bytes.toBytes(endTime + ""));
+                SingleColumnValueFilter endFilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                        Bytes.toBytes("start"), CompareFilter.CompareOp.LESS, comp1);
+                filters.add(startFilter);
+                filters.add(endFilter);
+
+                FilterList filterList = new FilterList(filters);
+                scan.setFilter(filterList);
+            }
+
 
             TableMapReduceUtil.initTableMapperJob(tableSourceName, scan, DateMapper.class, ImmutableBytesWritable.class, Put.class, job, false);
 
@@ -152,6 +158,12 @@ public class UserDateScheduler extends Configured implements Tool {
                 if (deviceId == null) {
                     return;
                 }
+
+                if (!StringUtils.isNotBlank(date)) {
+                    long time = Long.parseLong(Bytes.toString(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("start"))));
+                    date = Constant.dateFormat.format(new Date(time));
+                }
+
                 byte[] rowKeyBytes = Bytes.toBytes(deviceId + "|" + date);
 
                 ImmutableBytesWritable rowKey1 = new ImmutableBytesWritable(rowKeyBytes);
