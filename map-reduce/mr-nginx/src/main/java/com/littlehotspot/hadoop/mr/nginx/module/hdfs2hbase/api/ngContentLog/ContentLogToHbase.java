@@ -106,7 +106,7 @@ public class ContentLogToHbase extends Configured implements Tool {
             if (!matcherRequest.find()) {
                 return;
             }
-            requestUrl = matcherRequest.group().split("(\\\\x.*)?\\s")[0];
+            requestUrl = matcherRequest.group().split("(\\\\x.*)?\\s")[1];
 
             contentId = matcherRequest.group(1);
             String params = matcherRequest.group(2);
