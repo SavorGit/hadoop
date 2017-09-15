@@ -12,8 +12,10 @@ import java.io.IOException;
 public class ContentLogToHbaseMain {
     public static void main(String[] args) throws IOException {
 //        args = new String[]{
-//                "hdfsIn=hdfs://devpd1:8020/home/data/hadoop/flume/nginx_content_export/test",
+//                "hdfsIn=hdfs://devpd1:8020/home/data/hadoop/flume/nginx_content_export/2017-09-14",
 //                "hdfsOut=hdfs://devpd1:8020/home/data/hadoop/flume/nginx_content_export/testOut",
+//                "regex=\\s\\/content\\/(\\d{1,})\\.html\\?app=[^\\s\\?]*&(channel=[^\\s\\?\\\\]*)(\\\\x.*)?\\s.*",
+//                "regex=\\s/admin/activitydetail/index\\?([^\\s\\?]*)(\\\\x.*)?\\s.*",
 //        };
 //        System.setProperty("hadoop.home.dir", "E:\\GreenProfram\\HadoopEcosphere\\applications\\hadoop2.6_x64-for-win");
 

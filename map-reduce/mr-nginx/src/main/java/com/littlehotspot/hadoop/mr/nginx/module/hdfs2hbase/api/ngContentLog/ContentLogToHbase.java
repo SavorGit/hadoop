@@ -1,6 +1,9 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.ngContentLog;
 
-import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
+import net.lizhaoweb.common.util.argument.ArgumentFactory;
+import net.lizhaoweb.spring.hadoop.commons.argument.MapReduceConstant;
+import net.lizhaoweb.spring.hadoop.commons.argument.model.Argument;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -23,23 +26,33 @@ import org.apache.hadoop.util.Tool;
 import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
-import java.util.Random;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <h1> title </h1>
  * Created by Administrator on 2017-09-04 下午 10:06.
  */
 public class ContentLogToHbase extends Configured implements Tool {
+    private static final Argument regex = new Argument("regex", null, null);
+
     @Override
     public int run(String[] args) throws Exception {
         try {
 
-            CommonVariables.initMapReduce(this.getConf(), args);// 初始化 MAP REDUCE
+            MapReduceConstant.CommonVariables.initMapReduce(this.getConf(), args);
+
+            // 任务名称
+            String[] regexes = ArgumentFactory.getParameterValues(regex);
+            StringBuffer regex = new StringBuffer();
+            for (String s : regexes) {
+                regex.append(s).append("|");
+            }
+            this.getConf().set("regex", regex.toString());
 
             // 获取参数
-            String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
-            String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
+            String hdfsInputPath = ArgumentFactory.getParameterValue(Argument.InputPath);
+            String hdfsOutputPath = ArgumentFactory.getParameterValue(Argument.OutputPath);
 
             Job job = Job.getInstance(this.getConf(), this.getClass().getSimpleName());
             job.setJarByClass(this.getClass());
@@ -84,6 +97,17 @@ public class ContentLogToHbase extends Configured implements Tool {
     }
 
     private static class ContentLogMapper extends Mapper<LongWritable, Text, ImmutableBytesWritable, Put> {
+        private String[] regexes;
+
+        @Override
+        protected void setup(Context context) throws IOException, InterruptedException {
+            Configuration configuration = context.getConfiguration();
+            String regex = configuration.get("regex");
+
+            this.regexes = regex.split("\\|");
+
+        }
+
         @Override
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
             String line = value.toString();
@@ -92,33 +116,45 @@ public class ContentLogToHbase extends Configured implements Tool {
                 return;
             }
 
+            String requestUrl = matcher.group(4);
+            Matcher matcherRequest = null;
+            boolean find = false;
+            for (String regex : this.regexes) {
+                matcherRequest = Pattern.compile(regex).matcher(requestUrl);
+                if (matcherRequest.find()) {
+                    requestUrl = matcherRequest.group().split("(\\\\x.*)?\\s")[1];
+                    find = true;
+                }
+            }
+
+            if (!find) {
+                return;
+            }
+
+            // 从url中获取参数
+            String contentId = "0";
+            String channel = "";
+            String isSq = "0";
+            if (requestUrl.matches("(.*)\\/content\\/(\\d{1,})\\.html(.*)")) {
+                contentId = matcherRequest.group(1);
+                String params = matcherRequest.group(2);
+                String[] split = params.split("&");
+                for (String s : split) {
+                    if (s.contains("channel=")) {
+                        channel = s.substring(s.lastIndexOf("=") + 1);
+                    }
+                    if (s.contains("issq=")) {
+                        isSq = s.substring(s.lastIndexOf("=") + 1);
+                    }
+                }
+            }
+
+            // 从日直记录中获取展示的参数
             String ip;
             String isWx = "0";
             String netType = "";
             String deviceType = "";
             long timestamp = 0;
-            String contentId;
-            String channel = "";
-            String isSq = "0";
-            String requestUrl = matcher.group(4);
-
-            Matcher matcherRequest = CommonVariables.MAPPER_HTTP_REQUEST.matcher(requestUrl);
-            if (!matcherRequest.find()) {
-                return;
-            }
-            requestUrl = matcherRequest.group().split("(\\\\x.*)?\\s")[1];
-
-            contentId = matcherRequest.group(1);
-            String params = matcherRequest.group(2);
-            String[] split = params.split("&");
-            for (String s : split) {
-                if (s.contains("channel=")) {
-                    channel = s.substring(s.lastIndexOf("=") + 1);
-                }
-                if (s.contains("issq=")) {
-                    isSq = s.substring(s.lastIndexOf("=") + 1);
-                }
-            }
 
             ip = matcher.group(1);
             try {
@@ -153,7 +189,7 @@ public class ContentLogToHbase extends Configured implements Tool {
             Matcher matcher7 = CommonVariables.MAPPER_DEVICE_WINDOWS.matcher(httpUserAgent);
             if (matcher7.find()) {
                 deviceType = "windows";
-            }
+            }//
 
 
             String familyName = "attr";

@@ -20,6 +20,7 @@ public class CommonVariables extends Constant.CommonVariables {
 
     // 链接匹配
     static Pattern MAPPER_HTTP_REQUEST = Pattern.compile("\\s\\/content\\/(\\d{1,})\\.html\\?app=[^\\s\\?]*&(channel=[^\\s\\?\\\\]*)(\\\\x.*)?\\s.*");
+    static Pattern MAPPER_HTTP_REQUEST1 = Pattern.compile("\\s/admin/activitydetail/index\\?([^\\s\\?]*)(\\\\x.*)?\\s.*");
 
     static Pattern MAPPER_WX = Pattern.compile("MicroMessenger\\/");
     static Pattern MAPPER_NET_TYPE = Pattern.compile("NetType\\/([a-zA-Z\\d]*) ");
