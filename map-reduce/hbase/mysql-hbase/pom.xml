@@ -104,6 +104,7 @@
                                 <include>**/com/littlehotspot/hadoop/mr/hbase/hotelBoxIndex/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/hbase/area/*</include>
                                 <include>**/com/littlehotspot/hadoop/mr/hbase/tv/*</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hbase/category/*</include>
                             </includes>
                             <archive>
                                 <manifest>

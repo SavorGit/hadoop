@@ -14,6 +14,8 @@ import com.littlehotspot.hadoop.mr.hbase.area.AreaWritable;
 import com.littlehotspot.hadoop.mr.hbase.area.DBInputAreaMapper;
 import com.littlehotspot.hadoop.mr.hbase.box.BoxWritable;
 import com.littlehotspot.hadoop.mr.hbase.box.DBInputBoxMapper;
+import com.littlehotspot.hadoop.mr.hbase.category.CategoryWritable;
+import com.littlehotspot.hadoop.mr.hbase.category.DBInputCategoryMapper;
 import com.littlehotspot.hadoop.mr.hbase.hotel.DBInputHotelMapper;
 import com.littlehotspot.hadoop.mr.hbase.hotel.HotelWritable;
 import com.littlehotspot.hadoop.mr.hbase.hotelBoxIndex.DBInputHotelBoxIndexMapper;
@@ -131,6 +133,9 @@ public class Mysql2HBaseScheduler extends Configured implements Tool {
             }else if (hTableName.equals("area")){
                 writableClass = AreaWritable.class;
                 mapperClass = DBInputAreaMapper.class;
+            }else if (hTableName.equals("category")){
+                writableClass = CategoryWritable.class;
+                mapperClass = DBInputCategoryMapper.class;
             }
 
             Path outputPath = new Path(hdfsOutputPath);
