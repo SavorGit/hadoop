@@ -10,6 +10,7 @@
  */
 package com.littlehotspot.hadoop.mr.hbase.hotel;
 
+import com.littlehotspot.hadoop.mr.hbase.Mysql2HBaseScheduler;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 import org.junit.Before;

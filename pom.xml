@@ -218,6 +218,7 @@
         <module>map-reduce</module>
         <module>storm</module>
         <module>hadoop-web</module>
+        <module>spark</module>
     </modules>
 
 </project>

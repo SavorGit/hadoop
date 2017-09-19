@@ -11,7 +11,7 @@
 
     <groupId>com.littlehotspot.hadoop.mr.hbase</groupId>
     <artifactId>mysql-hbase</artifactId>
-    <version>LHS.HADOOP.2.6.1.0.1.0.0-SNAPSHOT</version>
+    <version>LHS.HADOOP.2.6.1.0.1.0.2-SNAPSHOT</version>
 
     <name>Hadoop Map-Reduce HBase [Mysql-To-HBase]</name>
     <packaging>jar</packaging>

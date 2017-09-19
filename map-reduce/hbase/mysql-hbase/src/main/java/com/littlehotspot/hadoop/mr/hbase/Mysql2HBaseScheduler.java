@@ -51,7 +51,6 @@ import org.apache.hadoop.mapreduce.lib.db.DBWritable;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
-import javax.swing.text.TabableView;
 import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -107,33 +106,33 @@ public class Mysql2HBaseScheduler extends Configured implements Tool {
             if (StringUtils.isBlank(jdbcDriver)) {
                 jdbcDriver = "com.mysql.jdbc.Driver";
             }
-            Class<?> writableClass = HotelWritable.class;
-            Class<?> mapperClass = DBInputHotelMapper.class;
+            Class<?> writableClass = null;
+            Class<?> mapperClass = null;
             if (hTableName.equals("hotel")) {
                 writableClass = HotelWritable.class;
                 mapperClass = DBInputHotelMapper.class;
-            }else if (hTableName.equals("room")){
+            } else if (hTableName.equals("room")) {
                 writableClass = RoomWritable.class;
                 mapperClass = DBInputRoomMapper.class;
-            }else if (hTableName.equals("box")){
+            } else if (hTableName.equals("box")) {
                 writableClass = BoxWritable.class;
                 mapperClass = DBInputBoxMapper.class;
-            }else if (hTableName.equals("hotel_box_index")){
+            } else if (hTableName.equals("hotel_box_index")) {
                 writableClass = HotelBoxIndexWritable.class;
                 mapperClass = DBInputHotelBoxIndexMapper.class;
-            }else if (hTableName.equals("medias")){
+            } else if (hTableName.equals("medias")) {
                 writableClass = MediasWritable.class;
                 mapperClass = DBInputMediasMapper.class;
-            }else if (hTableName.equals("resources")){
+            } else if (hTableName.equals("resources")) {
                 writableClass = ResourcesWritable.class;
                 mapperClass = DBInputResourcesMapper.class;
-            }else if (hTableName.equals("tv")){
+            } else if (hTableName.equals("tv")) {
                 writableClass = TvWritable.class;
                 mapperClass = DBInputTvMapper.class;
-            }else if (hTableName.equals("area")){
+            } else if (hTableName.equals("area")) {
                 writableClass = AreaWritable.class;
                 mapperClass = DBInputAreaMapper.class;
-            }else if (hTableName.equals("category")){
+            } else if (hTableName.equals("category")) {
                 writableClass = CategoryWritable.class;
                 mapperClass = DBInputCategoryMapper.class;
             }
