@@ -10,6 +10,8 @@
  */
 package com.littlehotspot.hadoop.mr.hbase;
 
+import com.littlehotspot.hadoop.mr.hbase.area.AreaWritable;
+import com.littlehotspot.hadoop.mr.hbase.area.DBInputAreaMapper;
 import com.littlehotspot.hadoop.mr.hbase.box.BoxWritable;
 import com.littlehotspot.hadoop.mr.hbase.box.DBInputBoxMapper;
 import com.littlehotspot.hadoop.mr.hbase.hotel.DBInputHotelMapper;
@@ -22,6 +24,8 @@ import com.littlehotspot.hadoop.mr.hbase.resources.DBInputResourcesMapper;
 import com.littlehotspot.hadoop.mr.hbase.resources.ResourcesWritable;
 import com.littlehotspot.hadoop.mr.hbase.room.DBInputRoomMapper;
 import com.littlehotspot.hadoop.mr.hbase.room.RoomWritable;
+import com.littlehotspot.hadoop.mr.hbase.tv.DBInputTvMapper;
+import com.littlehotspot.hadoop.mr.hbase.tv.TvWritable;
 import net.lizhaoweb.common.util.argument.ArgumentFactory;
 import net.lizhaoweb.spring.hadoop.commons.argument.MapReduceConstant;
 import net.lizhaoweb.spring.hadoop.commons.argument.model.Argument;
@@ -45,6 +49,7 @@ import org.apache.hadoop.mapreduce.lib.db.DBWritable;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
+import javax.swing.text.TabableView;
 import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -120,6 +125,12 @@ public class Mysql2HBaseScheduler extends Configured implements Tool {
             }else if (hTableName.equals("resources")){
                 writableClass = ResourcesWritable.class;
                 mapperClass = DBInputResourcesMapper.class;
+            }else if (hTableName.equals("tv")){
+                writableClass = TvWritable.class;
+                mapperClass = DBInputTvMapper.class;
+            }else if (hTableName.equals("area")){
+                writableClass = AreaWritable.class;
+                mapperClass = DBInputAreaMapper.class;
             }
 
             Path outputPath = new Path(hdfsOutputPath);
