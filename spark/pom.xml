@@ -41,4 +41,7 @@
         </dependencies>
     </dependencyManagement>
 
+    <modules>
+    </modules>
+
 </project>
