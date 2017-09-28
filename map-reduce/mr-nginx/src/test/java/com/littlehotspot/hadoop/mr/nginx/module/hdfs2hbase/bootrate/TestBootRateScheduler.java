@@ -11,6 +11,8 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.bootrate;
 
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.BootRateExcl;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.BootRateExclMain;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.BoxCleanJob;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.TotalBootRate;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.zhengwei.Validate;
@@ -61,26 +63,19 @@ public class TestBootRateScheduler {
                 "hbaseRoot=hdfs://onlinemain:8020/hbase",
                 "hbaseZookeeper=onlinemain"
 
-//                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase"
-//                "hdfsIn=/home/data/hadoop/flume/test-mr/mob_user",
-//                "hdfsOut=/home/data/hadoop/flume/test-mr/test-mob_user",
-//                "inRegex=^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$",
-//                "table=user"
         };
         System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
         Configuration conf = new Configuration();
 
         Constant.CommonVariables.initMapReduce(conf, args);
-        HBaseHelper hBaseHelper = new HBaseHelper(conf);
-//        List<Result> boot_rate = hBaseHelper.getAllRecord("boot_rate");
 
         HTable table = new HTable(HBaseConfiguration.create(conf), "boot_rate");
         Scan scan = new Scan();
         List<Filter> filters= new ArrayList<Filter>();
         SingleColumnValueFilter start = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                Bytes.toBytes("play_date"), CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes("2017-08-16"));
+                Bytes.toBytes("play_date"), CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes("2017-08-31"));
         SingleColumnValueFilter end = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                Bytes.toBytes("play_date"), CompareFilter.CompareOp.LESS,Bytes.toBytes("2017-08-31"));
+                Bytes.toBytes("play_date"), CompareFilter.CompareOp.LESS,Bytes.toBytes("2017-09-16"));
         filters.add(start);
         filters.add(end);
 
@@ -94,7 +89,7 @@ public class TestBootRateScheduler {
         scanner.close();
 
 
-        WritableWorkbook workbook = Workbook.createWorkbook(new File("D:\\2017年8月16-30号开机率明细.xls"));
+        WritableWorkbook workbook = Workbook.createWorkbook(new File("D:\\2017年8月31-9月15号开机率明细.xls"));
 
         WritableSheet sheet = workbook.createSheet("第一页", 0);
 
@@ -120,13 +115,6 @@ public class TestBootRateScheduler {
         sheet.addCell(playTime);
         Label production = new Label(10,0,"开机率");
         sheet.addCell(production);
-//        Map<String,String> map = new HashMap<>();
-//        map.put("start","09");
-//        map.put("end","10");
-//        mapper.insertMiddle(map);
-//        mapper.insertTimeOne();
-//        mapper.insertTimeTwo();
-//        mapper.insertRate();
         for (int i = 0; i < boot_rate.size(); i++) {
             Result result = boot_rate.get(i);
             Label areaName = new Label(0,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("area"))));
@@ -167,14 +155,14 @@ public class TestBootRateScheduler {
         String[] args = {
 //                "hdfsIn=/home/data/hadoop/flume/nginx_log/export/2017-05-31",
                 "hdfsOut=/home/data/hadoop/flume/text-mr/test-root_rate",
-//                "hbaseRoot=hdfs://onlinemain:8020/hbase",
-//                "hbaseZookeeper=onlinemain",
-//                "hdfsCluster=hdfs://onlinemain:8020",
-//                "hbaseSharePath=/user/oozie/share/lib/lib_20170512162404/hbase",
-                "hbaseRoot=hdfs://devpd1:8020/hbase",
-                "hbaseZookeeper=devpd1",
-                "hdfsCluster=hdfs://devpd1:8020",
-                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase",
+                "hbaseRoot=hdfs://onlinemain:8020/hbase",
+                "hbaseZookeeper=onlinemain",
+                "hdfsCluster=hdfs://onlinemain:8020",
+                "hbaseSharePath=/user/oozie/share/lib/lib_20170512162404/hbase",
+//                "hbaseRoot=hdfs://devpd1:8020/hbase",
+//                "hbaseZookeeper=devpd1",
+//                "hdfsCluster=hdfs://devpd1:8020",
+//                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase",
                 "startTime=2017071600",
                 "endTime=2017073200"
 
@@ -196,25 +184,14 @@ public class TestBootRateScheduler {
     @Test
     public void total() {
         String[] args = {
-//                "hdfsIn=/home/data/hadoop/flume/nginx_log/export/2017-05-31",
                 "hdfsOut=/home/data/hadoop/flume/text-mr/test-total_root_rate",
                 "hbaseRoot=hdfs://onlinemain:8020/hbase",
                 "hbaseZookeeper=onlinemain",
                 "hdfsCluster=hdfs://onlinemain:8020",
                 "hbaseSharePath=/user/oozie/share/lib/lib_20170512162404/hbase",
-//                "hbaseRoot=hdfs://devpd1:8020/hbase",
-//                "hbaseZookeeper=devpd1",
-//                "hdfsCluster=hdfs://devpd1:8020",
-//                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase",
-                "startTime=2017-08-16",
-                "endTime=2017-08-31"
+                "startTime=2017-08-31",
+                "endTime=2017-09-16"
 
-
-//                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase"
-//                "hdfsIn=/home/data/hadoop/flume/test-mr/mob_user",
-//                "hdfsOut=/home/data/hadoop/flume/test-mr/test-mob_user",
-//                "inRegex=^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$",
-//                "table=user"
         };
         System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
         Configuration conf = new Configuration();
@@ -234,11 +211,6 @@ public class TestBootRateScheduler {
                 "hbaseRoot=hdfs://onlinemain:8020/hbase",
                 "hbaseZookeeper=onlinemain"
 
-//                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase"
-//                "hdfsIn=/home/data/hadoop/flume/test-mr/mob_user",
-//                "hdfsOut=/home/data/hadoop/flume/test-mr/test-mob_user",
-//                "inRegex=^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$",
-//                "table=user"
         };
         System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
         Configuration conf = new Configuration();
@@ -249,29 +221,26 @@ public class TestBootRateScheduler {
 //        conf.set("hbase.zookeeper.property.clientPort", "2181");
 //        conf.set("hbase.rootdir", "hdfs://devpd1:9000/hbase");
         Constant.CommonVariables.initMapReduce(conf, args);
-        HBaseHelper hBaseHelper = new HBaseHelper(conf);
-        List<Result> boot_rate = hBaseHelper.getAllRecord("total_boot_rate");
-//        HTable table = new HTable(HBaseConfiguration.create(conf), "boot_rate");
-//        Scan scan = new Scan();
-//        List<Filter> filters= new ArrayList<Filter>();
-//        SingleColumnValueFilter start = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-//                Bytes.toBytes("play_date"), CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes("2017-07-01"));
-//        SingleColumnValueFilter end = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-//                Bytes.toBytes("play_date"), CompareFilter.CompareOp.LESS,Bytes.toBytes("2017-07-16"));
-//        filters.add(start);
-//        filters.add(end);
-//
-//        FilterList filterList = new FilterList(filters);
-//        scan.setFilter(filterList);
-//        ResultScanner scanner = table.getScanner(scan);
-//        List<Result> boot_rate = new ArrayList<>();
-//        for (Result result : scanner) {
-//            boot_rate.add(result);
-//        }
-//        scanner.close();
+//        HBaseHelper hBaseHelper = new HBaseHelper(conf);
+//        List<Result> boot_rate = hBaseHelper.getAllRecord("total_boot_rate");
+        HTable table = new HTable(HBaseConfiguration.create(conf), "total_boot_rate");
+        Scan scan = new Scan();
+        List<Filter> filters= new ArrayList<Filter>();
+        SingleColumnValueFilter end = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                Bytes.toBytes("issue"), CompareFilter.CompareOp.EQUAL,Bytes.toBytes("2017-08-162017-08-30"));
+        filters.add(end);
+
+        FilterList filterList = new FilterList(filters);
+        scan.setFilter(filterList);
+        ResultScanner scanner = table.getScanner(scan);
+        List<Result> boot_rate = new ArrayList<>();
+        for (Result result : scanner) {
+            boot_rate.add(result);
+        }
+        scanner.close();
 
 
-        WritableWorkbook workbook = Workbook.createWorkbook(new File("D:\\2017年8月16-30号开机率汇总.xls"));
+        WritableWorkbook workbook = Workbook.createWorkbook(new File("D:\\13212312.xls"));
 
         WritableSheet sheet = workbook.createSheet("第一页", 0);
 
@@ -361,8 +330,6 @@ public class TestBootRateScheduler {
     public void test() throws IOException, WriteException {
         String[] args = {
                 "hdfsCluster=hdfs://onlinemain:8020",
-//                "hdfsIn=/home/data/hadoop/flume/nginx_log/export/2017-05-31",
-//                "hdfsOut=/home/data/hadoop/flume/text-mr/test-box_log",
                 "hbaseRoot=hdfs://onlinemain:8020/hbase",
                 "hbaseZookeeper=onlinemain"
 
@@ -379,24 +346,31 @@ public class TestBootRateScheduler {
         HBaseHelper hBaseHelper = new HBaseHelper(conf);
 //        List<Result> boot_rate = hBaseHelper.getAllRecord("boot_rate");
 
-        HTable table = new HTable(HBaseConfiguration.create(conf), "media_sta");
+        HTable table = new HTable(HBaseConfiguration.create(conf), "box_log");
         Scan scan = new Scan();
         List<Filter> filters = new ArrayList<Filter>();
         SingleColumnValueFilter timefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                Bytes.toBytes("play_date"), CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes("20170905\t"));
+                Bytes.toBytes("date_time"), CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes("2017091200"));
+        SingleColumnValueFilter timefilter2 = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                Bytes.toBytes("date_time"), CompareFilter.CompareOp.LESS,Bytes.toBytes("2017091300"));
+        SingleColumnValueFilter macfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                Bytes.toBytes("mac"), CompareFilter.CompareOp.EQUAL,Bytes.toBytes("FCD5D900B1FF"));
         filters.add(timefilter);
+        filters.add(macfilter);
         FilterList filterList = new FilterList(filters);
         scan.setFilter(filterList);
         ResultScanner scanner = table.getScanner(scan);
         List<Result> boot_rate = new ArrayList<>();
         for (Result result : scanner) {
             boot_rate.add(result);
+            System.out.println(result.toString());
+            result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("hotel_id"));
         }
         scanner.close();
 
         for (Result result : boot_rate) {
-            byte[] value = result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_date"));
-            System.out.println(new String(value));
+
+            System.out.println(result.toString());
         }
     }
 
@@ -406,7 +380,6 @@ public class TestBootRateScheduler {
                 "hdfsCluster=hdfs://onlinemain:8020",
                 "hbaseRoot=hdfs://onlinemain:8020/hbase",
                 "hbaseZookeeper=onlinemain"
-
         };
         System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
         Configuration conf = new Configuration();
@@ -466,6 +439,39 @@ public class TestBootRateScheduler {
 
         workbook.write();
         workbook.close();
+    }
+
+    @Test
+    public void toexcel() {
+        long startTime = System.currentTimeMillis();
+        String[] args = {
+//                "hdfsIn=/home/data/hadoop/flume/nginx_log/export/2017-05-31",
+                "hbaseRoot=hdfs://onlinemain:8020/hbase",
+                "hbaseZookeeper=onlinemain",
+                "hdfsCluster=hdfs://onlinemain:8020",
+                "hbaseSharePath=/user/oozie/share/lib/lib_20170512162404/hbase",
+//                "hbaseRoot=hdfs://devpd1:8020/hbase",
+//                "hbaseZookeeper=devpd1",
+//                "hdfsCluster=hdfs://devpd1:8020",
+//                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase",
+                "startTime=2017083100",
+                "endTime=2017091600",
+                "issue=2017-08-312017-09-16",
+                "excelName=D:\\11111.xls"
+
+
+        };
+        System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
+        Configuration conf = new Configuration();
+
+        try {
+
+            ToolRunner.run(conf, new BootRateExcl(), args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        long endTime = System.currentTimeMillis();
+        System.out.println("totalTime=======>>>"+(endTime-startTime));
     }
 
 }
