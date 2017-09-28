@@ -58,16 +58,16 @@ public class BootRateExcl extends Configured implements Tool {
             ArgumentFactory.printInputArgument(BootRateArgument.JobName, jobName, false);
 
             String startTime = ArgumentFactory.getParameterValue(BootRateArgument.StartTime);
-            ArgumentFactory.printInputArgument(BootRateArgument.JobName, jobName, false);
+            ArgumentFactory.printInputArgument(BootRateArgument.StartTime, startTime, false);
 
             String endTime = ArgumentFactory.getParameterValue(BootRateArgument.EndTime);
-            ArgumentFactory.printInputArgument(BootRateArgument.JobName, jobName, false);
+            ArgumentFactory.printInputArgument(BootRateArgument.EndTime, endTime, false);
 
             String excelName = ArgumentFactory.getParameterValue(BootRateArgument.ExcelName);
-            ArgumentFactory.printInputArgument(BootRateArgument.JobName, jobName, false);
+            ArgumentFactory.printInputArgument(BootRateArgument.ExcelName, excelName, false);
 
             String issue = ArgumentFactory.getParameterValue(BootRateArgument.Issue);
-            ArgumentFactory.printInputArgument(BootRateArgument.JobName, jobName, false);
+            ArgumentFactory.printInputArgument(BootRateArgument.Issue, issue, false);
 
             // 准备工作
             ArgumentFactory.checkNullValueForArgument(BootRateArgument.StartTime, startTime);
@@ -152,9 +152,9 @@ public class BootRateExcl extends Configured implements Tool {
 
             HTable table1 = new HTable(HBaseConfiguration.create(this.getConf()), "total_boot_rate");
             Scan scan1 = new Scan();
-            List<Filter> filters1= new ArrayList<Filter>();
+            List<Filter> filters1 = new ArrayList<Filter>();
             SingleColumnValueFilter issuefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                    Bytes.toBytes("issue"), CompareFilter.CompareOp.EQUAL,Bytes.toBytes(issue));
+                    Bytes.toBytes("issue"), CompareFilter.CompareOp.EQUAL, Bytes.toBytes(issue));
             filters.add(end);
 
             FilterList filterList1 = new FilterList(issuefilter);
@@ -168,48 +168,48 @@ public class BootRateExcl extends Configured implements Tool {
 
             WritableSheet sheet1 = workbook.createSheet("开机率汇总", 1);
 
-            Label area1 = new Label(0,0,"区域");
+            Label area1 = new Label(0, 0, "区域");
             sheet1.addCell(area1);
-            Label hotel1 = new Label(1,0,"酒楼");
+            Label hotel1 = new Label(1, 0, "酒楼");
             sheet1.addCell(hotel1);
-            Label addr1 = new Label(2,0,"位置");
+            Label addr1 = new Label(2, 0, "位置");
             sheet1.addCell(addr1);
-            Label server1 = new Label(3,0,"包间");
+            Label server1 = new Label(3, 0, "包间");
             sheet1.addCell(server1);
-            Label maintenMan1 = new Label(4,0,"维护人");
+            Label maintenMan1 = new Label(4, 0, "维护人");
             sheet1.addCell(maintenMan1);
-            Label iskey1 = new Label(5,0,"重点酒楼");
+            Label iskey1 = new Label(5, 0, "重点酒楼");
             sheet1.addCell(iskey1);
-            Label boxMac1 = new Label(6,0,"机顶盒编号");
+            Label boxMac1 = new Label(6, 0, "机顶盒编号");
             sheet1.addCell(boxMac1);
-            Label playCount1 = new Label(7,0,"播放天数");
+            Label playCount1 = new Label(7, 0, "播放天数");
             sheet1.addCell(playCount1);
-            Label playTime1 = new Label(8,0,"有效率合计");
+            Label playTime1 = new Label(8, 0, "有效率合计");
             sheet1.addCell(playTime1);
-            Label production1 = new Label(9,0,"平均有效率");
+            Label production1 = new Label(9, 0, "平均有效率");
             sheet1.addCell(production1);
 
             for (int i = 0; i < boot_rate1.size(); i++) {
                 Result result = boot_rate1.get(i);
-                Label areaName = new Label(0,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("area"))));
+                Label areaName = new Label(0, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("area"))));
                 sheet.addCell(areaName);
-                Label hotelName = new Label(1,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("hotel_name"))));
+                Label hotelName = new Label(1, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("hotel_name"))));
                 sheet.addCell(hotelName);
-                Label address = new Label(2,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("addr"))));
+                Label address = new Label(2, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("addr"))));
                 sheet.addCell(address);
-                Label roomName = new Label(3,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("room_name"))));
+                Label roomName = new Label(3, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("room_name"))));
                 sheet.addCell(roomName);
-                Label mainten = new Label(4,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mainten_man"))));
+                Label mainten = new Label(4, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mainten_man"))));
                 sheet.addCell(mainten);
-                Label key = new Label(5,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("isKey"))));
+                Label key = new Label(5, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("isKey"))));
                 sheet.addCell(key);
-                Label mac = new Label(6,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mac"))));
+                Label mac = new Label(6, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mac"))));
                 sheet.addCell(mac);
-                Label count = new Label(7,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_days"))));
+                Label count = new Label(7, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_days"))));
                 sheet.addCell(count);
-                Label time = new Label(8,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("production")))+"%");
+                Label time = new Label(8, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("production"))) + "%");
                 sheet.addCell(time);
-                Label prod = new Label(9,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("av_production")))+"%");
+                Label prod = new Label(9, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("av_production"))) + "%");
                 sheet.addCell(prod);
             }
 
