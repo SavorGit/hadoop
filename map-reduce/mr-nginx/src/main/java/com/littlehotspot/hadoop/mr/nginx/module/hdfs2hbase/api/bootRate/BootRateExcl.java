@@ -20,7 +20,10 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.lizhaoweb.common.util.argument.ArgumentFactory;
 import net.lizhaoweb.spring.hadoop.commons.argument.MapReduceConstant;
+import net.lizhaoweb.spring.hadoop.commons.argument.model.Argument;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Result;
@@ -32,8 +35,9 @@ import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +61,8 @@ public class BootRateExcl {
     public void run(String[] args) throws Exception {
         MapReduceConstant.CommonVariables.initMapReduce(this.getConf(), args);// 解析参数并初始化 MAP REDUCE
 
+        String hdfsCluster = ArgumentFactory.getParameterValue(Argument.HDFSCluster);
+
         String startTime = ArgumentFactory.getParameterValue(BootRateArgument.StartTime);
         ArgumentFactory.printInputArgument(BootRateArgument.StartTime, startTime, false);
 
@@ -70,13 +76,18 @@ public class BootRateExcl {
         ArgumentFactory.printInputArgument(BootRateArgument.Issue, issue, false);
 
         // 准备工作
+        ArgumentFactory.checkNullValueForArgument(BootRateArgument.HDFSCluster, hdfsCluster);
         ArgumentFactory.checkNullValueForArgument(BootRateArgument.StartTime, startTime);
         ArgumentFactory.checkNullValueForArgument(BootRateArgument.EndTime, endTime);
         ArgumentFactory.checkNullValueForArgument(BootRateArgument.Issue, issue);
         ArgumentFactory.checkNullValueForArgument(BootRateArgument.ExcelName, excelName);
 
-
-        WritableWorkbook workbook = Workbook.createWorkbook(new File(excelName));
+        URI uri = new URI(hdfsCluster);
+        FileSystem fs = FileSystem.get(uri, conf);
+        Path outputPath = new Path(excelName);
+        OutputStream outputStream = fs.create(outputPath, true);
+        WritableWorkbook workbook = Workbook.createWorkbook(outputStream);
+//        WritableWorkbook workbook = Workbook.createWorkbook(new File(excelName));
 
         this.exportBootRateDetails(workbook, startTime, endTime);// 开机率明细
         this.exportBootRateSummary(workbook, issue);// 开机率汇总
