@@ -11,9 +11,7 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.util.ToolRunner;
-
-import java.io.IOException;
+import org.apache.hadoop.util.GenericOptionsParser;
 
 /**
  * <h1>主类 - 用户 [API]</h1>
@@ -28,14 +26,12 @@ import java.io.IOException;
 public class BootRateExclMain {
 
     public static void main(String[] args) throws Exception {
-        if (args.length < 2) {
-            throw new IOException("please write input path and output path...");
-        }
         Configuration conf = new Configuration();
-
-
         try {
-            ToolRunner.run(conf, new BootRateExcl(), args);
+            BootRateExcl bootRateExcl = new BootRateExcl(conf);
+            GenericOptionsParser parser = new GenericOptionsParser(conf, args);
+            String[] toolArgs = parser.getRemainingArgs();
+            bootRateExcl.run(toolArgs);
         } catch (Exception e) {
             e.printStackTrace();
         }

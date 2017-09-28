@@ -15,9 +15,12 @@ import jxl.write.Label;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.lizhaoweb.common.util.argument.ArgumentFactory;
 import net.lizhaoweb.spring.hadoop.commons.argument.MapReduceConstant;
-import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Result;
@@ -28,7 +31,6 @@ import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.util.Tool;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,47 +47,44 @@ import java.util.List;
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class BootRateExcl extends Configured implements Tool {
+@RequiredArgsConstructor
+public class BootRateExcl {
 
     private static final String HBASE_NAME = "boot_rate";
 
-    @Override
-    public int run(String[] args) throws Exception {
-        try {
-            MapReduceConstant.CommonVariables.initMapReduce(this.getConf(), args);// 解析参数并初始化 MAP REDUCE
+    @Getter
+    @NonNull
+    private Configuration conf;
 
-            String startTime = ArgumentFactory.getParameterValue(BootRateArgument.StartTime);
-            ArgumentFactory.printInputArgument(BootRateArgument.StartTime, startTime, false);
+    public void run(String[] args) throws Exception {
+        MapReduceConstant.CommonVariables.initMapReduce(this.getConf(), args);// 解析参数并初始化 MAP REDUCE
 
-            String endTime = ArgumentFactory.getParameterValue(BootRateArgument.EndTime);
-            ArgumentFactory.printInputArgument(BootRateArgument.EndTime, endTime, false);
+        String startTime = ArgumentFactory.getParameterValue(BootRateArgument.StartTime);
+        ArgumentFactory.printInputArgument(BootRateArgument.StartTime, startTime, false);
 
-            String excelName = ArgumentFactory.getParameterValue(BootRateArgument.ExcelName);
-            ArgumentFactory.printInputArgument(BootRateArgument.ExcelName, excelName, false);
+        String endTime = ArgumentFactory.getParameterValue(BootRateArgument.EndTime);
+        ArgumentFactory.printInputArgument(BootRateArgument.EndTime, endTime, false);
 
-            String issue = ArgumentFactory.getParameterValue(BootRateArgument.Issue);
-            ArgumentFactory.printInputArgument(BootRateArgument.Issue, issue, false);
+        String excelName = ArgumentFactory.getParameterValue(BootRateArgument.ExcelName);
+        ArgumentFactory.printInputArgument(BootRateArgument.ExcelName, excelName, false);
 
-            // 准备工作
-            ArgumentFactory.checkNullValueForArgument(BootRateArgument.StartTime, startTime);
-            ArgumentFactory.checkNullValueForArgument(BootRateArgument.EndTime, endTime);
-            ArgumentFactory.checkNullValueForArgument(BootRateArgument.Issue, issue);
-            ArgumentFactory.checkNullValueForArgument(BootRateArgument.ExcelName, excelName);
+        String issue = ArgumentFactory.getParameterValue(BootRateArgument.Issue);
+        ArgumentFactory.printInputArgument(BootRateArgument.Issue, issue, false);
+
+        // 准备工作
+        ArgumentFactory.checkNullValueForArgument(BootRateArgument.StartTime, startTime);
+        ArgumentFactory.checkNullValueForArgument(BootRateArgument.EndTime, endTime);
+        ArgumentFactory.checkNullValueForArgument(BootRateArgument.Issue, issue);
+        ArgumentFactory.checkNullValueForArgument(BootRateArgument.ExcelName, excelName);
 
 
-            WritableWorkbook workbook = Workbook.createWorkbook(new File(excelName));
+        WritableWorkbook workbook = Workbook.createWorkbook(new File(excelName));
 
-            this.exportBootRateDetails(workbook, startTime, endTime);// 开机率明细
-            this.exportBootRateSummary(workbook, issue);// 开机率汇总
+        this.exportBootRateDetails(workbook, startTime, endTime);// 开机率明细
+        this.exportBootRateSummary(workbook, issue);// 开机率汇总
 
-            workbook.write();
-            workbook.close();
-
-            return 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 1;
-        }
+        workbook.write();
+        workbook.close();
     }
 
     // 开机率明细

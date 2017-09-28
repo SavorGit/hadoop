@@ -12,7 +12,6 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.bootrate;
 
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.BootRateExcl;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.BootRateExclMain;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.BoxCleanJob;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.TotalBootRate;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.zhengwei.Validate;
@@ -22,25 +21,24 @@ import jxl.write.Label;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
-import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.filter.*;
+import org.apache.hadoop.hbase.filter.CompareFilter;
+import org.apache.hadoop.hbase.filter.Filter;
+import org.apache.hadoop.hbase.filter.FilterList;
+import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.ToolRunner;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -71,11 +69,11 @@ public class TestBootRateScheduler {
 
         HTable table = new HTable(HBaseConfiguration.create(conf), "boot_rate");
         Scan scan = new Scan();
-        List<Filter> filters= new ArrayList<Filter>();
+        List<Filter> filters = new ArrayList<Filter>();
         SingleColumnValueFilter start = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                Bytes.toBytes("play_date"), CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes("2017-08-31"));
+                Bytes.toBytes("play_date"), CompareFilter.CompareOp.GREATER_OR_EQUAL, Bytes.toBytes("2017-08-31"));
         SingleColumnValueFilter end = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                Bytes.toBytes("play_date"), CompareFilter.CompareOp.LESS,Bytes.toBytes("2017-09-16"));
+                Bytes.toBytes("play_date"), CompareFilter.CompareOp.LESS, Bytes.toBytes("2017-09-16"));
         filters.add(start);
         filters.add(end);
 
@@ -93,60 +91,58 @@ public class TestBootRateScheduler {
 
         WritableSheet sheet = workbook.createSheet("第一页", 0);
 
-        Label area = new Label(0,0,"区域");
+        Label area = new Label(0, 0, "区域");
         sheet.addCell(area);
-        Label hotel = new Label(1,0,"酒楼");
+        Label hotel = new Label(1, 0, "酒楼");
         sheet.addCell(hotel);
-        Label addr = new Label(2,0,"位置");
+        Label addr = new Label(2, 0, "位置");
         sheet.addCell(addr);
-        Label server = new Label(3,0,"包间");
+        Label server = new Label(3, 0, "包间");
         sheet.addCell(server);
-        Label maintenMan = new Label(4,0,"维护人");
+        Label maintenMan = new Label(4, 0, "维护人");
         sheet.addCell(maintenMan);
-        Label iskey = new Label(5,0,"重点酒楼");
+        Label iskey = new Label(5, 0, "重点酒楼");
         sheet.addCell(iskey);
-        Label playDate = new Label(6,0,"播放日期");
+        Label playDate = new Label(6, 0, "播放日期");
         sheet.addCell(playDate);
-        Label boxMac = new Label(7,0,"机顶盒编号");
+        Label boxMac = new Label(7, 0, "机顶盒编号");
         sheet.addCell(boxMac);
-        Label playCount = new Label(8,0,"播放次数");
+        Label playCount = new Label(8, 0, "播放次数");
         sheet.addCell(playCount);
-        Label playTime = new Label(9,0,"播放总秒数");
+        Label playTime = new Label(9, 0, "播放总秒数");
         sheet.addCell(playTime);
-        Label production = new Label(10,0,"开机率");
+        Label production = new Label(10, 0, "开机率");
         sheet.addCell(production);
         for (int i = 0; i < boot_rate.size(); i++) {
             Result result = boot_rate.get(i);
-            Label areaName = new Label(0,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("area"))));
+            Label areaName = new Label(0, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("area"))));
             sheet.addCell(areaName);
-            Label hotelName = new Label(1,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("hotel_name"))));
+            Label hotelName = new Label(1, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("hotel_name"))));
             sheet.addCell(hotelName);
-            Label address = new Label(2,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("addr"))));
+            Label address = new Label(2, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("addr"))));
             sheet.addCell(address);
-            Label roomName = new Label(3,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("room_name"))));
+            Label roomName = new Label(3, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("room_name"))));
             sheet.addCell(roomName);
-            Label mainten = new Label(4,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mainten_man"))));
+            Label mainten = new Label(4, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mainten_man"))));
             sheet.addCell(mainten);
-            Label key = new Label(5,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("isKey"))));
+            Label key = new Label(5, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("isKey"))));
             sheet.addCell(key);
-            Label date = new Label(6,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_date"))));
+            Label date = new Label(6, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_date"))));
             sheet.addCell(date);
-            Label mac = new Label(7,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mac"))));
+            Label mac = new Label(7, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mac"))));
             sheet.addCell(mac);
-            Label count = new Label(8,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_count"))));
+            Label count = new Label(8, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_count"))));
             sheet.addCell(count);
-            Label time = new Label(9,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_time"))));
+            Label time = new Label(9, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_time"))));
             sheet.addCell(time);
-            Label prod = new Label(10,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("production"))));
+            Label prod = new Label(10, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("production"))));
             sheet.addCell(prod);
         }
-
 
 
         workbook.write();
         workbook.close();
     }
-
 
 
     @Test
@@ -178,7 +174,7 @@ public class TestBootRateScheduler {
             e.printStackTrace();
         }
         long endTime = System.currentTimeMillis();
-        System.out.println("totalTime=======>>>"+(endTime-startTime));
+        System.out.println("totalTime=======>>>" + (endTime - startTime));
     }
 
     @Test
@@ -225,9 +221,9 @@ public class TestBootRateScheduler {
 //        List<Result> boot_rate = hBaseHelper.getAllRecord("total_boot_rate");
         HTable table = new HTable(HBaseConfiguration.create(conf), "total_boot_rate");
         Scan scan = new Scan();
-        List<Filter> filters= new ArrayList<Filter>();
+        List<Filter> filters = new ArrayList<Filter>();
         SingleColumnValueFilter end = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                Bytes.toBytes("issue"), CompareFilter.CompareOp.EQUAL,Bytes.toBytes("2017-08-162017-08-30"));
+                Bytes.toBytes("issue"), CompareFilter.CompareOp.EQUAL, Bytes.toBytes("2017-08-162017-08-30"));
         filters.add(end);
 
         FilterList filterList = new FilterList(filters);
@@ -244,51 +240,50 @@ public class TestBootRateScheduler {
 
         WritableSheet sheet = workbook.createSheet("第一页", 0);
 
-        Label area = new Label(0,0,"区域");
+        Label area = new Label(0, 0, "区域");
         sheet.addCell(area);
-        Label hotel = new Label(1,0,"酒楼");
+        Label hotel = new Label(1, 0, "酒楼");
         sheet.addCell(hotel);
-        Label addr = new Label(2,0,"位置");
+        Label addr = new Label(2, 0, "位置");
         sheet.addCell(addr);
-        Label server = new Label(3,0,"包间");
+        Label server = new Label(3, 0, "包间");
         sheet.addCell(server);
-        Label maintenMan = new Label(4,0,"维护人");
+        Label maintenMan = new Label(4, 0, "维护人");
         sheet.addCell(maintenMan);
-        Label iskey = new Label(5,0,"重点酒楼");
+        Label iskey = new Label(5, 0, "重点酒楼");
         sheet.addCell(iskey);
-        Label boxMac = new Label(6,0,"机顶盒编号");
+        Label boxMac = new Label(6, 0, "机顶盒编号");
         sheet.addCell(boxMac);
-        Label playCount = new Label(7,0,"播放天数");
+        Label playCount = new Label(7, 0, "播放天数");
         sheet.addCell(playCount);
-        Label playTime = new Label(8,0,"有效率合计");
+        Label playTime = new Label(8, 0, "有效率合计");
         sheet.addCell(playTime);
-        Label production = new Label(9,0,"平均有效率");
+        Label production = new Label(9, 0, "平均有效率");
         sheet.addCell(production);
 
         for (int i = 0; i < boot_rate.size(); i++) {
             Result result = boot_rate.get(i);
-            Label areaName = new Label(0,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("area"))));
+            Label areaName = new Label(0, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("area"))));
             sheet.addCell(areaName);
-            Label hotelName = new Label(1,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("hotel_name"))));
+            Label hotelName = new Label(1, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("hotel_name"))));
             sheet.addCell(hotelName);
-            Label address = new Label(2,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("addr"))));
+            Label address = new Label(2, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("addr"))));
             sheet.addCell(address);
-            Label roomName = new Label(3,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("room_name"))));
+            Label roomName = new Label(3, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("room_name"))));
             sheet.addCell(roomName);
-            Label mainten = new Label(4,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mainten_man"))));
+            Label mainten = new Label(4, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mainten_man"))));
             sheet.addCell(mainten);
-            Label key = new Label(5,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("isKey"))));
+            Label key = new Label(5, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("isKey"))));
             sheet.addCell(key);
-            Label mac = new Label(6,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mac"))));
+            Label mac = new Label(6, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mac"))));
             sheet.addCell(mac);
-            Label count = new Label(7,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_days"))));
+            Label count = new Label(7, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_days"))));
             sheet.addCell(count);
-            Label time = new Label(8,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("production")))+"%");
+            Label time = new Label(8, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("production"))) + "%");
             sheet.addCell(time);
-            Label prod = new Label(9,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("av_production")))+"%");
+            Label prod = new Label(9, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("av_production"))) + "%");
             sheet.addCell(prod);
         }
-
 
 
         workbook.write();
@@ -324,8 +319,9 @@ public class TestBootRateScheduler {
             e.printStackTrace();
         }
         long endTime = System.currentTimeMillis();
-        System.out.println("totalTime=======>>>"+(endTime-startTime));
+        System.out.println("totalTime=======>>>" + (endTime - startTime));
     }
+
     @Test
     public void test() throws IOException, WriteException {
         String[] args = {
@@ -350,11 +346,11 @@ public class TestBootRateScheduler {
         Scan scan = new Scan();
         List<Filter> filters = new ArrayList<Filter>();
         SingleColumnValueFilter timefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                Bytes.toBytes("date_time"), CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes("2017091200"));
+                Bytes.toBytes("date_time"), CompareFilter.CompareOp.GREATER_OR_EQUAL, Bytes.toBytes("2017091200"));
         SingleColumnValueFilter timefilter2 = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                Bytes.toBytes("date_time"), CompareFilter.CompareOp.LESS,Bytes.toBytes("2017091300"));
+                Bytes.toBytes("date_time"), CompareFilter.CompareOp.LESS, Bytes.toBytes("2017091300"));
         SingleColumnValueFilter macfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                Bytes.toBytes("mac"), CompareFilter.CompareOp.EQUAL,Bytes.toBytes("FCD5D900B1FF"));
+                Bytes.toBytes("mac"), CompareFilter.CompareOp.EQUAL, Bytes.toBytes("FCD5D900B1FF"));
         filters.add(timefilter);
         filters.add(macfilter);
         FilterList filterList = new FilterList(filters);
@@ -392,49 +388,48 @@ public class TestBootRateScheduler {
 
         WritableSheet sheet = workbook.createSheet("第一页", 0);
 
-        Label area = new Label(0,0,"酒楼ID");
+        Label area = new Label(0, 0, "酒楼ID");
         sheet.addCell(area);
-        Label hotel = new Label(1,0,"包间ID");
+        Label hotel = new Label(1, 0, "包间ID");
         sheet.addCell(hotel);
-        Label addr = new Label(2,0,"播放日期");
+        Label addr = new Label(2, 0, "播放日期");
         sheet.addCell(addr);
-        Label server = new Label(3,0,"动作");
+        Label server = new Label(3, 0, "动作");
         sheet.addCell(server);
-        Label maintenMan = new Label(4,0,"类型");
+        Label maintenMan = new Label(4, 0, "类型");
         sheet.addCell(maintenMan);
-        Label iskey = new Label(5,0,"视频名称");
+        Label iskey = new Label(5, 0, "视频名称");
         sheet.addCell(iskey);
-        Label boxMac = new Label(6,0,"视频长度");
+        Label boxMac = new Label(6, 0, "视频长度");
         sheet.addCell(boxMac);
-        Label playCount = new Label(7,0,"MAC");
+        Label playCount = new Label(7, 0, "MAC");
         sheet.addCell(playCount);
-        Label playTime = new Label(8,0,"播放时间");
+        Label playTime = new Label(8, 0, "播放时间");
         sheet.addCell(playTime);
 
         for (int i = 0; i < boot_rate.size(); i++) {
             Result result = boot_rate.get(i);
-            Label areaName = new Label(0,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("hotel_id"))));
+            Label areaName = new Label(0, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("hotel_id"))));
             sheet.addCell(areaName);
-            Label hotelName = new Label(1,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("room_id"))));
+            Label hotelName = new Label(1, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("room_id"))));
             sheet.addCell(hotelName);
-            Label address = new Label(2,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("date"))));
+            Label address = new Label(2, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("date"))));
             sheet.addCell(address);
-            Label roomName = new Label(3,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("time"))));
+            Label roomName = new Label(3, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("time"))));
             sheet.addCell(roomName);
-            Label mainten = new Label(4,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("option_type"))));
+            Label mainten = new Label(4, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("option_type"))));
             sheet.addCell(mainten);
-            Label key = new Label(5,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("media_type"))));
+            Label key = new Label(5, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("media_type"))));
             sheet.addCell(key);
-            Label mac = new Label(6,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("content_name"))));
+            Label mac = new Label(6, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("content_name"))));
             sheet.addCell(mac);
-            Label count = new Label(7,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_time"))));
+            Label count = new Label(7, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_time"))));
             sheet.addCell(count);
-            Label time = new Label(8,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mac"))));
+            Label time = new Label(8, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mac"))));
             sheet.addCell(time);
-            Label prod = new Label(9,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_date"))));
+            Label prod = new Label(9, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_date"))));
             sheet.addCell(prod);
         }
-
 
 
         workbook.write();
@@ -465,13 +460,15 @@ public class TestBootRateScheduler {
         Configuration conf = new Configuration();
 
         try {
-
-            ToolRunner.run(conf, new BootRateExcl(), args);
+            BootRateExcl bootRateExcl = new BootRateExcl(conf);
+            GenericOptionsParser parser = new GenericOptionsParser(conf, args);
+            String[] toolArgs = parser.getRemainingArgs();
+            bootRateExcl.run(toolArgs);
         } catch (Exception e) {
             e.printStackTrace();
         }
         long endTime = System.currentTimeMillis();
-        System.out.println("totalTime=======>>>"+(endTime-startTime));
+        System.out.println("totalTime=======>>>" + (endTime - startTime));
     }
 
 }
