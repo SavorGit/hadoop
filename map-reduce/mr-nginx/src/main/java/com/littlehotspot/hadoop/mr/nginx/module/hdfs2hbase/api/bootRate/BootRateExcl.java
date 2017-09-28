@@ -50,8 +50,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BootRateExcl {
 
-    private static final String HBASE_NAME = "boot_rate";
-
     @Getter
     @NonNull
     private Configuration conf;
@@ -89,7 +87,7 @@ public class BootRateExcl {
 
     // 开机率明细
     private void exportBootRateDetails(WritableWorkbook workbook, String startTime, String endTime) throws IOException, WriteException {
-        HTable table = new HTable(HBaseConfiguration.create(this.getConf()), HBASE_NAME);
+        HTable table = new HTable(HBaseConfiguration.create(this.getConf()), "boot_rate");
 
         Scan scan = new Scan();
         List<Filter> filters = new ArrayList<>();
