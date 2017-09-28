@@ -83,12 +83,12 @@ public class BootRateExcl {
         ArgumentFactory.checkNullValueForArgument(BootRateArgument.ExcelName, excelName);
 
         URI uri = new URI(hdfsCluster);
-        FileSystem fs = FileSystem.get(uri, conf);
+        FileSystem fs = FileSystem.get(uri, this.getConf());
         Path outputPath = new Path(excelName);
         OutputStream outputStream = fs.create(outputPath, true);
+
         WritableWorkbook workbook = Workbook.createWorkbook(outputStream);
 //        WritableWorkbook workbook = Workbook.createWorkbook(new File(excelName));
-
         this.exportBootRateDetails(workbook, startTime, endTime);// 开机率明细
         this.exportBootRateSummary(workbook, issue);// 开机率汇总
 
