@@ -81,6 +81,10 @@ public enum Argument {
 
     StartTime("startTime", null),
     EndTime("endTime", null),
+
+    TableName("tableName", null),
+
+    ExcelName("excelName", null),
     ;
 
     @Getter
