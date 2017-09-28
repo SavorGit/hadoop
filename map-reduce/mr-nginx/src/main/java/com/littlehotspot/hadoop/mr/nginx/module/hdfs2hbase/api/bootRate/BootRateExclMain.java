@@ -35,7 +35,7 @@ public class BootRateExclMain {
 
 
         try {
-            ToolRunner.run(conf, new BoxCleanJob(), args);
+            ToolRunner.run(conf, new BootRateExcl(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }

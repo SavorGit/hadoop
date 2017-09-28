@@ -66,10 +66,15 @@ public class BootRateExcl extends Configured implements Tool {
             String excelName = ArgumentFactory.getParameterValue(BootRateArgument.ExcelName);
             ArgumentFactory.printInputArgument(BootRateArgument.JobName, jobName, false);
 
+            String issue = ArgumentFactory.getParameterValue(BootRateArgument.Issue);
+            ArgumentFactory.printInputArgument(BootRateArgument.JobName, jobName, false);
+
             // 准备工作
             ArgumentFactory.checkNullValueForArgument(BootRateArgument.StartTime, startTime);
             ArgumentFactory.checkNullValueForArgument(BootRateArgument.EndTime, endTime);
+            ArgumentFactory.checkNullValueForArgument(BootRateArgument.Issue, issue);
             ArgumentFactory.checkNullValueForArgument(BootRateArgument.ExcelName, excelName);
+
             if (StringUtils.isBlank(jobName)) {
                 jobName = this.getClass().getName();
             }
@@ -95,7 +100,7 @@ public class BootRateExcl extends Configured implements Tool {
 
             WritableWorkbook workbook = Workbook.createWorkbook(new File(excelName));
 
-            WritableSheet sheet = workbook.createSheet("第一页", 0);
+            WritableSheet sheet = workbook.createSheet("开机率明细", 0);
 
             Label area = new Label(0, 0, "区域");
             sheet.addCell(area);
@@ -144,6 +149,70 @@ public class BootRateExcl extends Configured implements Tool {
                 Label prod = new Label(10, i + 1, new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("production"))));
                 sheet.addCell(prod);
             }
+
+            HTable table1 = new HTable(HBaseConfiguration.create(this.getConf()), "total_boot_rate");
+            Scan scan1 = new Scan();
+            List<Filter> filters1= new ArrayList<Filter>();
+            SingleColumnValueFilter issuefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
+                    Bytes.toBytes("issue"), CompareFilter.CompareOp.EQUAL,Bytes.toBytes(issue));
+            filters.add(end);
+
+            FilterList filterList1 = new FilterList(issuefilter);
+            scan1.setFilter(filterList1);
+            ResultScanner scanner1 = table1.getScanner(scan1);
+            List<Result> boot_rate1 = new ArrayList<>();
+            for (Result result : scanner) {
+                boot_rate1.add(result);
+            }
+            scanner.close();
+
+            WritableSheet sheet1 = workbook.createSheet("开机率汇总", 1);
+
+            Label area1 = new Label(0,0,"区域");
+            sheet1.addCell(area1);
+            Label hotel1 = new Label(1,0,"酒楼");
+            sheet1.addCell(hotel1);
+            Label addr1 = new Label(2,0,"位置");
+            sheet1.addCell(addr1);
+            Label server1 = new Label(3,0,"包间");
+            sheet1.addCell(server1);
+            Label maintenMan1 = new Label(4,0,"维护人");
+            sheet1.addCell(maintenMan1);
+            Label iskey1 = new Label(5,0,"重点酒楼");
+            sheet1.addCell(iskey1);
+            Label boxMac1 = new Label(6,0,"机顶盒编号");
+            sheet1.addCell(boxMac1);
+            Label playCount1 = new Label(7,0,"播放天数");
+            sheet1.addCell(playCount1);
+            Label playTime1 = new Label(8,0,"有效率合计");
+            sheet1.addCell(playTime1);
+            Label production1 = new Label(9,0,"平均有效率");
+            sheet1.addCell(production1);
+
+            for (int i = 0; i < boot_rate1.size(); i++) {
+                Result result = boot_rate1.get(i);
+                Label areaName = new Label(0,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("area"))));
+                sheet.addCell(areaName);
+                Label hotelName = new Label(1,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("hotel_name"))));
+                sheet.addCell(hotelName);
+                Label address = new Label(2,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("addr"))));
+                sheet.addCell(address);
+                Label roomName = new Label(3,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("room_name"))));
+                sheet.addCell(roomName);
+                Label mainten = new Label(4,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mainten_man"))));
+                sheet.addCell(mainten);
+                Label key = new Label(5,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("isKey"))));
+                sheet.addCell(key);
+                Label mac = new Label(6,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("mac"))));
+                sheet.addCell(mac);
+                Label count = new Label(7,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("play_days"))));
+                sheet.addCell(count);
+                Label time = new Label(8,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("production")))+"%");
+                sheet.addCell(time);
+                Label prod = new Label(9,i+1,new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("av_production")))+"%");
+                sheet.addCell(prod);
+            }
+
             workbook.write();
             workbook.close();
 

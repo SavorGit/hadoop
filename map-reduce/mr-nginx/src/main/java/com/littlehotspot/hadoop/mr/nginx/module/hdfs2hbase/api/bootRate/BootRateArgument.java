@@ -27,7 +27,9 @@ public class BootRateArgument extends Argument{
 
     public static final Argument StartTime = new Argument("startTime", null, null);// JDBC 驱动
     public static final Argument EndTime = new Argument("endTime", null, null);// JDBC 连接路径
+    public static final Argument Issue = new Argument("issue", null, null);// JDBC 连接路径
     public static final Argument ExcelName = new Argument("excelName", null, null);// JDBC 连接路径
+
 
     public BootRateArgument(String name, String nullValue, String[] nullArray) {
         super(name, nullValue, nullArray);
