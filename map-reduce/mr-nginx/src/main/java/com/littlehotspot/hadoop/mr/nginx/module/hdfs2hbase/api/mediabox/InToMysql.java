@@ -11,7 +11,6 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mediabox;
 
     import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
-    import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.JDBCTool;
     import net.lizhaoweb.spring.hadoop.commons.utils.IJDBCTools;
     import net.lizhaoweb.spring.hadoop.commons.utils.impl.JDBCTools;
     import org.apache.commons.lang.StringUtils;
@@ -228,11 +227,15 @@ public class InToMysql extends Configured implements Tool {
                 now.setTime(format.parse(time));
                 now.set(Calendar.DATE,now.get(Calendar.DATE)-Integer.parseInt(before));
                 String day = format.format(now.getTime());
-//                jdbcTool.executeUpdate(sql,Integer.parseInt(day),Integer.parseInt(time));
+                jdbcTool.executeUpdate(sql,Integer.parseInt(day),Integer.parseInt(time));
 //                jdbcTool.updateSQL(sql,Integer.parseInt(day),Integer.parseInt(time));
                 SingleColumnValueFilter timefilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                        Bytes.toBytes("play_date"), CompareFilter.CompareOp.EQUAL,Bytes.toBytes(day));
+                        Bytes.toBytes("play_date"), CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes(day));
                 filters.add(timefilter);
+                FilterList filterList = new FilterList(filters);
+                scan.setFilter(filterList);
+            }else {
+                jdbcTool.executeUpdate(sql);
             }
 
             if(null==scan) {
@@ -254,24 +257,16 @@ public class InToMysql extends Configured implements Tool {
                 DistributedCache.addArchiveToClassPath(archive, jobConf, fs);
             }//
 
-            FilterList filterList = new FilterList(filters);
-            scan.setFilter(filterList);
+
             TableMapReduceUtil.initTableMapperJob("media_sta", scan, MobileMapper.class, Text.class, Text.class, job,false);
 
             /**作业输出*/
-//            Path outputPath = new Path(hdfsOutputPath);
-//            FileSystem fileSystem = FileSystem.get(URI.create(outputPath.toString()), this.getConf());
-//            if (fileSystem.exists(outputPath)) {
-//                fileSystem.delete(outputPath, true);
-//            }
-
-//            FileOutputFormat.setOutputPath(job, outputPath);
             job.setMapperClass(MobileMapper.class);
             job.setReducerClass(DBOutputReducer.class);
             job.setOutputFormatClass(DBOutputFormat.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
-            DBOutputFormat.setOutput(job, "savor_medias_sta", "rowKey","area_id", "area_name","hotel_id", "hotel_name","room_id", "room_name", "box_id","box_name","mac", "media_id","media_name", "play_time", "play_count", "play_date");
+            DBOutputFormat.setOutput(job, "savor_medias_sta", "rowKey","area_id", "area_name","hotel_id", "hotel_name","room_id", "room_name", "box_id","box_name","mac", "media_id","media_name", "play_count", "play_time", "play_date");
 
             boolean status = job.waitForCompletion(true);
             if (!status) {

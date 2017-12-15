@@ -11,7 +11,7 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.bootrate;
 
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.BootRateExcl;
+//import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.BootRateExcl;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.BoxCleanJob;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.bootRate.TotalBootRate;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.zhengwei.Validate;
@@ -71,9 +71,9 @@ public class TestBootRateScheduler {
         Scan scan = new Scan();
         List<Filter> filters = new ArrayList<Filter>();
         SingleColumnValueFilter start = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                Bytes.toBytes("play_date"), CompareFilter.CompareOp.GREATER_OR_EQUAL, Bytes.toBytes("2017-08-31"));
+                Bytes.toBytes("play_date"), CompareFilter.CompareOp.GREATER_OR_EQUAL, Bytes.toBytes("2017-11-16"));
         SingleColumnValueFilter end = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                Bytes.toBytes("play_date"), CompareFilter.CompareOp.LESS, Bytes.toBytes("2017-09-16"));
+                Bytes.toBytes("play_date"), CompareFilter.CompareOp.LESS, Bytes.toBytes("2017-12-01"));
         filters.add(start);
         filters.add(end);
 
@@ -87,7 +87,7 @@ public class TestBootRateScheduler {
         scanner.close();
 
 
-        WritableWorkbook workbook = Workbook.createWorkbook(new File("D:\\2017年8月31-9月15号开机率明细.xls"));
+        WritableWorkbook workbook = Workbook.createWorkbook(new File("D:\\2017年11月16-11月30号开机率明细.xls"));
 
         WritableSheet sheet = workbook.createSheet("第一页", 0);
 
@@ -159,8 +159,8 @@ public class TestBootRateScheduler {
 //                "hbaseZookeeper=devpd1",
 //                "hdfsCluster=hdfs://devpd1:8020",
 //                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase",
-                "startTime=2017071600",
-                "endTime=2017073200"
+                "startTime=2017-08-31",
+                "endTime=2017-09-16"
 
 
         };
@@ -223,7 +223,7 @@ public class TestBootRateScheduler {
         Scan scan = new Scan();
         List<Filter> filters = new ArrayList<Filter>();
         SingleColumnValueFilter end = new SingleColumnValueFilter(Bytes.toBytes("attr"),
-                Bytes.toBytes("issue"), CompareFilter.CompareOp.EQUAL, Bytes.toBytes("2017-08-162017-08-30"));
+                Bytes.toBytes("issue"), CompareFilter.CompareOp.EQUAL, Bytes.toBytes("2017-11-162017-12-01"));
         filters.add(end);
 
         FilterList filterList = new FilterList(filters);
@@ -236,7 +236,7 @@ public class TestBootRateScheduler {
         scanner.close();
 
 
-        WritableWorkbook workbook = Workbook.createWorkbook(new File("D:\\13212312.xls"));
+        WritableWorkbook workbook = Workbook.createWorkbook(new File("D:\\2017年11月16-11月30号开机率汇总.xls"));
 
         WritableSheet sheet = workbook.createSheet("第一页", 0);
 
@@ -436,39 +436,39 @@ public class TestBootRateScheduler {
         workbook.close();
     }
 
-    @Test
-    public void toexcel() {
-        long startTime = System.currentTimeMillis();
-        String[] args = {
-//                "hdfsIn=/home/data/hadoop/flume/nginx_log/export/2017-05-31",
-                "hbaseRoot=hdfs://onlinemain:8020/hbase",
-                "hbaseZookeeper=onlinemain",
-                "hdfsCluster=hdfs://onlinemain:8020",
-                "hbaseSharePath=/user/oozie/share/lib/lib_20170512162404/hbase",
-//                "hbaseRoot=hdfs://devpd1:8020/hbase",
-//                "hbaseZookeeper=devpd1",
-//                "hdfsCluster=hdfs://devpd1:8020",
-//                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase",
-                "startTime=2017083100",
-                "endTime=2017091600",
-                "issue=2017-08-312017-09-16",
-                "excelName=D:\\11111.xls"
-
-
-        };
-        System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
-        Configuration conf = new Configuration();
-
-        try {
-            BootRateExcl bootRateExcl = new BootRateExcl(conf);
-            GenericOptionsParser parser = new GenericOptionsParser(conf, args);
-            String[] toolArgs = parser.getRemainingArgs();
-            bootRateExcl.run(toolArgs);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        long endTime = System.currentTimeMillis();
-        System.out.println("totalTime=======>>>" + (endTime - startTime));
-    }
+//    @Test
+//    public void toexcel() {
+//        long startTime = System.currentTimeMillis();
+//        String[] args = {
+////                "hdfsIn=/home/data/hadoop/flume/nginx_log/export/2017-05-31",
+//                "hBaseRootDir=hdfs://onlinemain:8020/hbase",
+//                "hBaseZookeeper=onlinemain",
+//                "hdfsCluster=hdfs://onlinemain:8020",
+//                "hbaseSharePath=/user/oozie/share/lib/lib_20170512162404/hbase",
+////                "hbaseRoot=hdfs://devpd1:8020/hbase",
+////                "hbaseZookeeper=devpd1",
+////                "hdfsCluster=hdfs://devpd1:8020",
+////                "hbaseSharePath=/user/oozie/share/lib/lib_20170601134717/hbase",
+//                "startTime=2017-08-16",
+//                "endTime=2017-08-30",
+//                "issue=2017-08-162017-08-30",
+//                "excelName=D:\\11111.xls"
+//
+//
+//        };
+//        System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.3");
+//        Configuration conf = new Configuration();
+//
+//        try {
+//            BootRateExcl bootRateExcl = new BootRateExcl(conf);
+//            GenericOptionsParser parser = new GenericOptionsParser(conf, args);
+//            String[] toolArgs = parser.getRemainingArgs();
+//            bootRateExcl.run(toolArgs);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        long endTime = System.currentTimeMillis();
+//        System.out.println("totalTime=======>>>" + (endTime - startTime));
+//    }
 
 }

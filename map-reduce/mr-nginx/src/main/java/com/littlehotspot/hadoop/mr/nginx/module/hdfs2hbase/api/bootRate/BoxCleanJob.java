@@ -105,7 +105,7 @@ public class BoxCleanJob extends Configured implements Tool {
                 filters.add(bigfilter);
             }
             if (!StringUtils.isBlank(startTime)){
-                String s = dateToStamp(endTime);
+                String s = dateToStamp(startTime);
                 SingleColumnValueFilter smallfilter = new SingleColumnValueFilter(Bytes.toBytes("attr"),
                         Bytes.toBytes("timestamps"), CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes(s));
                 filters.add(smallfilter);

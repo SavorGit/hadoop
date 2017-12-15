@@ -48,7 +48,10 @@ public class BoxTableMapper extends TableMapper<Text, Text> {
             flag=false;
         }else if (hour==16){
             flag=false;
+        }else if (StringUtils.isBlank(hotelId)||StringUtils.isBlank(roomId)){
+            flag=false;
         }
+
 //        System.out.println("ROWKEY{"+row+"}"+":mda_type="+mediaType+":option_type="+optionType+":mda_id="+mediaId);
         try {
             if (!StringUtils.isBlank(mediaId)&&flag){

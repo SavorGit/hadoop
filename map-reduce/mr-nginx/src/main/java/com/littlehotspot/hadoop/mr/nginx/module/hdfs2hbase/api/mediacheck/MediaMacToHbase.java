@@ -8,16 +8,9 @@
  * @EMAIL 404644381@qq.com
  * @Time : 15:38
  */
-package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mediabox;
+package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mediacheck;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.JDBCTool;
-import com.littlehotspot.hadoop.mr.nginx.mysql.MysqlCommonVariables;
-import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorArea;
-import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorBox;
-import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorHotel;
-import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorTv;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -26,17 +19,16 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.filter.*;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
-import org.apache.hadoop.hbase.mapreduce.*;
+import org.apache.hadoop.hbase.mapreduce.HFileOutputFormat2;
+import org.apache.hadoop.hbase.mapreduce.KeyValueSortReducer;
+import org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles;
+import org.apache.hadoop.hbase.mapreduce.SimpleTotalOrderPartitioner;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.filecache.DistributedCache;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -44,23 +36,18 @@ import org.apache.hadoop.util.Tool;
 
 import java.io.IOException;
 import java.net.URI;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * 手机日志
  */
-public class InToHbase extends Configured implements Tool {
+public class MediaMacToHbase extends Configured implements Tool {
 
 
     private static class MobileMapper extends Mapper<LongWritable, Text, ImmutableBytesWritable, Put> {
 
-        private static final Pattern PATTERN = Pattern.compile("^(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*)$");
+        private static final Pattern PATTERN = Pattern.compile("^(.*)&(.*)$");
 
         @Override
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
@@ -76,20 +63,7 @@ public class InToHbase extends Configured implements Tool {
                 byte[] rowKeyBytes = Bytes.toBytes(matcher.group(1));
                 Put put = new Put(rowKeyBytes);// 设置rowkey
 
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("area_id"), version, Bytes.toBytes(matcher.group(2)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("area_name"), version, Bytes.toBytes(matcher.group(3)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("hotel_id"), version, Bytes.toBytes(matcher.group(4)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("hotel_name"), version, Bytes.toBytes(matcher.group(5)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("room_id"), version, Bytes.toBytes(matcher.group(6)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("room_name"), version, Bytes.toBytes(matcher.group(7)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("box_id"), version, Bytes.toBytes(matcher.group(8)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("box_name"), version, Bytes.toBytes(matcher.group(9)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("mac"), version, Bytes.toBytes(matcher.group(10)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("media_id"), version, Bytes.toBytes(matcher.group(11)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("media_name"), version, Bytes.toBytes(matcher.group(12)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("play_count"), version, Bytes.toBytes(matcher.group(13)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("play_time"), version, Bytes.toBytes(matcher.group(14)));
-                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("play_date"), version, Bytes.toBytes(StringUtils.trim(matcher.group(15))));
+                put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes("rowkeies"), version, Bytes.toBytes(matcher.group(2)));
 
 
                 ImmutableBytesWritable rowKey = new ImmutableBytesWritable(rowKeyBytes);
@@ -97,10 +71,7 @@ public class InToHbase extends Configured implements Tool {
             }catch (Exception e){
                 e.printStackTrace();
             }
-
         }
-
-
     }
 
 
@@ -116,9 +87,10 @@ public class InToHbase extends Configured implements Tool {
             String hdfsCluster = CommonVariables.getParameterValue(Argument.HDFSCluster);
             String hdfsInputPath = CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
+            String tableName = CommonVariables.getParameterValue(Argument.TableName);
 
-            Job job = Job.getInstance(this.getConf(), InToHbase.class.getSimpleName());
-            job.setJarByClass(InToHbase.class);
+            Job job = Job.getInstance(this.getConf(), MediaMacToHbase.class.getSimpleName());
+            job.setJarByClass(MediaMacToHbase.class);
 
             // 避免报错：ClassNotFoundError hbaseConfiguration
             Configuration jobConf = job.getConfiguration();
@@ -145,7 +117,7 @@ public class InToHbase extends Configured implements Tool {
                 fileSystem.delete(outputPath, true);
             }
 
-            HTable hTable = new HTable(this.getConf(),"media_sta");
+            HTable hTable = new HTable(this.getConf(),tableName);
 
             FileOutputFormat.setOutputPath(job, outputPath);
             job.setMapperClass(MobileMapper.class);

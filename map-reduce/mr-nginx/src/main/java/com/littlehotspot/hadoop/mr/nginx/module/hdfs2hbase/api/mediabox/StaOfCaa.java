@@ -25,7 +25,10 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.filter.*;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
@@ -57,13 +60,7 @@ import java.util.regex.Matcher;
  */
 public class StaOfCaa extends Configured implements Tool {
 
-    private String hotels;
 
-    private String tvs;
-
-    private String boxes;
-
-    private String areas;
 
     private static class MobileMapper extends TableMapper<Text, Text> {
 
@@ -122,42 +119,22 @@ public class StaOfCaa extends Configured implements Tool {
 
         private Map<String, Object> areaMap = new ConcurrentHashMap<>();
 
-        private Map<String, Object> tvMap = new ConcurrentHashMap<>();
-
-        private Map<String, Object> boxMap = new ConcurrentHashMap<>();
 
         @Override
         protected void setup(Context context) throws IOException, InterruptedException {
             Configuration conf = context.getConfiguration();
             this.hBaseHelper = new HBaseHelper(conf);
 
-            String hotels = conf.get("hotels");
-            String tvs = conf.get("tvs");
-            String boxes = conf.get("boxes");
-            String areas = conf.get("areas");
+            List<Result> hotels = hBaseHelper.getAllRecord("hotel");
+            for (Result result : hotels) {
 
-            List<Object> hotelList = JSONUtil.JSONArrayToList(hotels, SavorHotel.class);
-            for (Object o : hotelList) {
-                SavorHotel hotel = (SavorHotel) o;
-                this.hotelMap.put(String.valueOf(hotel.getId()), hotel);
+                hotelMap.put(new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("id"))),new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("area_id"))));
             }
 
-            List<Object> tvList = JSONUtil.JSONArrayToList(tvs, SavorTv.class);
-            for (Object o : tvList) {
-                SavorTv tv = (SavorTv) o;
-                this.tvMap.put(String.valueOf(tv.getId()), tv);
-            }
+            List<Result> areas = hBaseHelper.getAllRecord("area");
+            for (Result result : areas) {
 
-            List<Object> boxList = JSONUtil.JSONArrayToList(boxes, SavorBox.class);
-            for (Object o : boxList) {
-                SavorBox box = (SavorBox) o;
-                this.boxMap.put(String.valueOf(box.getMac()), box);
-            }
-
-            List<Object> areaList = JSONUtil.JSONArrayToList(areas, SavorArea.class);
-            for (Object o : areaList) {
-                SavorArea area = (SavorArea) o;
-                this.areaMap.put(String.valueOf(area.getId()), area);
+                areaMap.put(new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("id"))),new String(result.getValue(Bytes.toBytes("attr"), Bytes.toBytes("region_name"))));
             }
 
         }
@@ -187,11 +164,14 @@ public class StaOfCaa extends Configured implements Tool {
                     bean.setMac(matcher.group(5));
                     bean.setPlayDate(StringUtils.trim(matcher.group(8)));
                     bean.setHotelId(matcher.group(1));
+                    if (StringUtils.isBlank(matcher.group(1))){
+                        return;
+                    }
                     if (StringUtils.isBlank(bean.getArea())){
-                        SavorHotel hotel = this.readMysqlHotel(matcher.group(1));
-                        SavorArea area = this.readMysqlArea(hotel.getArea_id().toString());
-                        bean.setArea(area.getRegion_name());
-                        bean.setAreaId(Long.valueOf(area.getId()).toString());
+                        String areaId = (String)hotelMap.get(matcher.group(1));
+                        String areaName = (String)areaMap.get(areaId);
+                        bean.setArea(areaName);
+                        bean.setAreaId(areaId);
                     }
 
                     Result medias=hBaseHelper.getOneRecord("medias", matcher.group(6));
@@ -224,53 +204,6 @@ public class StaOfCaa extends Configured implements Tool {
             }
         }
 
-
-        /**
-         * 查询酒店信息
-         * @throws Exception
-         */
-        public SavorHotel readMysqlHotel(String hotelId) throws Exception{
-            if (this.hotelMap == null || this.hotelMap.get(hotelId) == null || this.hotelMap.size() <= 0) {
-                return null;
-            }
-            return (SavorHotel) this.hotelMap.get(hotelId);
-
-        }
-
-
-        public SavorArea readMysqlArea(String areaId) throws Exception{
-            if (this.areaMap == null || this.areaMap.get(areaId) == null || this.areaMap.size() <= 0) {
-                return null;
-            }
-            return (SavorArea) this.areaMap.get(areaId);
-
-        }
-
-
-        public SavorBox readMysqlBox(String mac) throws Exception{
-            if (this.boxMap == null || this.boxMap.get(mac) == null || this.boxMap.size() <= 0) {
-                return null;
-            }
-            return (SavorBox) this.boxMap.get(mac);
-
-        }
-
-
-        public Integer readMysqlTv(Long boxId) throws Exception{
-
-            Integer count=0;
-            for (String s : tvMap.keySet()) {
-                SavorTv o = (SavorTv) tvMap.get(s);
-                if (o.getBox_id()==boxId){
-                    count++;
-                }
-            }
-
-
-            return  count;
-
-        }
-
     }
 
     @Override
@@ -285,13 +218,6 @@ public class StaOfCaa extends Configured implements Tool {
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
             String time = CommonVariables.getParameterValue(Argument.Time);
             String before = CommonVariables.getParameterValue(Argument.Before);
-
-            // 查询mysql
-            findByMysql();
-            this.getConf().set("hotels", this.hotels);
-            this.getConf().set("tvs", this.tvs);
-            this.getConf().set("boxes", this.boxes);
-            this.getConf().set("areas", this.areas);
 
             Job job = Job.getInstance(this.getConf(), StaOfCaa.class.getSimpleName());
             job.setJarByClass(StaOfCaa.class);
@@ -398,52 +324,5 @@ public class StaOfCaa extends Configured implements Tool {
         return isYesterday;
     }
 
-    /**
-     * 查询mysql数据库
-     * @throws SQLException
-     * @throws IOException
-     * @throws JSONException
-     */
-    private void findByMysql() throws SQLException, IOException, JSONException {
-        JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
-        jdbcUtil.getConnection();
-        try {
-            findHotels(jdbcUtil);
-            findTvs(jdbcUtil);
-            findBoxes(jdbcUtil);
-            findAreas(jdbcUtil);
-        } catch (SQLException e) {
-            throw e;
-        } catch (IOException e) {
-            throw e;
-        } catch (JSONException e) {
-            throw e;
-        } finally {
-            jdbcUtil.releaseConnection();
-        }
-    }
 
-    private void findHotels(JDBCTool jdbcUtil) throws IOException, JSONException, SQLException {
-        String sql = "select id,name,area_id from savor_hotel";
-        List<SavorHotel> result = jdbcUtil.findResult(SavorHotel.class, sql);
-        this.hotels = JSONUtil.listToJsonArray(result).toString();
-    }
-
-    private void findTvs(JDBCTool jdbcUtil) throws IOException, JSONException, SQLException {
-        String sql = "select box_id from savor_tv";
-        List<SavorTv> result = jdbcUtil.findResult(SavorTv.class, sql);
-        this.tvs = JSONUtil.listToJsonArray(result).toString();
-    }
-
-    private void findBoxes(JDBCTool jdbcUtil) throws IOException, JSONException, SQLException {
-        String sql = "select id,name,mac from savor_box";
-        List<SavorBox> result = jdbcUtil.findResult(SavorBox.class, sql);
-        this.boxes = JSONUtil.listToJsonArray(result).toString();
-    }
-
-    private void findAreas(JDBCTool jdbcUtil) throws IOException, JSONException, SQLException {
-        String sql = "select id,region_name from savor_area_info";
-        List<SavorArea> result = jdbcUtil.findResult(SavorArea.class, sql);
-        this.areas = JSONUtil.listToJsonArray(result).toString();
-    }
 }

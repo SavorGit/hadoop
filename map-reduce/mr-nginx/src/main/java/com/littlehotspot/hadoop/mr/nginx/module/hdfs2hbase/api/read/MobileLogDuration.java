@@ -23,6 +23,8 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -51,14 +53,6 @@ import java.util.regex.Matcher;
  */
 public class MobileLogDuration extends Configured implements Tool {
 
-    private String hotels;
-
-    private String rooms;
-
-    private String contents;
-
-    private String categorys;
-
 
     private static class MobileMapper extends Mapper<LongWritable, Text, Text, Text> {
 
@@ -84,6 +78,8 @@ public class MobileLogDuration extends Configured implements Tool {
 
         private HBaseHelper hBaseHelper;
 
+        private Content content;
+
         private Map<String, Object> hotelMap = new ConcurrentHashMap<>();
 
         private Map<String, Object> roomMap = new ConcurrentHashMap<>();
@@ -96,34 +92,30 @@ public class MobileLogDuration extends Configured implements Tool {
         protected void setup(Context context) throws IOException, InterruptedException {
             Configuration conf = context.getConfiguration();
             this.hBaseHelper = new HBaseHelper(conf);
-            String hotels = conf.get("hotels");
-            String rooms = conf.get("rooms");
-            String contents = conf.get("contents");
-            String categorys = conf.get("categorys");
 
-            List<Object> hotelList = JSONUtil.JSONArrayToList(hotels, SavorHotel.class);
-            for (Object o : hotelList) {
-                SavorHotel hotel = (SavorHotel) o;
-                this.hotelMap.put(String.valueOf(hotel.getId()), hotel);
+            List<Result> hotels = hBaseHelper.getAllRecord("hotel");
+            for (Result hotel : hotels) {
+                hotelMap.put(new String(hotel.getValue(Bytes.toBytes("attr"), Bytes.toBytes("id"))),new String(hotel.getValue(Bytes.toBytes("attr"), Bytes.toBytes("name"))));
             }
 
-            List<Object> tvList = JSONUtil.JSONArrayToList(rooms, SavorRoom.class);
-            for (Object o : tvList) {
-                SavorRoom room = (SavorRoom) o;
-                this.roomMap.put(String.valueOf(room.getId()), room);
+            List<Result> rooms = hBaseHelper.getAllRecord("room");
+            for (Result room : rooms) {
+                roomMap.put(new String(room.getValue(Bytes.toBytes("attr"), Bytes.toBytes("id"))),new String(room.getValue(Bytes.toBytes("attr"), Bytes.toBytes("name"))));
             }
 
-            List<Object> boxList = JSONUtil.JSONArrayToList(contents, Content.class);
-            for (Object o : boxList) {
-                Content content = (Content) o;
-                this.contentMap.put(String.valueOf(content.getId()), content);
+            List<Result> resources = hBaseHelper.getAllRecord("resources");
+            for (Result resource : resources) {
+                content.setId(Integer.parseInt(new String(resource.getValue(Bytes.toBytes("attr"), Bytes.toBytes("id")))));
+                content.setTitle(new String(resource.getValue(Bytes.toBytes("attr"), Bytes.toBytes("name"))));
+                content.setContent(new String(resource.getValue(Bytes.toBytes("attr"), Bytes.toBytes("content"))));
+                contentMap.put(new String(resource.getValue(Bytes.toBytes("attr"), Bytes.toBytes("id"))),content);
             }
 
-            List<Object> areaList = JSONUtil.JSONArrayToList(categorys, Category.class);
-            for (Object o : areaList) {
-                Category category = (Category) o;
-                this.categoryMap.put(String.valueOf(category.getId()), category);
+            List<Result> categorys = hBaseHelper.getAllRecord("category");
+            for (Result category : categorys) {
+                categoryMap.put(new String(category.getValue(Bytes.toBytes("attr"), Bytes.toBytes("id"))),new String(category.getValue(Bytes.toBytes("attr"), Bytes.toBytes("name"))));
             }
+
 
         }
 
@@ -175,7 +167,7 @@ public class MobileLogDuration extends Configured implements Tool {
             bean.setConId(source.getContentId());
 
             //读取mysql
-            Content content = readMysqlContent(source.getContentId());
+            Content content = (Content)contentMap.get(source.getContentId());
             if (null!=content){
                 bean.setConNam(content.getTitle());
                 bean.setContent(content.getContent().toString());
@@ -204,9 +196,9 @@ public class MobileLogDuration extends Configured implements Tool {
                 else {
 
                     //读取mysql
-                    Category category = readMysqlCategory(source.getCategoryId());
-                    if (null!=category){
-                        bean.setCatName(category.getName());
+                    String categoryName = (String)categoryMap.get(source.getCategoryId());
+                    if (!StringUtils.isBlank(categoryName)){
+                        bean.setCatName(categoryName);
                     }
 
                 }
@@ -218,9 +210,9 @@ public class MobileLogDuration extends Configured implements Tool {
             }
 
             //读取mysql
-            SavorHotel hotel = readMysqlHotel(source.getHotelId());
-            if(hotel != null) {
-                bean.setHotelName(hotel.getName());
+            String hotelName = (String)hotelMap.get(source.getHotelId());
+            if(!StringUtils.isBlank(hotelName)) {
+                bean.setHotelName(hotelName);
             }
 
             if (!source.getRoomId().matches(reg)){
@@ -229,60 +221,10 @@ public class MobileLogDuration extends Configured implements Tool {
                 bean.setRoom(source.getRoomId());
             }
             //读取mysql
-            SavorRoom room = readMysqlRoom(source.getRoomId());
-            if (null!=room){
-                bean.setRoomName(room.getName());
+            String roomName = (String)roomMap.get(source.getRoomId());
+            if (!StringUtils.isBlank(roomName)){
+                bean.setRoomName(roomName);
             }
-
-        }
-
-        /**
-         * 查询酒店信息
-         * @throws Exception
-         */
-        public SavorHotel readMysqlHotel(String hotelId) throws Exception{
-            if (this.hotelMap == null || this.hotelMap.get(hotelId) == null || this.hotelMap.size() <= 0) {
-                return null;
-            }
-            return (SavorHotel) this.hotelMap.get(hotelId);
-
-        }
-
-        /**
-         * 查询包间信息
-         * @throws Exception
-         */
-        public SavorRoom readMysqlRoom(String roomId) throws Exception{
-            if (this.contentMap == null || this.contentMap.get(roomId) == null || this.contentMap.size() <= 0) {
-                return null;
-            }
-            return (SavorRoom) this.roomMap.get(roomId);
-
-        }
-
-        /**
-         * 查询包间信息
-         * @param
-         * @throws Exception
-         */
-        public Content readMysqlContent(String contentId) throws Exception{
-            if (this.contentMap == null || this.contentMap.get(contentId) == null || this.contentMap.size() <= 0) {
-                return null;
-            }
-            return (Content) this.contentMap.get(contentId);
-
-        }
-
-
-        /**
-         * 查询包间信息
-         * @throws Exception
-         */
-        public Category readMysqlCategory(String categoryId) throws Exception{
-            if (this.categoryMap == null || this.categoryMap.get(categoryId) == null || this.categoryMap.size() <= 0) {
-                return null;
-            }
-            return (Category) this.categoryMap.get(categoryId);
 
         }
 
@@ -300,13 +242,6 @@ public class MobileLogDuration extends Configured implements Tool {
             String hdfsInputStart = CommonVariables.getParameterValue(Argument.InputPathStart);
             String hdfsInputEnd = CommonVariables.getParameterValue(Argument.InputPathEnd);
             String hdfsOutputPath = CommonVariables.getParameterValue(Argument.OutputPath);
-
-            // 查询mysql
-            findByMysql();
-            this.getConf().set("hotels", this.hotels);
-            this.getConf().set("rooms", this.rooms);
-            this.getConf().set("contents", this.contents);
-            this.getConf().set("categorys", this.categorys);
 
             Job job = Job.getInstance(this.getConf(), MobileLogDuration.class.getSimpleName());
             job.setJarByClass(MobileLogDuration.class);
@@ -371,54 +306,5 @@ public class MobileLogDuration extends Configured implements Tool {
             e.printStackTrace();
         }
         return isYesterday;
-    }
-
-    /**
-     * 查询mysql数据库
-     * @throws SQLException
-     * @throws IOException
-     * @throws JSONException
-     */
-    private void findByMysql() throws SQLException, IOException, JSONException {
-        JDBCTool jdbcUtil = new JDBCTool(MysqlCommonVariables.driver, MysqlCommonVariables.dbUrl, MysqlCommonVariables.userName, MysqlCommonVariables.passwd);
-        jdbcUtil.getConnection();
-        try {
-            findHotels(jdbcUtil);
-            findRooms(jdbcUtil);
-            findContents(jdbcUtil);
-            findCategorys(jdbcUtil);
-        } catch (SQLException e) {
-            throw e;
-        } catch (IOException e) {
-            throw e;
-        } catch (JSONException e) {
-            throw e;
-        } finally {
-            jdbcUtil.releaseConnection();
-        }
-    }
-
-    private void findHotels(JDBCTool jdbcUtil) throws IOException, JSONException, SQLException {
-        String sql = "select id,name from savor_hotel";
-        List<SavorHotel> result = jdbcUtil.findResult(SavorHotel.class, sql);
-        this.hotels = JSONUtil.listToJsonArray(result).toString();
-    }
-
-    private void findRooms(JDBCTool jdbcUtil) throws IOException, JSONException, SQLException {
-        String sql = "select id,name from savor_room";
-        List<SavorRoom> result = jdbcUtil.findResult(SavorRoom.class, sql);
-        this.rooms = JSONUtil.listToJsonArray(result).toString();
-    }
-
-    private void findContents(JDBCTool jdbcUtil) throws IOException, JSONException, SQLException {
-        String sql = "select id,title,content from savor_mb_content";
-        List<Content> result = jdbcUtil.findResult(Content.class, sql);
-        this.contents = JSONUtil.listToJsonArray(result).toString();
-    }
-
-    private void findCategorys(JDBCTool jdbcUtil) throws IOException, JSONException, SQLException {
-        String sql = "select id,name from savor_mb_category";
-        List<Category> result = jdbcUtil.findResult(Category.class, sql);
-        this.categorys = JSONUtil.listToJsonArray(result).toString();
     }
 }
