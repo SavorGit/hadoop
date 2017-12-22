@@ -11,6 +11,8 @@ import org.apache.hadoop.hbase.filter.*;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *@Author 刘飞飞
@@ -24,30 +26,41 @@ public class QueryTable extends Configured {
         this.setConf(new Configuration());
         Constant.CommonVariables.initMapReduce(this.getConf(), args);
         Configuration conf = HBaseConfiguration.create(this.getConf());
+        conf.setInt("mapreduce.task.timeout",1200000);
+        conf.setInt("hbase.client.scanner.timeout.period",600000);
+        conf.setInt("hbase.rpc.timeout",600000);
         connection= ConnectionFactory.createConnection(conf);
-        Table table=connection.getTable(TableName.valueOf("box_log"));
-//        Filter filter = new RowFilter(CompareFilter.CompareOp.EQUAL,new RegexStringComparator("FCD5D900B607.+"));
+        Table table=connection.getTable(TableName.valueOf("probe_log"));
+        Filter filter = new RowFilter(CompareFilter.CompareOp.NOT_EQUAL,new RegexStringComparator("C8E7D8D40134"));
 //        SingleColumnValueFilter mda_id=new SingleColumnValueFilter(Bytes.toBytes("attr"),Bytes.toBytes("mobile_id"),CompareFilter.CompareOp.NOT_EQUAL,new RegexStringComparator("^\\s*$"));
-        SingleColumnValueFilter date_time=new SingleColumnValueFilter(Bytes.toBytes("attr"),Bytes.toBytes("date_time"),CompareFilter.CompareOp.EQUAL,new RegexStringComparator("^20170905.+$"));
+        SingleColumnValueFilter date_time=new SingleColumnValueFilter(Bytes.toBytes("attr"),Bytes.toBytes("time"),CompareFilter.CompareOp.GREATER_OR_EQUAL,Bytes.toBytes("1511280000000"));
 //        Filter filter1=new PageFilter(MAX_RESULT_SIZE);
-        SingleColumnValueFilter mda_id=new SingleColumnValueFilter(Bytes.toBytes("attr"),Bytes.toBytes("mda_id"),CompareFilter.CompareOp.EQUAL,Bytes.toBytes("7024"));
-        Filter filterList=new FilterList(mda_id,date_time);
+//        SingleColumnValueFilter mda_id=new SingleColumnValueFilter(Bytes.toBytes("attr"),Bytes.toBytes("mda_id"),CompareFilter.CompareOp.EQUAL,Bytes.toBytes("7024"));
+        Filter filterList=new FilterList(filter,date_time);
 
         Scan s = new Scan();
         s.setFilter(filterList);
+        s.setMaxResultSize(10000);
+        s.setCaching(500);
 //        s.setMaxResultSize(MAX_RESULT_SIZE);
-        s.addColumn(Bytes.toBytes("attr"),Bytes.toBytes("uuid"));
-        s.addColumn(Bytes.toBytes("attr"),Bytes.toBytes("mda_id"));
-        s.addColumn(Bytes.toBytes("attr"),Bytes.toBytes("date_time"));
+        s.addColumn(Bytes.toBytes("attr"),Bytes.toBytes("probe_mac"));
+        s.addColumn(Bytes.toBytes("attr"),Bytes.toBytes("device_mac"));
+        s.addColumn(Bytes.toBytes("attr"),Bytes.toBytes("time"));
+        s.addColumn(Bytes.toBytes("attr"),Bytes.toBytes("hotel_id"));
         ResultScanner rs = table.getScanner(s);
         String rowkey;
         String mda=null;
         String dateTime=null;
+        String mmac=null;
+        String hotelId=null;
+        Set<String> hotelIds=new HashSet<>();
         int i=0;
         for(Result r:rs){
             i++;
-            mda=Bytes.toString(r.getValue(Bytes.toBytes("attr"),Bytes.toBytes("mda_id")));
-            dateTime=Bytes.toString(r.getValue(Bytes.toBytes("attr"),Bytes.toBytes("date_time")));
+//            mda=Bytes.toString(r.getValue(Bytes.toBytes("attr"),Bytes.toBytes("probe_mac")));
+//            dateTime=Bytes.toString(r.getValue(Bytes.toBytes("attr"),Bytes.toBytes("time")));
+//            mmac=Bytes.toString(r.getValue(Bytes.toBytes("attr"),Bytes.toBytes("device_mac")));
+            hotelId=Bytes.toString(r.getValue(Bytes.toBytes("attr"),Bytes.toBytes("hotel_id")));
             rowkey=Bytes.toString(r.getRow());
 //            if(!StringUtils.startsWith(mda,"201708")){
 //               continue;
@@ -56,10 +69,11 @@ public class QueryTable extends Configured {
                 System.out.println("当前总数整==="+i);
             }
             if(i>0){
-                System.out.println(mda);
                 System.out.println(rowkey);
-                System.out.println(dateTime);
-                System.out.println("当前总数==="+i);
+                if(!hotelIds.contains(hotelId)){
+                    hotelIds.add(hotelId);
+                }
+                System.out.println("当前总数==="+i+",扫描第"+hotelIds.size()+"个酒楼["+hotelId+"]");
             }
 //
 //            System.out.println(rowkey);
@@ -76,6 +90,7 @@ public class QueryTable extends Configured {
 
         }
         System.out.println(i);
+        System.out.println("扫描了酒楼:"+hotelIds);
         connection.close();
     }
 

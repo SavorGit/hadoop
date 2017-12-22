@@ -44,6 +44,7 @@
         <module>hdfs</module>
         <module>hbase</module>
         <module>mr-user-tag</module>
+        <module>mr-demo</module>
     </modules>
 
 </project>
