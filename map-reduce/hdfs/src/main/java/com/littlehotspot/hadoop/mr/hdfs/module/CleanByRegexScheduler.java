@@ -18,6 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.CombineTextInputFormat;
@@ -113,7 +114,7 @@ public class CleanByRegexScheduler extends Configured implements Tool {
             job.setInputFormatClass(CombineTextInputFormat.class);
             job.setMapperClass(CleanByRegexMapper.class);
             job.setMapOutputKeyClass(Text.class);
-            job.setMapOutputValueClass(Text.class);
+            job.setMapOutputValueClass(NullWritable.class);
 
             // 作业输出
             Path outputPath = new Path(hdfsOutputPath);

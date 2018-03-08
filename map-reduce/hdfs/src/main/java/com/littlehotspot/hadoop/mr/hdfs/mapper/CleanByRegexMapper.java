@@ -13,6 +13,7 @@ package com.littlehotspot.hadoop.mr.hdfs.mapper;
 import com.littlehotspot.hadoop.mr.hdfs.util.CleanByRegexConstant;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
@@ -31,7 +32,7 @@ import java.util.regex.Pattern;
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class CleanByRegexMapper extends Mapper<LongWritable, Text, Text, Text> {
+public class CleanByRegexMapper extends Mapper<LongWritable, Text, Text, NullWritable> {
 
     private Pattern mapperInputFormatRegexPattern;
 
@@ -52,7 +53,7 @@ public class CleanByRegexMapper extends Mapper<LongWritable, Text, Text, Text> {
             if (!matcher.find()) {
                 return;
             }
-            context.write(value, new Text());
+            context.write(value,NullWritable.get());
         } catch (Exception e) {
             e.printStackTrace();
         }
