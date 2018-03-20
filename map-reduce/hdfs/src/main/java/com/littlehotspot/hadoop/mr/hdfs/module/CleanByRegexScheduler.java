@@ -62,83 +62,83 @@ public class CleanByRegexScheduler extends Configured implements Tool {
      */
     @Override
     public int run(String[] args) throws Exception {
-        try {
-            CleanByRegexConstant.CommonVariables.initMapReduce(this.getConf(), args);// 解析参数并初始化 MAP REDUCE
+//        try {
+        CleanByRegexConstant.CommonVariables.initMapReduce(this.getConf(), args);// 解析参数并初始化 MAP REDUCE
 
-            // Mapper 输入正则表达式
-            String jobName = ArgumentFactory.getParameterValue(Argument.JobName);
-            ArgumentFactory.printInputArgument(Argument.JobName, jobName, false);
+        // Mapper 输入正则表达式
+        String jobName = ArgumentFactory.getParameterValue(Argument.JobName);
+        ArgumentFactory.printInputArgument(Argument.JobName, jobName, false);
 
-            // Mapper 输入正则表达式
-            String matcherRegex = ArgumentFactory.getParameterValue(Argument.MapperInputFormatRegex);
-            ArgumentFactory.printInputArgument(Argument.MapperInputFormatRegex, matcherRegex, false);
+        // Mapper 输入正则表达式
+        String matcherRegex = ArgumentFactory.getParameterValue(Argument.MapperInputFormatRegex);
+        ArgumentFactory.printInputArgument(Argument.MapperInputFormatRegex, matcherRegex, false);
 
-            // Hdfs 读取路径
-            String[] hdfsInputPathArray = ArgumentFactory.getParameterValues(Argument.InputPath);
-            ArgumentFactory.printInputArgument(Argument.InputPath, hdfsInputPathArray);
+        // Hdfs 读取路径
+        String[] hdfsInputPathArray = ArgumentFactory.getParameterValues(Argument.InputPath);
+        ArgumentFactory.printInputArgument(Argument.InputPath, hdfsInputPathArray);
 
-            // Hdfs 写入路径
-            String hdfsOutputPath = ArgumentFactory.getParameterValue(Argument.OutputPath);
-            ArgumentFactory.printInputArgument(Argument.OutputPath, hdfsOutputPath, false);
-
-
-            // 准备工作
-            ArgumentFactory.checkNullValueForArgument(Argument.MapperInputFormatRegex, matcherRegex);
-            ArgumentFactory.checkNullValuesForArgument(Argument.InputPath, hdfsInputPathArray);
-            ArgumentFactory.checkNullValueForArgument(Argument.OutputPath, hdfsOutputPath);
-            if (StringUtils.isBlank(jobName)) {
-                jobName = this.getClass().getName();
-            }
-
-            // Map side tuning
-            this.setMapperConfig();
-
-            // Reduce side tuning
-            this.setReduceConfig();
+        // Hdfs 写入路径
+        String hdfsOutputPath = ArgumentFactory.getParameterValue(Argument.OutputPath);
+        ArgumentFactory.printInputArgument(Argument.OutputPath, hdfsOutputPath, false);
 
 
-            this.getConf().setLong("mapreduce.input.fileinputformat.split.maxsize", BYTES_5M);
-            this.getConf().setPattern(CleanByRegexConstant.HadoopConfig.Key.MAPPER_INPUT_FORMAT_REGEX_PATTERN, Pattern.compile(matcherRegex));// 配置 Mapper 输入的正则匹配对象
+        // 准备工作
+        ArgumentFactory.checkNullValueForArgument(Argument.MapperInputFormatRegex, matcherRegex);
+        ArgumentFactory.checkNullValuesForArgument(Argument.InputPath, hdfsInputPathArray);
+        ArgumentFactory.checkNullValueForArgument(Argument.OutputPath, hdfsOutputPath);
+        if (StringUtils.isBlank(jobName)) {
+            jobName = this.getClass().getName();
+        }
+
+        // Map side tuning
+        this.setMapperConfig();
+
+        // Reduce side tuning
+        this.setReduceConfig();
+
+
+        this.getConf().setLong("mapreduce.input.fileinputformat.split.maxsize", BYTES_5M);
+        this.getConf().setPattern(CleanByRegexConstant.HadoopConfig.Key.MAPPER_INPUT_FORMAT_REGEX_PATTERN, Pattern.compile(matcherRegex));// 配置 Mapper 输入的正则匹配对象
 //            System.out.println(this.getConf().get("mapreduce.input.fileinputformat.split.maxsize"));
 //            System.out.println(this.getConf().get("mapreduce.job.inputformat.class"));
 
-            Job job = Job.getInstance(this.getConf(), jobName);
-            job.setJarByClass(this.getClass());
+        Job job = Job.getInstance(this.getConf(), jobName);
+        job.setJarByClass(this.getClass());
 
 
-            // 作业输入
-            for (String hdfsInputPath : hdfsInputPathArray) {
-                Path inputPath = new Path(hdfsInputPath);
-                FileInputFormat.addInputPath(job, inputPath);
-            }
-            job.setInputFormatClass(CombineTextInputFormat.class);
-            job.setMapperClass(CleanByRegexMapper.class);
-            job.setMapOutputKeyClass(Text.class);
-            job.setMapOutputValueClass(NullWritable.class);
+        // 作业输入
+        for (String hdfsInputPath : hdfsInputPathArray) {
+            Path inputPath = new Path(hdfsInputPath);
+            FileInputFormat.addInputPath(job, inputPath);
+        }
+        job.setInputFormatClass(CombineTextInputFormat.class);
+        job.setMapperClass(CleanByRegexMapper.class);
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(NullWritable.class);
 
-            // 作业输出
-            Path outputPath = new Path(hdfsOutputPath);
-            FileOutputFormat.setOutputPath(job, outputPath);
+        // 作业输出
+        Path outputPath = new Path(hdfsOutputPath);
+        FileOutputFormat.setOutputPath(job, outputPath);
 //            job.setReducerClass(GeneralReducer.class);
 //            job.setOutputKeyClass(Text.class);
 //            job.setOutputValueClass(Text.class);
 
-            // 如果输入路径已经存在，则删除
-            FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());
-            if (fileSystem.exists(outputPath)) {
-                fileSystem.delete(outputPath, true);
-            }
-
-            boolean status = job.waitForCompletion(true);
-            if (!status) {
-                String exceptionMessage = String.format("MapReduce[Clean-By-Regex] task[%s] execute failed", jobName);
-                throw new RuntimeException(exceptionMessage);
-            }
-            return 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 1;
+        // 如果输入路径已经存在，则删除
+        FileSystem fileSystem = FileSystem.get(new URI(outputPath.toString()), this.getConf());
+        if (fileSystem.exists(outputPath)) {
+            fileSystem.delete(outputPath, true);
         }
+
+        boolean status = job.waitForCompletion(true);
+        if (!status) {
+            String exceptionMessage = String.format("MapReduce[Clean-By-Regex] task[%s] execute failed", jobName);
+            throw new RuntimeException(exceptionMessage);
+        }
+        return 0;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return 1;
+//        }
     }
 
     // Reduce side tuning

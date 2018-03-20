@@ -47,16 +47,16 @@ public class CleanByRegexMapper extends Mapper<LongWritable, Text, Text, NullWri
      */
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-        try {
-            String msg = value.toString();
-            Matcher matcher = this.mapperInputFormatRegexPattern.matcher(msg);
-            if (!matcher.find()) {
-                return;
-            }
-            context.write(value,NullWritable.get());
-        } catch (Exception e) {
-            e.printStackTrace();
+//        try {
+        String msg = value.toString();
+        Matcher matcher = this.mapperInputFormatRegexPattern.matcher(msg);
+        if (!matcher.find()) {
+            return;
         }
+        context.write(value, NullWritable.get());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
