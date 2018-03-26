@@ -21,7 +21,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.CombineTextInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
@@ -63,6 +62,10 @@ public class CleanByRegexScheduler extends Configured implements Tool {
     @Override
     public int run(String[] args) throws Exception {
 //        try {
+        System.out.println();
+        System.out.println("Jar Clean action configuration");
+        System.out.println("=================================================================");
+
         CleanByRegexConstant.CommonVariables.initMapReduce(this.getConf(), args);// 解析参数并初始化 MAP REDUCE
 
         // Mapper 输入正则表达式
@@ -77,6 +80,10 @@ public class CleanByRegexScheduler extends Configured implements Tool {
         String[] hdfsInputPathArray = ArgumentFactory.getParameterValues(Argument.InputPath);
         ArgumentFactory.printInputArgument(Argument.InputPath, hdfsInputPathArray);
 
+        // Hdfs 读取路径正则表示
+        String hdfsInputPathRegex = ArgumentFactory.getParameterValue(Argument.InputPathReg);
+        ArgumentFactory.printInputArgument(Argument.InputPathReg, hdfsInputPathRegex, false);
+
         // Hdfs 写入路径
         String hdfsOutputPath = ArgumentFactory.getParameterValue(Argument.OutputPath);
         ArgumentFactory.printInputArgument(Argument.OutputPath, hdfsOutputPath, false);
@@ -84,11 +91,20 @@ public class CleanByRegexScheduler extends Configured implements Tool {
 
         // 准备工作
         ArgumentFactory.checkNullValueForArgument(Argument.MapperInputFormatRegex, matcherRegex);
-        ArgumentFactory.checkNullValuesForArgument(Argument.InputPath, hdfsInputPathArray);
+        if (hdfsInputPathArray == null && hdfsInputPathRegex == null) {
+            String exceptionMessage = "The argument[\'" + Argument.InputPath.getName() + "\' OR \'" + Argument.InputPathReg.getName() + "\'] for this program is null";
+            throw new IllegalArgumentException(exceptionMessage);
+        }
         ArgumentFactory.checkNullValueForArgument(Argument.OutputPath, hdfsOutputPath);
         if (StringUtils.isBlank(jobName)) {
             jobName = this.getClass().getName();
         }
+
+        System.out.println("=================================================================");
+        System.out.println();
+        System.out.println(">>> Invoking Clean job task now >>>");
+        System.out.println();
+        System.out.flush();
 
 //        // Map side tuning
 //        this.setMapperConfig();
@@ -104,11 +120,15 @@ public class CleanByRegexScheduler extends Configured implements Tool {
 
 
         // 作业输入
-        for (String hdfsInputPath : hdfsInputPathArray) {
-            Path inputPath = new Path(hdfsInputPath);
-            FileInputFormat.addInputPath(job, inputPath);
+        if (hdfsInputPathArray == null || hdfsInputPathArray.length < 1) {
+            FileInputFormat.setInputPaths(job, hdfsInputPathRegex);
+        } else {
+            for (String hdfsInputPath : hdfsInputPathArray) {
+                Path inputPath = new Path(hdfsInputPath);
+                FileInputFormat.addInputPath(job, inputPath);
+            }
         }
-        job.setInputFormatClass(CombineTextInputFormat.class);
+//        job.setInputFormatClass(CombineTextInputFormat.class);
         job.setMapperClass(CleanByRegexMapper.class);
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(NullWritable.class);
