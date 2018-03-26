@@ -41,11 +41,11 @@ import java.util.regex.Pattern;
  */
 public class CleanByRegexScheduler extends Configured implements Tool {
 
-    private static final int BYTES_5M = 5 * 1024 * 1024;
-    private static final int BYTES_10M = 10 * 1024 * 1024;
-    private static final int BYTES_64M = 128 * 1024 * 1024;
-    private static final int BYTES_128M = 128 * 1024 * 1024;
-    private static final int BYTES_256M = 256 * 1024 * 1024;
+//    private static final int BYTES_5M = 5 * 1024 * 1024;
+//    private static final int BYTES_10M = 10 * 1024 * 1024;
+//    private static final int BYTES_64M = 128 * 1024 * 1024;
+//    private static final int BYTES_128M = 128 * 1024 * 1024;
+//    private static final int BYTES_256M = 256 * 1024 * 1024;
 
     /**
      * 运行
