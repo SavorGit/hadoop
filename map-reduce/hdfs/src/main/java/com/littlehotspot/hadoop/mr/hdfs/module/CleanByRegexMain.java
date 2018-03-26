@@ -12,8 +12,7 @@ package com.littlehotspot.hadoop.mr.hdfs.module;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
-
-import java.io.IOException;
+import org.apache.oozie.action.hadoop.LauncherMain;
 
 /**
  * <h1>主类 - 机顶盒日志第一次清洗</h1>
@@ -41,8 +40,9 @@ public class CleanByRegexMain {
      */
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
-            throw new IOException("please write input path and output path...");
+            throw new IllegalArgumentException("please write input path and output path...");
         }
-        ToolRunner.run(new Configuration(), new CleanByRegexScheduler(), args);
+        Configuration configuration = LauncherMain.loadActionConf();
+        ToolRunner.run(configuration, new CleanByRegexScheduler(), args);
     }
 }
