@@ -78,7 +78,7 @@ public class OpeningRateDetailScheduler extends Configured implements Tool {
         ArgumentFactory.printInputArgument(Argument.Sheet, sheetArray);
         Map<String, String> indexHDFSDirMap = this.analysisSheetConfig(excelSheetConfigMap, sheetArray);
 
-        // Title配置: // sheetIndex,标题分割符,字段名1|字段名2|...
+        // Title配置: sheetIndex,标题分割符,字段名1|字段名2|...
         String[] titleArray = ArgumentFactory.getParameterValues(Argument.Title);
         ArgumentFactory.printInputArgument(Argument.Title, titleArray);
         this.analysisTitleConfig(excelSheetConfigMap, indexHDFSDirMap, titleArray);
