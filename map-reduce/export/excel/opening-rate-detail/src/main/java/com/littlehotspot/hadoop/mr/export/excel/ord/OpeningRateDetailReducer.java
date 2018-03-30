@@ -16,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.poi.hssf.usermodel.*;
@@ -38,7 +39,7 @@ import java.util.Map;
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class OpeningRateDetailReducer extends Reducer<Text, Text, Text, Text> {
+public class OpeningRateDetailReducer extends Reducer<Text, Text, NullWritable, NullWritable> {
 
     private static final Gson GSON = new Gson();
 
