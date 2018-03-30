@@ -125,6 +125,7 @@ public class OpeningRateDetailScheduler extends Configured implements Tool {
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);
         job.setReducerClass(OpeningRateDetailReducer.class);
+        job.setNumReduceTasks(1);
 
         // 作业输出
         Path outputPath = new Path("/tmp/.john/export/excel/");
