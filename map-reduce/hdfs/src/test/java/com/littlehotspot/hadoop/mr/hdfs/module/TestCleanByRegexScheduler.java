@@ -70,7 +70,7 @@ public class TestCleanByRegexScheduler {
 //                    "hdfsCluster=hdfs://devpd1:8020",
 //                    "hdfsIn=/home/data/hadoop/flume/box_source/2017-06-28",
 //                    "hdfsOut=/home/data/hadoop/flume/box_export/2017-06-28",
-                    "hdfsIn=hdfs://devpd1:8020/home/data/hadoop/flume/box/source/command/2017080",
+                    "hdfsIn=hdfs://devpmain:8020/home/data/hadoop/flume/box_source/2017-12-01",
                     "hdfsOut=hdfs://localhost:9000/home/data/hadoop/flume/box/export/2017-08-00",
                     "inMapperRegex=^.+,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.*,.+,.*,?$"
             };
