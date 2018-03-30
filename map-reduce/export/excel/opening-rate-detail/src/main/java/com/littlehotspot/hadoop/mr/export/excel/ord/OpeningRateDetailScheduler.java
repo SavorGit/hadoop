@@ -18,7 +18,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
@@ -74,12 +73,12 @@ public class OpeningRateDetailScheduler extends Configured implements Tool {
         String workbook = ArgumentFactory.getParameterValue(Argument.Workbook);
         ArgumentFactory.printInputArgument(Argument.Workbook, workbook, false);
 
-        // Sheet配置: sheet索引,hdfs目录名,sheet名称
+        // Sheet配置: sheet索引,hdfs目录名,sheet名称,数据中字段的分割符
         String[] sheetArray = ArgumentFactory.getParameterValues(Argument.Sheet);
         ArgumentFactory.printInputArgument(Argument.Sheet, sheetArray);
         Map<String, String> indexHDFSDirMap = this.analysisSheetConfig(excelSheetConfigMap, sheetArray);
 
-        // Title配置: // sheetIndex,字段名1|字段名2|...
+        // Title配置: // sheetIndex,标题分割符,字段名1|字段名2|...
         String[] titleArray = ArgumentFactory.getParameterValues(Argument.Title);
         ArgumentFactory.printInputArgument(Argument.Title, titleArray);
         this.analysisTitleConfig(excelSheetConfigMap, indexHDFSDirMap, titleArray);
@@ -204,12 +203,13 @@ public class OpeningRateDetailScheduler extends Configured implements Tool {
     }
 
     private void analysisTitleConfig(Map<String, ExcelConfigSheet> excelSheetConfigMap, Map<String, String> indexHDFSDirMap, String[] titleArray) {
-        Pattern sheetConfigPattern = Pattern.compile("^(\\d+),([^,]+)$");
+        Pattern sheetConfigPattern = Pattern.compile("^(\\d+),([^,]+),([^,]+)$");
         for (String titleConfig : titleArray) {
             Matcher matcher = sheetConfigPattern.matcher(titleConfig);
             if (matcher.find()) {
                 String sheetIndexString = matcher.group(1);
-                String titles = matcher.group(2);
+                String titleRegexSeparator = matcher.group(2);
+                String titles = matcher.group(3);
 
                 String hdfsDir = indexHDFSDirMap.get(sheetIndexString);
                 ExcelConfigSheet excelConfigSheet = excelSheetConfigMap.get(hdfsDir);
@@ -217,19 +217,21 @@ public class OpeningRateDetailScheduler extends Configured implements Tool {
                     continue;
                 }
                 excelConfigSheet.setTitles(titles);
+                excelConfigSheet.setTitleRegexSeparator(titleRegexSeparator);
             }
         }
     }
 
     private Map<String, String> analysisSheetConfig(Map<String, ExcelConfigSheet> excelSheetConfigMap, String[] sheetArray) {
         Map<String, String> indexHDFSDirMap = new ConcurrentHashMap<>();
-        Pattern sheetConfigPattern = Pattern.compile("^(\\d+),(\\w+),([^,]+)$");
+        Pattern sheetConfigPattern = Pattern.compile("^(\\d+),(\\w+),([^,]+),([^,]+)$");
         for (String sheetConfig : sheetArray) {
             Matcher matcher = sheetConfigPattern.matcher(sheetConfig);
             if (matcher.find()) {
                 String indexString = matcher.group(1);
                 String hdfsDir = matcher.group(2);
                 String name = matcher.group(3);
+                String fieldRegexSeparator = matcher.group(4);
                 ExcelConfigSheet excelConfigSheet = excelSheetConfigMap.get(hdfsDir);
                 if (excelConfigSheet == null) {
                     excelConfigSheet = new ExcelConfigSheet();
@@ -238,6 +240,7 @@ public class OpeningRateDetailScheduler extends Configured implements Tool {
                 excelConfigSheet.setIndex(index);
                 excelConfigSheet.setName(name);
                 excelConfigSheet.setHdfsDir(hdfsDir);
+                excelConfigSheet.setFieldRegexSeparator(fieldRegexSeparator);
 
                 indexHDFSDirMap.put(indexString, hdfsDir);
                 excelSheetConfigMap.put(hdfsDir, excelConfigSheet);

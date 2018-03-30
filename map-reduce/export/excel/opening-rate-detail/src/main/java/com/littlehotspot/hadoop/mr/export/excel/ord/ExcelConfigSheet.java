@@ -30,8 +30,10 @@ public class ExcelConfigSheet {
 
     private int index;
     private String hdfsDir;
+    private String fieldRegexSeparator;
     private String name;
     private String titles;
+    private String titleRegexSeparator;
 
     private List<OperationMode> operationModeList;
 }

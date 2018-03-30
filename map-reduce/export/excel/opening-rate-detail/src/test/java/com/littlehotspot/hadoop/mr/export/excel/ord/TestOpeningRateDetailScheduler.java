@@ -76,22 +76,22 @@ public class TestOpeningRateDetailScheduler {
 
                     // Sheet 0
                     "hdfsIn=hdfs://onlinemain:8020/home/data/hadoop/hive/box_log_play_rate",
-                    "sheet=0,box_log_play_rate,网络版",// sheetIndex,hdfs目录名,sheet名称
-                    "title=0,区域|酒楼|位置|包间|维护人|重点酒楼|播放日期|机顶盒编号|播放次数|播放总秒数|开机率",// sheetIndex,字段名1|字段名2|...
+                    "sheet=0,box_log_play_rate,网络版,\\u0001",// sheetIndex,hdfs目录名,sheet名称,数据中字段的分割符
+                    "title=0,\\|,区域|酒楼|位置|包间|维护人|重点酒楼|播放日期|机顶盒编号|播放次数|播放总秒数|开机率",// sheetIndex,标题分割符,字段名1|字段名2|...
                     "operationMode=0,1,>=,20180301,yyyyMMdd,date,date",// sheet索引,正则GROUP索引,操作符号,参考值,字段格式,字段类型
                     "operationMode=0,1,<=,20180331,yyyyMMdd,date,date",
 
                     // Sheet 1
                     "hdfsIn=hdfs://onlinemain:8020/home/data/hadoop/hive/stand_alone_play_rate",
-                    "sheet=1,stand_alone_play_rate,一代单机版",
-                    "title=1,区域|酒楼|位置|包间|维护人|重点酒楼|播放日期|机顶盒编号|播放次数|播放总秒数|开机率",
+                    "sheet=1,stand_alone_play_rate,一代单机版,\\u0001",
+                    "title=1,\\|,区域|酒楼|位置|包间|维护人|重点酒楼|播放日期|机顶盒编号|播放次数|播放总秒数|开机率",
                     "operationMode=1,1,>=,20180301,yyyyMMdd,date,date",
                     "operationMode=1,1,<=,20180331,yyyyMMdd,date,date",
 
                     // Sheet 2
                     "hdfsIn=hdfs://onlinemain:8020/home/data/hadoop/hive/stand3_box_log_play_rate",
-                    "sheet=2,stand3_box_log_play_rate,三代单机版",
-                    "title=2,区域|酒楼|位置|包间|维护人|重点酒楼|播放日期|机顶盒编号|播放次数|播放总秒数|开机率",
+                    "sheet=2,stand3_box_log_play_rate,三代单机版,\\u0001",
+                    "title=2,\\|,区域|酒楼|位置|包间|维护人|重点酒楼|播放日期|机顶盒编号|播放次数|播放总秒数|开机率",
                     "operationMode=2,1,>=,20180301,yyyyMMdd,date,date",
                     "operationMode=2,1,<=,20180331,yyyyMMdd,date,date"
             };

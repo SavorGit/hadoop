@@ -80,7 +80,7 @@ public class OpeningRateDetailReducer extends Reducer<Text, Text, Text, Text> {
             }
 
             int rowIndex = 0, colIndex = 0;
-            String[] titles = excelConfigSheet.getTitles().split("\\|");
+            String[] titles = excelConfigSheet.getTitles().split(excelConfigSheet.getTitleRegexSeparator());
 
             HSSFRow titleRow = sheet.createRow(rowIndex);
             for (String title : titles) {
