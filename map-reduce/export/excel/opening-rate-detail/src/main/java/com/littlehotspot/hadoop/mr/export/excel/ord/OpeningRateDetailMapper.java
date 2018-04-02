@@ -72,7 +72,10 @@ public class OpeningRateDetailMapper extends Mapper<LongWritable, Text, Text, Te
                     Object object = klass.newInstance();
                     if (object instanceof IDataOperator) {
                         Method operationMethod = klass.getMethod("operate", OperationMode.class, String.class);
-                        operationMethod.invoke(object, operationMode, dataString);
+                        Object returnObject = operationMethod.invoke(object, operationMode, dataString);
+                        if (!(Boolean) returnObject) {
+                            return;
+                        }
                     }
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
                     throw new IOException(e);
