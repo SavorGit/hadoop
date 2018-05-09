@@ -55,7 +55,7 @@ public class HbaseToMysqlScheduler extends Configured implements Tool {
             if (StringUtils.isBlank(jobName)) {
                 jobName = this.getClass().getName();
             }
-            String sql = "truncate savor_ng_content_log";
+            String sql = "truncate savor_ng_content_log_001";
             JDBCTool jdbcUtil = new JDBCTool(jdbcDriver, jdbcUrl, jdbcUsername, jdbcPassword);
             jdbcUtil.getConnection();
             try {
@@ -92,7 +92,7 @@ public class HbaseToMysqlScheduler extends Configured implements Tool {
 
             job.setReducerClass(DBOutputReducer.class);
             job.setOutputFormatClass(DBOutputFormat.class);
-            DBOutputFormat.setOutput(job, "savor_ng_content_log"
+            DBOutputFormat.setOutput(job, "savor_ng_content_log_001"
                     , "ip", "is_wx", "net_type", "device_type",
                     "timestamp", "content_id", "channel", "is_sq", "request_url"
             );
