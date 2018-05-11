@@ -15,7 +15,7 @@ import net.lizhaoweb.spring.hadoop.hbase.util.HBaseTable;
 @Data
 @NoArgsConstructor
 @HBaseTable(name = CommonVariables.HBASE_TABLE_NAME)
-public class NgContentLogHbase {
+public class NgContentLogHBase {
 
     /**
      * id + rety

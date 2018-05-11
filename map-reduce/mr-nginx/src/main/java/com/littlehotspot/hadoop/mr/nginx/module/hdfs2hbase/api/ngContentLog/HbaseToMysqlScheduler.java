@@ -2,7 +2,7 @@ package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.ngContentLog;
 
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.JDBCTool;
 import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.ngContentLog.io.ContentLogWritable;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.ngContentLog.io.NgContentLogHbase;
+import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.ngContentLog.io.NgContentLogHBase;
 import net.lizhaoweb.common.util.argument.ArgumentFactory;
 import net.lizhaoweb.spring.hadoop.commons.argument.MapReduceConstant;
 import net.lizhaoweb.spring.hadoop.commons.argument.model.Argument;
@@ -55,7 +55,10 @@ public class HbaseToMysqlScheduler extends Configured implements Tool {
             if (StringUtils.isBlank(jobName)) {
                 jobName = this.getClass().getName();
             }
-            String sql = "truncate savor_ng_content_log_001";
+            System.out.printf("=+-*-+=+-*-+=  HBase Table Name : %s\n", CommonVariables.HBASE_TABLE_NAME);
+            System.out.printf("=+-*-+=+-*-+=  Mysql Table Name : %s\n", CommonVariables.MYSQL_TABLE_NAME);
+
+            String sql = String.format("truncate %s", CommonVariables.MYSQL_TABLE_NAME);
             JDBCTool jdbcUtil = new JDBCTool(jdbcDriver, jdbcUrl, jdbcUsername, jdbcPassword);
             jdbcUtil.getConnection();
             try {
@@ -92,8 +95,8 @@ public class HbaseToMysqlScheduler extends Configured implements Tool {
 
             job.setReducerClass(DBOutputReducer.class);
             job.setOutputFormatClass(DBOutputFormat.class);
-            DBOutputFormat.setOutput(job, "savor_ng_content_log_001"
-                    , "ip", "is_wx", "net_type", "device_type",
+            DBOutputFormat.setOutput(job, CommonVariables.MYSQL_TABLE_NAME,
+                    "ip", "is_wx", "net_type", "device_type",
                     "timestamp", "content_id", "channel", "is_sq", "request_url"
             );
 
@@ -114,8 +117,9 @@ public class HbaseToMysqlScheduler extends Configured implements Tool {
         @Override
         protected void map(ImmutableBytesWritable key, Result result, Context context) throws IOException, InterruptedException {
             try {
-                NgContentLogHbase ngContentLogHbase = HBaseHelper.toBean(result, NgContentLogHbase.class);
+                NgContentLogHBase ngContentLogHbase = HBaseHelper.toBean(result, NgContentLogHBase.class);
                 String row = ngContentLogHbase.getAttrBean().toString();
+                System.out.printf("MR[Mapper] <<<<<<<<<<<<<<<<<<<<<<<<< %s\n", row);
                 context.write(new Text(ngContentLogHbase.getRowKey()), new Text(row));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -128,6 +132,7 @@ public class HbaseToMysqlScheduler extends Configured implements Tool {
         @Override
         protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
             String line = values.iterator().next().toString();
+            System.out.printf("MR[Reduce] >>>>>>>>>>>>>>>>>>>>>>>>> %s\n", line);
             Matcher matcher = CommonVariables.MYSQL_ROW_PATTERN.matcher(line);
             if (!matcher.find()) {
                 return;

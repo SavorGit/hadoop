@@ -23,7 +23,7 @@
 <configuration>
     <property>
         <name>hbase.rootdir</name>
-        <value>hdfs://devpd1:8020/hbase</value>
+        <value>hdfs://onlinemain:8020/hbase</value>
     </property>
     <property>
         <name>hbase.cluster.distributed</name>
@@ -31,7 +31,7 @@
     </property>
     <property>
         <name>hbase.zookeeper.quorum</name>
-        <value>devpd1</value>
+        <value>onlinemain</value>
     </property>
     <property>
         <name>dfs.replication</name>

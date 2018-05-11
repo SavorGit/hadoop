@@ -35,6 +35,7 @@ public class CommonVariables extends Constant.CommonVariables {
     static String httpUrl2 = "/content/3340.html?app=inner&channel=bigscpro";
 
     public static final String HBASE_TABLE_NAME = "ng_content_log";
+    public static final String MYSQL_TABLE_NAME = "savor_ng_content_log_001";
 
     static final Pattern MYSQL_ROW_PATTERN = Pattern.compile("^(\\d{0,3}\\.\\d{0,3}\\.\\d{0,3}\\.\\d{0,3})\u0001(.*)\u0001(.*)\u0001(.*)\u0001([1-9]\\d*)\u0001(\\d{1,})\u0001(.*)\u0001(.*)\u0001(.*)$");
 
