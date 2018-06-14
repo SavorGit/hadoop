@@ -16,6 +16,20 @@
     <name>Hadoop Map-Reduce Export Excel</name>
     <packaging>pom</packaging>
 
+    <properties>
+        <poi.version>3.7</poi.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <modules>
         <module>opening-rate-detail</module>
     </modules>
