@@ -11,7 +11,7 @@
 
     <groupId>com.littlehotspot.hadoop.mr</groupId>
     <artifactId>mr-box</artifactId>
-    <version>LHS.HADOOP.2.2.0.0.1.0.0-SNAPSHOT</version>
+    <version>LHS.HADOOP.2.2.0.0.1.0.1-SNAPSHOT</version>
 
     <name>Hadoop Map-Reduce [Box]</name>
     <packaging>jar</packaging>

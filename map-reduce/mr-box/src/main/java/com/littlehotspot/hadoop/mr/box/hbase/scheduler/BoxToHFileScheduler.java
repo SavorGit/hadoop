@@ -21,7 +21,6 @@ import org.apache.hadoop.hbase.mapreduce.KeyValueSortReducer;
 import org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles;
 import org.apache.hadoop.hbase.mapreduce.SimpleTotalOrderPartitioner;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.CombineTextInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
@@ -32,12 +31,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *@Author 刘飞飞
- *@Date 2017/7/31 18:52
+ * @Author 刘飞飞
+ * @Date 2017/7/31 18:52
  */
 public class BoxToHFileScheduler extends Configured implements Tool {
 
     private String hTableName = "box_log";
+
     @Override
     public int run(String[] args) throws Exception {
         try {
@@ -46,17 +46,17 @@ public class BoxToHFileScheduler extends Configured implements Tool {
             String hdfsInputPath = Constant.CommonVariables.getParameterValue(Argument.InputPath);
             String hdfsOutputPath = Constant.CommonVariables.getParameterValue(Argument.OutputPath);
 
-            JDBCTool jdbcTool= JdbcReader.createSimpleJdbc();
+            JDBCTool jdbcTool = JdbcReader.createSimpleJdbc();
             //查询hotel
-            integQuery(jdbcTool,Hotel.class,"select id,name from savor_hotel");
+            integQuery(jdbcTool, Hotel.class, "select id,name from savor_hotel");
             //查询room
-            integQuery(jdbcTool,Room.class,"select id,name from savor_room");
+            integQuery(jdbcTool, Room.class, "select id,name from savor_room");
             //查询media
-            integQuery(jdbcTool,Media.class,"select id,name from savor_media");
+            integQuery(jdbcTool, Media.class, "select id,name from savor_media");
             JdbcReader.closeJdbc();
             //封装数据
-            for(Map.Entry<String,String> entry: JdbcCommonVariables.modelMaps.entrySet()){
-                this.getConf().set(entry.getKey(),entry.getValue());
+            for (Map.Entry<String, String> entry : JdbcCommonVariables.modelMaps.entrySet()) {
+                this.getConf().set(entry.getKey(), entry.getValue());
             }
 
             Path outputPath = new Path(hdfsOutputPath);
@@ -95,22 +95,29 @@ public class BoxToHFileScheduler extends Configured implements Tool {
         }
     }
 
-    private void putToMap(List<Model> modelList){
-        if(modelList==null || modelList.size()==0){
+    private void putToMap(List<Model> modelList) {
+        if (modelList == null || modelList.size() == 0) {
             return;
         }
-        for(Model model:modelList){
-            String key=model.getClass().getSimpleName()+model.getId();
-            JdbcCommonVariables.modelMaps.put(key,model.getName());
+        for (Model model : modelList) {
+            if (model == null) {
+                continue;
+            }
+            String key = model.getClass().getSimpleName() + model.getId();
+            String value = model.getName();
+            if (value == null) {
+                continue;
+            }
+            JdbcCommonVariables.modelMaps.put(key, value);
         }
     }
 
-    private  void integQuery(JDBCTool jdbcTool,Class<? extends Model> t,String sql,Object...params){
+    private void integQuery(JDBCTool jdbcTool, Class<? extends Model> t, String sql, Object... params) {
         try {
-            List tList=jdbcTool.findResult(t,sql,params);
+            List tList = jdbcTool.findResult(t, sql, params);
             putToMap(tList);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }

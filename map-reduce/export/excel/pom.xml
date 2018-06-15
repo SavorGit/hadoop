@@ -32,6 +32,7 @@
 
     <modules>
         <module>opening-rate-detail</module>
+        <module>jdbc-excel</module>
     </modules>
 
 </project>
