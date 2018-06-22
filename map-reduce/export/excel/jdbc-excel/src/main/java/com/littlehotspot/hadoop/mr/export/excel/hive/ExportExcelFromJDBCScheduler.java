@@ -125,7 +125,7 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
         job.setOutputFormatClass(ExcelFileOutputFormat.class);
 
 
-        String fieldSQL = "SELECT id, name, description, creator, create_time, md5, creator_id, oss_addr, file_path, duration, surfix, type, oss_etag, flag, state, checker_id FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC";
+        String fieldSQL = "SELECT id, name, description,    creator, create_time, md5,     creator_id, oss_addr, file_path, duration, surfix, type, oss_etag, flag,    state, checker_id FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC";
         String countSQL = "SELECT COUNT(*) FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59'";
         HiveInputFormat.setInput(job, SimpleDataWritable.class, fieldSQL, countSQL);
         ExcelFileOutputFormat.setOutputPath(job, outputPath);

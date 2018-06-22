@@ -11,6 +11,8 @@
 package com.littlehotspot.hadoop.mr.export.excel.hive;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.MRJobConfig;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.ToolRunner;
 import org.fusesource.jansi.Ansi;
 import org.junit.Before;
@@ -49,6 +51,9 @@ public class TestExportExcelFromJDBCScheduler {
         this.decimalFormat = new DecimalFormat();
 
         this.conf = new Configuration();
+        this.conf.setBoolean(FileOutputFormat.COMPRESS, true);
+        this.conf.set(FileOutputFormat.COMPRESS_CODEC, "org.apache.hadoop.io.compress.GzipCodec");
+        this.conf.setInt(MRJobConfig.NUM_MAPS, 5);
     }
 
     @Test

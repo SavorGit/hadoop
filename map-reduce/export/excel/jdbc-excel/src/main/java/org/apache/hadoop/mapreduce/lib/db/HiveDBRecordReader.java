@@ -13,6 +13,7 @@ package org.apache.hadoop.mapreduce.lib.db;
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.MRJobConfig;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -57,6 +58,10 @@ public class HiveDBRecordReader<T extends DBWritable> extends DBRecordReader<T> 
     @Override
     protected String getSelectQuery() {
         StringBuilder query = new StringBuilder();
+        StringBuilder realQuery = new StringBuilder();
+        StringBuilder fieldNames = new StringBuilder();
+
+        int chunks = this.getDBConf().getConf().getInt(MRJobConfig.NUM_MAPS, 1);
 
         // Default codepath for MySQL, HSQLDB, etc. Relies on LIMIT/OFFSET for splits.
         if (this.getDBConf().getInputQuery() == null) {
@@ -64,8 +69,10 @@ public class HiveDBRecordReader<T extends DBWritable> extends DBRecordReader<T> 
 
             for (int i = 0; i < this.getFieldNames().length; i++) {
                 query.append(this.getFieldNames()[i]);
+                fieldNames.append(this.getFieldNames()[i]);
                 if (i != this.getFieldNames().length - 1) {
                     query.append(", ");
+                    fieldNames.append(", ");
                 }
             }
 
@@ -81,17 +88,22 @@ public class HiveDBRecordReader<T extends DBWritable> extends DBRecordReader<T> 
             }
         } else {
             //PREBUILT QUERY
-            query.append(this.getDBConf().getInputQuery());
+            String inputQuery = this.getDBConf().getInputQuery();
+            String selectQuest = inputQuery.substring(0, inputQuery.indexOf(" FROM "));
+            fieldNames.append(selectQuest.substring(selectQuest.indexOf("SELECT ") + "SELECT ".length()));
+            query.append(inputQuery);
         }
 
-        try {
-            query.append(" LIMIT ").append(this.getSplit().getLength());
-//            query.append(" OFFSET ").append(this.getSplit().getStart());
-        } catch (IOException ex) {
-            // Ignore, will not throw.
+        if (chunks < 1) {
+            return null;
+        } else if (chunks == 1) {
+            realQuery.append(query);
+        } else {
+            realQuery.append("SELECT ").append(fieldNames).append(" FROM (SELECT row_number() OVER () AS sys_row_num_, sys_table_1_.* FROM (").append(query).append(") AS sys_table_1_) AS sys_table_2_ WHERE sys_table_2_.sys_row_num_ BETWEEN ").append(this.getSplit().getStart() + 1).append(" AND ").append(this.getSplit().getEnd());
         }
 
-        return query.toString();
+//        System.out.println("HiveQL : " + realQuery);
+        return realQuery.toString();
     }
 
     /**

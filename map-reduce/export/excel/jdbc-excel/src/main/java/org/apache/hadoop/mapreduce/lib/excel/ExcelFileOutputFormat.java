@@ -16,12 +16,12 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.GzipCodec;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.MRJobConfig;
-import org.apache.hadoop.mapreduce.RecordWriter;
-import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapred.FileAlreadyExistsException;
+import org.apache.hadoop.mapred.InvalidJobConfException;
+import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.security.TokenCache;
 import org.apache.hadoop.util.ReflectionUtils;
 
 import java.io.DataOutputStream;
@@ -37,6 +37,8 @@ import java.io.IOException;
  * Date of last commit:$Date$<br>
  */
 public class ExcelFileOutputFormat<K, V> extends FileOutputFormat<K, V> {
+//    public static final String OUTFILE = "mapreduce.output.fileoutputformat.outputfile";
+
     private static final String FILE_SUFFIX = ".xlsx";
 
     public static String SEPARATOR = "mapreduce.output.exceloutputformat.separator";
@@ -81,8 +83,29 @@ public class ExcelFileOutputFormat<K, V> extends FileOutputFormat<K, V> {
             throw new RuntimeException(e);
         }
         job.getConfiguration().setInt(MRJobConfig.NUM_REDUCES, 1);
+//        job.getConfiguration().set(ExcelFileOutputFormat.OUTFILE, outputFile.toString());
         job.getConfiguration().set(ExcelFileOutputFormat.OUTDIR, outputDir.toString());
-        job.getConfiguration().set(ExcelFileOutputFormat.BASE_OUTPUT_NAME, outputDir.getName());
+        job.getConfiguration().set(ExcelFileOutputFormat.BASE_OUTPUT_NAME, outputFile.getName());
+    }
+
+    /**
+     * Get the {@link Path} to the output directory for the map-reduce job.
+     *
+     * @return the {@link Path} to the output directory for the map-reduce job.
+     * @see FileOutputFormat#getWorkOutputPath(TaskInputOutputContext)
+     */
+    public static Path getOutputPath(JobContext job) {
+        Configuration conf = job.getConfiguration();
+        String dirName = conf.get(FileOutputFormat.OUTDIR);
+        if (dirName == null) {
+            return null;
+        }
+        String fileName = conf.get(ExcelFileOutputFormat.BASE_OUTPUT_NAME);
+        if (fileName == null) {
+            return null;
+        }
+        String name = String.format("%s/%s", dirName, fileName);
+        return name == null ? null : new Path(name);
     }
 
     /**
@@ -109,8 +132,25 @@ public class ExcelFileOutputFormat<K, V> extends FileOutputFormat<K, V> {
      * @return a full path $output/_temporary/$taskid/part.xlsx
      * @throws IOException
      */
+    @Override
     public Path getDefaultWorkFile(TaskAttemptContext context, String extension) throws IOException {
         FileOutputCommitter committer = (FileOutputCommitter) getOutputCommitter(context);
         return new Path(committer.getWorkPath(), getUniqueFile(context, getOutputName(context), extension));
+    }
+
+    @Override
+    public void checkOutputSpecs(JobContext job) throws FileAlreadyExistsException, IOException {
+        // Ensure that the output directory is set and not already there
+        Path outFile = getOutputPath(job);
+        if (outFile == null) {
+            throw new InvalidJobConfException("Output file not set.");
+        }
+
+        // get delegation token for outDir's file system
+        TokenCache.obtainTokensForNamenodes(job.getCredentials(), new Path[]{outFile}, job.getConfiguration());
+
+        if (outFile.getFileSystem(job.getConfiguration()).exists(outFile)) {
+            throw new FileAlreadyExistsException("Output file " + outFile + " already exists");
+        }
     }
 }

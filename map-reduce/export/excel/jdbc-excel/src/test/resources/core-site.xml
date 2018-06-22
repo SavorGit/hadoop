@@ -22,10 +22,6 @@
         <value>hdfs://devpmain:8020</value>
         <!--<value>hdfs://localhost:9000</value>-->
     </property>
-    <property>
-        <name>mapreduce.output.fileoutputformat.compress</name>
-        <value>true</value>
-    </property>
     <!--<property>-->
     <!--<name>hadoop.tmp.dir</name>-->
     <!--<value>/D:/GreenProfram/HadoopEcosphere/tmp/hadoop</value>-->
