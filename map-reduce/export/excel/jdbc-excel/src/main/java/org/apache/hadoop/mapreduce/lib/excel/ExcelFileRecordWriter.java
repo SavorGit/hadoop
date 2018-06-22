@@ -13,14 +13,16 @@ package org.apache.hadoop.mapreduce.lib.excel;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.usermodel.RichTextString;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A RecordWriter that writes the reduce output to a Excel file
@@ -36,75 +38,68 @@ import java.io.UnsupportedEncodingException;
 @InterfaceStability.Evolving
 public class ExcelFileRecordWriter<K, V> extends RecordWriter<K, V> {
     protected HSSFWorkbook writableWorkbook = null;
-    protected DataOutputStream out;
-    private final byte[] keyValueSeparator;
-    private static final String utf8 = "UTF-8";
-    private static final String gbk = "GBK";
-    private static final byte[] newline;
+    protected HSSFSheet sheet = null;
+    protected DataInputStream inputStream;
+    protected DataOutputStream outputStream;
+    protected Pattern dataPattern;
 
-    static {
-        try {
-            newline = "\n".getBytes(utf8);
-        } catch (UnsupportedEncodingException uee) {
-            throw new IllegalArgumentException("can't find " + utf8 + " encoding");
-        }
-    }
+    private int rowIndex = 0;
 
-    public ExcelFileRecordWriter(DataOutputStream out, String keyValueSeparator) {
-        writableWorkbook = new HSSFWorkbook();
-        this.out = out;
-        try {
-            this.keyValueSeparator = keyValueSeparator.getBytes(utf8);
-        } catch (UnsupportedEncodingException uee) {
-            throw new IllegalArgumentException("can't find " + utf8 + " encoding");
+    public ExcelFileRecordWriter(DataInputStream inputStream, DataOutputStream outputStream, String sheetName, Pattern dataPattern, String[] titles) throws IOException {
+        if (inputStream == null) {
+            writableWorkbook = new HSSFWorkbook();
+        } else {
+            writableWorkbook = new HSSFWorkbook(inputStream);
         }
+        sheet = writableWorkbook.getSheet(sheetName);
+        if (sheet == null) {// 如果 Sheet 不存在，则创建。同时生成标题
+            sheet = writableWorkbook.createSheet(sheetName);
+            if (titles != null && titles.length > 0) {
+                HSSFRow titleRow = sheet.createRow(rowIndex);
+                for (int index = 0; index < titles.length; index++) {
+                    HSSFCell titleCell = titleRow.createCell(index);
+                    RichTextString titleRichTextString = new HSSFRichTextString(titles[index]);
+                    titleCell.setCellValue(titleRichTextString);
+                }
+                rowIndex++;
+            }
+        }
+        this.dataPattern = dataPattern;
+        this.inputStream = inputStream;
+        this.outputStream = outputStream;
     }
 
     /**
      * {@inheritDoc}
      */
     public void close(TaskAttemptContext context) throws IOException {
-        writableWorkbook.write(out);
-        out.flush();
-        IOUtils.closeQuietly(out);
+        writableWorkbook.write(outputStream);
+        outputStream.flush();
+        IOUtils.closeQuietly(outputStream);
+        IOUtils.closeQuietly(inputStream);
     }
 
     /**
      * {@inheritDoc}
      */
     public void write(K key, V value) throws IOException {
-        System.out.println("public void ExcelRecordWriter.write(K key, V value) throws IOException");
-
-        boolean nullKey = key == null || key instanceof NullWritable;
         boolean nullValue = value == null || value instanceof NullWritable;
-        if (nullKey && nullValue) {
+        if (nullValue) {
             return;
         }
-        if (!nullKey) {
-            writeObject(key);
+        String valueData = value.toString();
+        Matcher matcher = dataPattern.matcher(valueData);
+        if (!matcher.find()) {
+            return;
         }
-        if (!(nullKey || nullValue)) {
-            out.write(keyValueSeparator);
+        int colCount = matcher.groupCount();
+        HSSFRow dataRow = sheet.createRow(rowIndex);
+        for (int index = 0; index < colCount; index++) {
+            String cell = matcher.group(index + 1);
+            HSSFCell dataCell = dataRow.createCell(index);
+            RichTextString dataRichTextString = new HSSFRichTextString(cell);
+            dataCell.setCellValue(dataRichTextString);
         }
-        if (!nullValue) {
-            writeObject(value);
-        }
-        out.write(newline);
-    }
-
-    /**
-     * Write the object to the byte stream, handling Text as a special
-     * case.
-     *
-     * @param o the object to print
-     * @throws IOException if the write throws, we pass it on
-     */
-    private void writeObject(Object o) throws IOException {
-        if (o instanceof Text) {
-            Text to = (Text) o;
-            out.write(to.getBytes(), 0, to.getLength());
-        } else {
-            out.write(o.toString().getBytes(utf8));
-        }
+        rowIndex++;
     }
 }

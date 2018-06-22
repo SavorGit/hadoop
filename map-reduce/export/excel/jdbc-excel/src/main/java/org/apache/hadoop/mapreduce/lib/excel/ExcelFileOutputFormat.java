@@ -11,6 +11,7 @@
 package org.apache.hadoop.mapreduce.lib.excel;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -24,8 +25,10 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.security.TokenCache;
 import org.apache.hadoop.util.ReflectionUtils;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 /**
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
@@ -37,11 +40,13 @@ import java.io.IOException;
  * Date of last commit:$Date$<br>
  */
 public class ExcelFileOutputFormat<K, V> extends FileOutputFormat<K, V> {
-//    public static final String OUTFILE = "mapreduce.output.fileoutputformat.outputfile";
+    //    public static final String OUTFILE = "mapreduce.output.fileoutputformat.outputfile";
+    public static final String SHEET_NAME = "mapreduce.output.exceloutput.sheet.name";
+    public static final String TITLES = "mapreduce.output.exceloutput.sheet.titles";
+    public static final String DATA_PATTERN = "mapreduce.output.exceloutput.sheet.data.pattern";
 
     private static final String FILE_SUFFIX = ".xlsx";
 
-    public static String SEPARATOR = "mapreduce.output.exceloutputformat.separator";
 
     /**
      * {@inheritDoc}
@@ -49,7 +54,9 @@ public class ExcelFileOutputFormat<K, V> extends FileOutputFormat<K, V> {
     public RecordWriter<K, V> getRecordWriter(TaskAttemptContext job) throws IOException, InterruptedException {
         Configuration conf = job.getConfiguration();
         boolean isCompressed = getCompressOutput(job);
-        String keyValueSeparator = conf.get(ExcelFileOutputFormat.SEPARATOR, "\t");
+        String sheetName = conf.get(ExcelFileOutputFormat.SHEET_NAME, "Sheet_0");
+        String[] titles = conf.getStrings(ExcelFileOutputFormat.TITLES);
+        Pattern dataPattern = conf.getPattern(ExcelFileOutputFormat.DATA_PATTERN, null);
         CompressionCodec codec = null;
         String extension = "";
         if (isCompressed) {
@@ -59,12 +66,15 @@ public class ExcelFileOutputFormat<K, V> extends FileOutputFormat<K, V> {
         }
         Path file = getDefaultWorkFile(job, extension);
         FileSystem fs = file.getFileSystem(conf);
+        FSDataInputStream fileIn = null;
+        if (fs.exists(file)) {
+            fileIn = fs.open(file);
+        }
+        FSDataOutputStream fileOut = fs.create(file, false);
         if (!isCompressed) {
-            FSDataOutputStream fileOut = fs.create(file, false);
-            return new ExcelFileRecordWriter<>(fileOut, keyValueSeparator);
+            return new ExcelFileRecordWriter<>(fileIn, fileOut, sheetName, dataPattern, titles);
         } else {
-            FSDataOutputStream fileOut = fs.create(file, false);
-            return new ExcelFileRecordWriter<>(new DataOutputStream(codec.createOutputStream(fileOut)), keyValueSeparator);
+            return new ExcelFileRecordWriter<>(new DataInputStream(codec.createInputStream(fileIn)), new DataOutputStream(codec.createOutputStream(fileOut)), sheetName, dataPattern, titles);
         }
     }
 
@@ -149,8 +159,8 @@ public class ExcelFileOutputFormat<K, V> extends FileOutputFormat<K, V> {
         // get delegation token for outDir's file system
         TokenCache.obtainTokensForNamenodes(job.getCredentials(), new Path[]{outFile}, job.getConfiguration());
 
-        if (outFile.getFileSystem(job.getConfiguration()).exists(outFile)) {
-            throw new FileAlreadyExistsException("Output file " + outFile + " already exists");
-        }
+//        if (outFile.getFileSystem(job.getConfiguration()).exists(outFile)) {
+//            throw new FileAlreadyExistsException("Output file " + outFile + " already exists");
+//        }
     }
 }
