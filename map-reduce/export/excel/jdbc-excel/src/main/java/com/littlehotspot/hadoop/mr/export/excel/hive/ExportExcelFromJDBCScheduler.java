@@ -17,16 +17,14 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.conf.HiveConfUtil;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.db.DBConfiguration;
-import org.apache.hadoop.mapreduce.lib.db.DBInputFormat;
-import org.apache.hadoop.mapreduce.lib.db.DBOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.db.HiveInputFormat;
+import org.apache.hadoop.mapreduce.lib.db.SimpleDataWritable;
+import org.apache.hadoop.mapreduce.lib.excel.ExcelFileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
 import java.io.IOException;
@@ -111,27 +109,26 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
 
         // 如果输出路径已经存在，则删除
         FileSystem fileSystem = FileSystem.newInstance(this.getConf());
-//        if (fileSystem.exists(outputPath)) {
-//            fileSystem.delete(outputPath, true);
-//        }
+        if (fileSystem.exists(outputPath)) {
+            fileSystem.delete(outputPath, true);
+        }
 
         Job job = Job.getInstance(this.getConf(), jobName);
         job.setJarByClass(this.getClass());
 
-        job.setInputFormatClass(DBInputFormat.class);
-        job.setMapperClass(DBInputMapper.class);
+        job.setMapperClass(HiveInputMapper.class);
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);
 
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
-        job.setOutputFormatClass(DBOutputFormat.class);
+        job.setOutputFormatClass(ExcelFileOutputFormat.class);
 
 
         String fieldSQL = "SELECT id, name, description, creator, create_time, md5, creator_id, oss_addr, file_path, duration, surfix, type, oss_etag, flag, state, checker_id FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC";
         String countSQL = "SELECT COUNT(*) FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59'";
-        DBInputFormat.setInput(job, DBInputFormat.NullDBWritable.class, fieldSQL, countSQL);
-        FileOutputFormat.setOutputPath(job, outputPath);
+        HiveInputFormat.setInput(job, SimpleDataWritable.class, fieldSQL, countSQL);
+        ExcelFileOutputFormat.setOutputPath(job, outputPath);
 
         boolean status = job.waitForCompletion(true);
         if (!status) {
@@ -141,9 +138,9 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
         return 0;
     }
 
-    private class DBInputMapper extends Mapper<LongWritable, DBInputFormat.NullDBWritable, Text, Text> {
+    public static class HiveInputMapper extends Mapper<LongWritable, SimpleDataWritable, Text, Text> {
         @Override
-        public void map(LongWritable key, DBInputFormat.NullDBWritable value, Context context) throws IOException, InterruptedException {
+        public void map(LongWritable key, SimpleDataWritable value, Context context) throws IOException, InterruptedException {
             context.write(new Text(value.toString()), new Text());
         }
     }

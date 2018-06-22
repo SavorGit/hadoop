@@ -53,13 +53,14 @@ public class TestExportExcelFromJDBCScheduler {
 
     @Test
     public void run() {
-        System.out.println();
+        System.out.println("Test Main Execute ...");
         long start = System.currentTimeMillis();
         try {
             String[] args = {
                     "jdbcDriver=org.apache.hive.jdbc.HiveDriver",
                     "jdbcUrl=jdbc:hive2://onlinemain:10000/default",
-                    "workbook=hdfs://onlinemain:8020/john.lee/excel/2018年05月01-05月15号开机率明细(hive).xls"
+                    "workbook=john.lee/excel/2018年05月01-05月15号开机率明细(hive).xls"
+//                    "workbook=hdfs://onlinemain:8020/john.lee/excel/2018年05月01-05月15号开机率明细(hive).xls"
             };
             ToolRunner.run(this.conf, new ExportExcelFromJDBCScheduler(), args);
         } catch (Exception e) {
