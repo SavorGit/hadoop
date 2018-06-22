@@ -28,6 +28,7 @@ import org.apache.hadoop.mapreduce.lib.excel.ExcelFileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
 import java.io.IOException;
+import java.sql.SQLSyntaxErrorException;
 
 /**
  * <h1>调度器 - Hive 导出 Excel</h1>
@@ -125,9 +126,8 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
         job.setOutputFormatClass(ExcelFileOutputFormat.class);
 
 
-        String fieldSQL = "SELECT id, name, description,    creator, create_time, md5,     creator_id, oss_addr, file_path, duration, surfix, type, oss_etag, flag,    state, checker_id FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC";
-        String countSQL = "SELECT COUNT(*) FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59'";
-        HiveInputFormat.setInput(job, SimpleDataWritable.class, fieldSQL, countSQL);
+        String selectQuery = "SELECT id, name, description,    creator, create_time, md5,     creator_id, oss_addr, file_path, duration, surfix, type, oss_etag, flag,    state, checker_id FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC";
+        HiveInputFormat.setInput(job, SimpleDataWritable.class, selectQuery, this.getCountQuery(selectQuery));
         ExcelFileOutputFormat.setOutputPath(job, outputPath);
 
         boolean status = job.waitForCompletion(true);
@@ -136,6 +136,23 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
         }
 
         return 0;
+    }
+
+    // 生成获取总记录数据的 SQL 语句
+    private String getCountQuery(String selectQuery) {
+        StringBuilder query = new StringBuilder("SELECT COUNT(*)");
+        String selectQueryToUpperCase = selectQuery.toUpperCase();
+        int firstFromIndex = selectQueryToUpperCase.indexOf(" FROM ");
+        if (firstFromIndex < 0) {
+            throw new RuntimeException(new SQLSyntaxErrorException("Not found from clause in SQL '" + selectQuery + "'"));
+        }
+        int lastOrderIndex = selectQueryToUpperCase.lastIndexOf(" ORDER BY ");
+        if (lastOrderIndex < 0) {
+            query.append(selectQuery.substring(firstFromIndex));
+        } else {
+            query.append(selectQuery.substring(firstFromIndex, lastOrderIndex));
+        }
+        return query.toString();
     }
 
     public static class HiveInputMapper extends Mapper<LongWritable, SimpleDataWritable, Text, Text> {

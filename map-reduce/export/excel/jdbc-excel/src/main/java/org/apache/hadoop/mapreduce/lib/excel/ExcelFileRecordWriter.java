@@ -10,11 +10,13 @@
  */
 package org.apache.hadoop.mapreduce.lib.excel;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -33,6 +35,7 @@ import java.io.UnsupportedEncodingException;
  */
 @InterfaceStability.Evolving
 public class ExcelFileRecordWriter<K, V> extends RecordWriter<K, V> {
+    protected HSSFWorkbook writableWorkbook = null;
     protected DataOutputStream out;
     private final byte[] keyValueSeparator;
     private static final String utf8 = "UTF-8";
@@ -48,7 +51,7 @@ public class ExcelFileRecordWriter<K, V> extends RecordWriter<K, V> {
     }
 
     public ExcelFileRecordWriter(DataOutputStream out, String keyValueSeparator) {
-        System.out.println("ExcelFileRecordWriter 构造");
+        writableWorkbook = new HSSFWorkbook();
         this.out = out;
         try {
             this.keyValueSeparator = keyValueSeparator.getBytes(utf8);
@@ -61,8 +64,9 @@ public class ExcelFileRecordWriter<K, V> extends RecordWriter<K, V> {
      * {@inheritDoc}
      */
     public void close(TaskAttemptContext context) throws IOException {
-        System.out.println("public void ExcelRecordWriter.close(TaskAttemptContext context) throws IOException");
-        out.close();
+        writableWorkbook.write(out);
+        out.flush();
+        IOUtils.closeQuietly(out);
     }
 
     /**

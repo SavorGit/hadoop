@@ -96,7 +96,6 @@ public class HiveInputFormat<T extends DBWritable> extends DBInputFormat<T> {
             // accordingly
             for (int i = 0; i < chunks; i++) {
                 HiveInputFormat.DBInputSplit split;
-
                 if ((i + 1) == chunks) {
                     split = new HiveInputFormat.DBInputSplit(i * chunkSize, count);
                 } else {

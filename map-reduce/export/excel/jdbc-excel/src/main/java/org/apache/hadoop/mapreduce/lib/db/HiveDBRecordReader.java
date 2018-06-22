@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
 
 /**
  * A RecordReader that reads records from a Hive table.
@@ -89,8 +90,17 @@ public class HiveDBRecordReader<T extends DBWritable> extends DBRecordReader<T> 
         } else {
             //PREBUILT QUERY
             String inputQuery = this.getDBConf().getInputQuery();
-            String selectQuest = inputQuery.substring(0, inputQuery.indexOf(" FROM "));
-            fieldNames.append(selectQuest.substring(selectQuest.indexOf("SELECT ") + "SELECT ".length()));
+            String inputQueryToUpperCase = inputQuery.toUpperCase();
+            int firstSelectIndex = inputQueryToUpperCase.indexOf("SELECT ");
+            if (firstSelectIndex < 0) {
+                throw new RuntimeException(new SQLSyntaxErrorException("Not found select clause in SQL '" + inputQuery + "'"));
+            }
+            int firstFromIndex = inputQueryToUpperCase.indexOf(" FROM ");
+            if (firstFromIndex < 0) {
+                throw new RuntimeException(new SQLSyntaxErrorException("Not found from clause in SQL '" + inputQuery + "'"));
+            }
+            String fieldNamesString = inputQuery.substring(firstSelectIndex + "SELECT ".length(), firstFromIndex);
+            fieldNames.append(fieldNamesString);
             query.append(inputQuery);
         }
 
@@ -102,7 +112,7 @@ public class HiveDBRecordReader<T extends DBWritable> extends DBRecordReader<T> 
             realQuery.append("SELECT ").append(fieldNames).append(" FROM (SELECT row_number() OVER () AS sys_row_num_, sys_table_1_.* FROM (").append(query).append(") AS sys_table_1_) AS sys_table_2_ WHERE sys_table_2_.sys_row_num_ BETWEEN ").append(this.getSplit().getStart() + 1).append(" AND ").append(this.getSplit().getEnd());
         }
 
-//        System.out.println("HiveQL : " + realQuery);
+        System.out.println("HiveQL : " + realQuery);
         return realQuery.toString();
     }
 
