@@ -29,6 +29,7 @@ import org.apache.hadoop.util.Tool;
 
 import java.io.IOException;
 import java.sql.SQLSyntaxErrorException;
+import java.util.regex.Pattern;
 
 /**
  * <h1>调度器 - Hive 导出 Excel</h1>
@@ -114,6 +115,8 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
             fileSystem.delete(outputPath, true);
         }
 
+        this.getConf().setPattern(ExcelFileOutputFormat.DATA_PATTERN, Pattern.compile("^(.+)\\u0001(.+)$"));
+
         Job job = Job.getInstance(this.getConf(), jobName);
         job.setJarByClass(this.getClass());
 
@@ -126,7 +129,8 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
         job.setOutputFormatClass(ExcelFileOutputFormat.class);
 
 
-        String mediaSelectQuery = "SELECT id, name, description, creator, create_time, md5, creator_id, oss_addr, file_path, duration, surfix, type, oss_etag, flag, state, checker_id FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC";
+        String mediaSelectQuery = "SELECT id, name FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC";
+//        String mediaSelectQuery = "SELECT id, name, description, creator, create_time, md5, creator_id, oss_addr, file_path, duration, surfix, type, oss_etag, flag, state, checker_id FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC";
         HiveInputFormat.setInput(job, SimpleDataWritable.class, mediaSelectQuery, this.getCountQuery(mediaSelectQuery));
 //        String hotelSelectQuery = "SELECT * FROM mysql.savor_hotel";
 //        HiveInputFormat.setInput(job, SimpleDataWritable.class, hotelSelectQuery, this.getCountQuery(hotelSelectQuery));
