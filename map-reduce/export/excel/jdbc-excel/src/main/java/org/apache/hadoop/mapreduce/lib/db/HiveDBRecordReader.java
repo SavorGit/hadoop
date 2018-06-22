@@ -112,7 +112,7 @@ public class HiveDBRecordReader<T extends DBWritable> extends DBRecordReader<T> 
             realQuery.append("SELECT ").append(fieldNames).append(" FROM (SELECT row_number() OVER () AS sys_row_num_, sys_table_1_.* FROM (").append(query).append(") AS sys_table_1_) AS sys_table_2_ WHERE sys_table_2_.sys_row_num_ BETWEEN ").append(this.getSplit().getStart() + 1).append(" AND ").append(this.getSplit().getEnd());
         }
 
-        System.out.println("HiveQL : " + realQuery);
+//        System.out.println("HiveQL : " + realQuery);
         return realQuery.toString();
     }
 

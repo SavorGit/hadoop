@@ -126,8 +126,10 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
         job.setOutputFormatClass(ExcelFileOutputFormat.class);
 
 
-        String selectQuery = "SELECT id, name, description,    creator, create_time, md5,     creator_id, oss_addr, file_path, duration, surfix, type, oss_etag, flag,    state, checker_id FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC";
-        HiveInputFormat.setInput(job, SimpleDataWritable.class, selectQuery, this.getCountQuery(selectQuery));
+        String mediaSelectQuery = "SELECT id, name, description, creator, create_time, md5, creator_id, oss_addr, file_path, duration, surfix, type, oss_etag, flag, state, checker_id FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC";
+        HiveInputFormat.setInput(job, SimpleDataWritable.class, mediaSelectQuery, this.getCountQuery(mediaSelectQuery));
+        String hotelSelectQuery = "SELECT * FROM mysql.savor_hotel";
+        HiveInputFormat.setInput(job, SimpleDataWritable.class, hotelSelectQuery, this.getCountQuery(hotelSelectQuery));
         ExcelFileOutputFormat.setOutputPath(job, outputPath);
 
         boolean status = job.waitForCompletion(true);
@@ -158,6 +160,7 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
     public static class HiveInputMapper extends Mapper<LongWritable, SimpleDataWritable, Text, Text> {
         @Override
         public void map(LongWritable key, SimpleDataWritable value, Context context) throws IOException, InterruptedException {
+            System.out.println(key + "\t" + value);
             context.write(new Text(value.toString()), new Text());
         }
     }
