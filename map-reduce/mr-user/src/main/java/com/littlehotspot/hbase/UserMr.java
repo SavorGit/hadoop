@@ -4,7 +4,7 @@ import com.littlehotspot.model.UserReadOrderAttrBean;
 import com.littlehotspot.model.UserReadOrderBean;
 import com.littlehotspot.util.Argument;
 import com.littlehotspot.util.Constant;
-import com.littlehotspot.util.hbase.HBaseHelper;
+import net.lizhaoweb.spring.hadoop.hbase.util.HBaseHelper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;

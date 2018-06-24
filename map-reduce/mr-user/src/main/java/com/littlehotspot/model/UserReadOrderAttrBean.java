@@ -1,8 +1,8 @@
 package com.littlehotspot.model;
 
-import com.littlehotspot.util.hbase.HBaseColumn;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.lizhaoweb.spring.hadoop.hbase.util.HBaseColumn;
 
 /**
  * <h1>模型 -  用户阅读数排序表</h1>
@@ -49,13 +49,13 @@ public class UserReadOrderAttrBean {
     private String fDemaTime;
 
     public UserReadOrderAttrBean(String text) {
-         String [] cols=text.split("\\|",-1);
-         this.userId=cols[0];
-         this.mType=cols[1];
-         this.mMachine=cols[2];
-         this.readCount=cols[3];
-         this.fDownTime=cols[4];
-         this.fProjeTime=cols[5];
-         this.fDemaTime=cols[6];
+        String[] cols = text.split("\\|", -1);
+        this.userId = cols[0];
+        this.mType = cols[1];
+        this.mMachine = cols[2];
+        this.readCount = cols[3];
+        this.fDownTime = cols[4];
+        this.fProjeTime = cols[5];
+        this.fDemaTime = cols[6];
     }
 }

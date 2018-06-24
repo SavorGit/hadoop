@@ -1,13 +1,13 @@
 package com.littlehotspot.model;
 
-import com.littlehotspot.util.hbase.HBaseFamily;
-import com.littlehotspot.util.hbase.HBaseRowKey;
-import com.littlehotspot.util.hbase.HBaseTable;
 import lombok.Data;
+import net.lizhaoweb.spring.hadoop.hbase.util.HBaseFamily;
+import net.lizhaoweb.spring.hadoop.hbase.util.HBaseRowKey;
+import net.lizhaoweb.spring.hadoop.hbase.util.HBaseTable;
 
 /**
- *@Author 刘飞飞
- *@Date 2017/7/21 11:20
+ * @Author 刘飞飞
+ * @Date 2017/7/21 11:20
  */
 @Data
 @HBaseTable(name = "user_read_order")
