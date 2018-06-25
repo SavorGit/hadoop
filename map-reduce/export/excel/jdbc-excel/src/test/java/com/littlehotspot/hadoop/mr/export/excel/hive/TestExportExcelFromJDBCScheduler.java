@@ -65,7 +65,7 @@ public class TestExportExcelFromJDBCScheduler {
                     "jdbcUrl=jdbc:hive2://onlinemain:10000/default",
                     "jdbcUsername=",
                     "jdbcPassword=",
-                    "workbook=john.lee/excel/2018年05月01-05月15号开机率明细(hive)",
+                    "workbook=/john.lee/excel/2018年05月01-05月15号开机率明细(hive)",
 //                    "workbook=hdfs://onlinemain:8020/john.lee/excel/2018年05月01-05月15号开机率明细(hive).xls",
                     "sheet=媒体表",
                     "title=媒体标识|媒体名称",
