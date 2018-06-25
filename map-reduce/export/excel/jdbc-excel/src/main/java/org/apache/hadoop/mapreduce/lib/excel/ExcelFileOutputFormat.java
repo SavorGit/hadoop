@@ -45,7 +45,7 @@ public class ExcelFileOutputFormat<K, V> extends FileOutputFormat<K, V> {
     public static final String TITLES = "mapreduce.output.exceloutput.sheet.titles";
     public static final String DATA_PATTERN = "mapreduce.output.exceloutput.sheet.data.pattern";
 
-    private static final String FILE_SUFFIX = ".xlsx";
+    private static final String FILE_SUFFIX = ".xls";
 
 
     /**
@@ -54,7 +54,7 @@ public class ExcelFileOutputFormat<K, V> extends FileOutputFormat<K, V> {
     public RecordWriter<K, V> getRecordWriter(TaskAttemptContext job) throws IOException, InterruptedException {
         Configuration conf = job.getConfiguration();
         boolean isCompressed = getCompressOutput(job);
-        String sheetName = conf.get(ExcelFileOutputFormat.SHEET_NAME, "Sheet_0");
+        String sheetName = conf.get(ExcelFileOutputFormat.SHEET_NAME, "MR Sheet");
         String[] titles = conf.getStrings(ExcelFileOutputFormat.TITLES);
         Pattern dataPattern = conf.getPattern(ExcelFileOutputFormat.DATA_PATTERN, null);
         CompressionCodec codec = null;
@@ -64,27 +64,33 @@ public class ExcelFileOutputFormat<K, V> extends FileOutputFormat<K, V> {
             codec = ReflectionUtils.newInstance(codecClass, conf);
             extension = codec.getDefaultExtension();
         }
-        Path file = getDefaultWorkFile(job, extension);
-        FileSystem fs = file.getFileSystem(conf);
+        Path workFile = getDefaultWorkFile(job, extension);
+        Path excelFile = getOutputPath(job);
+        FileSystem fs = workFile.getFileSystem(conf);
         FSDataInputStream fileIn = null;
-        if (fs.exists(file)) {
-            fileIn = fs.open(file);
+        if (fs.exists(excelFile)) {
+            fileIn = fs.open(excelFile);
         }
-        FSDataOutputStream fileOut = fs.create(file, false);
+        FSDataOutputStream fileOut = fs.create(workFile, false);
         if (!isCompressed) {
-            return new ExcelFileRecordWriter<>(fileIn, fileOut, sheetName, dataPattern, titles);
+            return new ExcelFileRecordWriter<>(fileIn, fileOut, sheetName, dataPattern, titles, false);
         } else {
-            return new ExcelFileRecordWriter<>(new DataInputStream(codec.createInputStream(fileIn)), new DataOutputStream(codec.createOutputStream(fileOut)), sheetName, dataPattern, titles);
+            DataInputStream dataInputStream = fileIn == null ? null : new DataInputStream(codec.createInputStream(fileIn));
+            DataOutputStream dataOutputStream = fileOut == null ? null : new DataOutputStream(codec.createOutputStream(fileOut));
+            return new ExcelFileRecordWriter<>(dataInputStream, dataOutputStream, sheetName, dataPattern, titles, false);
         }
     }
 
     /**
      * Set the {@link Path} of the output directory for the map-reduce job.
      *
-     * @param job        The job to modify
-     * @param outputFile the {@link Path} of the output file for the map-reduce job.
+     * @param job          The job to modify
+     * @param outputFile   the {@link Path} of the output file for the map-reduce job.
+     * @param sheetName    The name of the sheet
+     * @param titles       The title in sheet
+     * @param valuePattern The value to matching
      */
-    public static void setOutputPath(Job job, Path outputFile) {
+    public static void setOutputPath(Job job, Path outputFile, String sheetName, String[] titles, Pattern valuePattern) {
         Path outputDir = outputFile.getParent();
         try {
             outputDir = outputFile.getFileSystem(job.getConfiguration()).makeQualified(outputDir);
@@ -94,8 +100,15 @@ public class ExcelFileOutputFormat<K, V> extends FileOutputFormat<K, V> {
         }
         job.getConfiguration().setInt(MRJobConfig.NUM_REDUCES, 1);
 //        job.getConfiguration().set(ExcelFileOutputFormat.OUTFILE, outputFile.toString());
+        job.getConfiguration().set(ExcelFileOutputFormat.SHEET_NAME, sheetName);
+        job.getConfiguration().setStrings(ExcelFileOutputFormat.TITLES, titles);
+        job.getConfiguration().setPattern(ExcelFileOutputFormat.DATA_PATTERN, valuePattern);
         job.getConfiguration().set(ExcelFileOutputFormat.OUTDIR, outputDir.toString());
         job.getConfiguration().set(ExcelFileOutputFormat.BASE_OUTPUT_NAME, outputFile.getName());
+    }
+
+    public static void setOutputPath(Job job, Path outputFile) {
+        throw new RuntimeException("Method not supported");
     }
 
     /**
@@ -114,7 +127,7 @@ public class ExcelFileOutputFormat<K, V> extends FileOutputFormat<K, V> {
         if (fileName == null) {
             return null;
         }
-        String name = String.format("%s/%s", dirName, fileName);
+        String name = String.format("%s/%s%s", dirName, fileName, ExcelFileOutputFormat.FILE_SUFFIX);
         return name == null ? null : new Path(name);
     }
 

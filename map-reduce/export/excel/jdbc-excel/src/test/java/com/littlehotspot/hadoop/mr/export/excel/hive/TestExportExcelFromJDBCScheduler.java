@@ -51,9 +51,9 @@ public class TestExportExcelFromJDBCScheduler {
         this.decimalFormat = new DecimalFormat();
 
         this.conf = new Configuration();
-        this.conf.setBoolean(FileOutputFormat.COMPRESS, true);
-        this.conf.set(FileOutputFormat.COMPRESS_CODEC, "org.apache.hadoop.io.compress.GzipCodec");
-        this.conf.setInt(MRJobConfig.NUM_MAPS, 5);
+//        this.conf.setBoolean(FileOutputFormat.COMPRESS, true);
+//        this.conf.set(FileOutputFormat.COMPRESS_CODEC, "org.apache.hadoop.io.compress.GzipCodec");
+//        this.conf.setInt(MRJobConfig.NUM_MAPS, 5);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class TestExportExcelFromJDBCScheduler {
             String[] args = {
                     "jdbcDriver=org.apache.hive.jdbc.HiveDriver",
                     "jdbcUrl=jdbc:hive2://onlinemain:10000/default",
-                    "workbook=john.lee/excel/2018年05月01-05月15号开机率明细(hive).xls"
+                    "workbook=john.lee/excel/2018年05月01-05月15号开机率明细(hive)"
 //                    "workbook=hdfs://onlinemain:8020/john.lee/excel/2018年05月01-05月15号开机率明细(hive).xls"
             };
             ToolRunner.run(this.conf, new ExportExcelFromJDBCScheduler(), args);

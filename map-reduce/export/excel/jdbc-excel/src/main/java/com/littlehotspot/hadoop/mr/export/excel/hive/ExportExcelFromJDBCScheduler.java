@@ -15,7 +15,6 @@ import net.lizhaoweb.spring.hadoop.commons.argument.MapReduceConstant;
 import net.lizhaoweb.spring.hadoop.commons.argument.model.Argument;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -109,13 +108,12 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
 
         DBConfiguration.configureDB(this.getConf(), jdbcDriver, jdbcUrl, jdbcUser, jdbcPass);
 
-        // 如果输出路径已经存在，则删除
-        FileSystem fileSystem = FileSystem.newInstance(this.getConf());
-        if (fileSystem.exists(outputPath)) {
-            fileSystem.delete(outputPath, true);
-        }
+//        // 如果输出路径已经存在，则删除
+//        FileSystem fileSystem = FileSystem.newInstance(this.getConf());
+//        if (fileSystem.exists(outputPath)) {
+//            fileSystem.delete(outputPath, true);
+//        }
 
-        this.getConf().setPattern(ExcelFileOutputFormat.DATA_PATTERN, Pattern.compile("^(.+)\\u0001(.+)$"));
 
         Job job = Job.getInstance(this.getConf(), jobName);
         job.setJarByClass(this.getClass());
@@ -134,7 +132,10 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
         HiveInputFormat.setInput(job, SimpleDataWritable.class, mediaSelectQuery, this.getCountQuery(mediaSelectQuery));
 //        String hotelSelectQuery = "SELECT * FROM mysql.savor_hotel";
 //        HiveInputFormat.setInput(job, SimpleDataWritable.class, hotelSelectQuery, this.getCountQuery(hotelSelectQuery));
-        ExcelFileOutputFormat.setOutputPath(job, outputPath);
+        String sheetName = "媒体表";
+        String[] sheetTitles = {"媒体标识", "媒体名称"};
+        Pattern valuePattern = Pattern.compile("^([^\\u0001]+)\\u0001(.*)$");
+        ExcelFileOutputFormat.setOutputPath(job, outputPath, sheetName, sheetTitles, valuePattern);
 
         boolean status = job.waitForCompletion(true);
         if (!status) {
@@ -165,7 +166,7 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
         @Override
         public void map(LongWritable key, SimpleDataWritable value, Context context) throws IOException, InterruptedException {
             System.out.println(key + "\t" + value);
-            context.write(new Text(value.toString()), new Text());
+            context.write(new Text(key.toString()), new Text(value.toString()));
         }
     }
 }

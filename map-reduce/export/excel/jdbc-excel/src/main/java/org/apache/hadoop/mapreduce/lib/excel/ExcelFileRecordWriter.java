@@ -45,7 +45,7 @@ public class ExcelFileRecordWriter<K, V> extends RecordWriter<K, V> {
 
     private int rowIndex = 0;
 
-    public ExcelFileRecordWriter(DataInputStream inputStream, DataOutputStream outputStream, String sheetName, Pattern dataPattern, String[] titles) throws IOException {
+    public ExcelFileRecordWriter(DataInputStream inputStream, DataOutputStream outputStream, String sheetName, Pattern dataPattern, String[] titles, boolean append) throws IOException {
         if (inputStream == null) {
             writableWorkbook = new HSSFWorkbook();
         } else {
@@ -63,6 +63,19 @@ public class ExcelFileRecordWriter<K, V> extends RecordWriter<K, V> {
                 }
                 rowIndex++;
             }
+        } else if (!append) {
+            if (titles != null && titles.length > 0) {
+                HSSFRow titleRow = sheet.createRow(rowIndex);
+                for (int index = 0; index < titles.length; index++) {
+                    HSSFCell titleCell = titleRow.createCell(index);
+                    RichTextString titleRichTextString = new HSSFRichTextString(titles[index]);
+                    titleCell.setCellValue(titleRichTextString);
+                }
+                rowIndex++;
+            }
+        }
+        if (append) {
+            rowIndex = sheet.getPhysicalNumberOfRows();
         }
         this.dataPattern = dataPattern;
         this.inputStream = inputStream;
