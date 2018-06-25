@@ -90,6 +90,11 @@
             <artifactId>argument</artifactId>
             <version>JL.SPRING.4.1.1.0.1.0.2-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>net.lizhaoweb.spring.hadoop.commons</groupId>
+            <artifactId>hadoop-mapreduce-client-core-ext</artifactId>
+            <version>JL.SPRING.4.1.3.0.1.0.0-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
 
