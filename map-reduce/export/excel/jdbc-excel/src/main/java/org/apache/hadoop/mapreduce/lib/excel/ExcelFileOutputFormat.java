@@ -101,7 +101,9 @@ public class ExcelFileOutputFormat<K, V> extends FileOutputFormat<K, V> {
         job.getConfiguration().setInt(MRJobConfig.NUM_REDUCES, 1);
 //        job.getConfiguration().set(ExcelFileOutputFormat.OUTFILE, outputFile.toString());
         job.getConfiguration().set(ExcelFileOutputFormat.SHEET_NAME, sheetName);
-        job.getConfiguration().setStrings(ExcelFileOutputFormat.TITLES, titles);
+        if (titles != null) {
+            job.getConfiguration().setStrings(ExcelFileOutputFormat.TITLES, titles);
+        }
         job.getConfiguration().setPattern(ExcelFileOutputFormat.DATA_PATTERN, valuePattern);
         job.getConfiguration().set(ExcelFileOutputFormat.OUTDIR, outputDir.toString());
         job.getConfiguration().set(ExcelFileOutputFormat.BASE_OUTPUT_NAME, outputFile.getName());

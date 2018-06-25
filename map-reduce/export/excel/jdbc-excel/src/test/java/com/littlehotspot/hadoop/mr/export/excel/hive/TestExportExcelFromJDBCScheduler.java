@@ -11,8 +11,6 @@
 package com.littlehotspot.hadoop.mr.export.excel.hive;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapreduce.MRJobConfig;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.ToolRunner;
 import org.fusesource.jansi.Ansi;
 import org.junit.Before;
@@ -62,10 +60,18 @@ public class TestExportExcelFromJDBCScheduler {
         long start = System.currentTimeMillis();
         try {
             String[] args = {
+                    "jobName=Export hive to excel",
                     "jdbcDriver=org.apache.hive.jdbc.HiveDriver",
                     "jdbcUrl=jdbc:hive2://onlinemain:10000/default",
-                    "workbook=john.lee/excel/2018年05月01-05月15号开机率明细(hive)"
-//                    "workbook=hdfs://onlinemain:8020/john.lee/excel/2018年05月01-05月15号开机率明细(hive).xls"
+                    "jdbcUsername=",
+                    "jdbcPassword=",
+                    "workbook=john.lee/excel/2018年05月01-05月15号开机率明细(hive)",
+//                    "workbook=hdfs://onlinemain:8020/john.lee/excel/2018年05月01-05月15号开机率明细(hive).xls",
+                    "sheet=媒体表",
+                    "title=媒体标识|媒体名称",
+                    "jdbcSql=SELECT id, name FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC",
+//                    "jdbcSql=SELECT id, name, description, creator, create_time, md5, creator_id, oss_addr, file_path, duration, surfix, type, oss_etag, flag, state, checker_id FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC",
+                    "reduceInRegexValue=^([^\\u0001]+)\\u0001(.*)$"
             };
             ToolRunner.run(this.conf, new ExportExcelFromJDBCScheduler(), args);
         } catch (Exception e) {

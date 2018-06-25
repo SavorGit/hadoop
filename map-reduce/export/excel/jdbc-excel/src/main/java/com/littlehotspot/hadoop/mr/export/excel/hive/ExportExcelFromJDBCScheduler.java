@@ -51,7 +51,6 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
         System.out.println("=================================================================");
 
         MapReduceConstant.CommonVariables.initMapReduce(this.getConf(), args);// 解析参数并初始化 MAP REDUCE
-//        Map<String, ExcelConfigSheet> excelSheetConfigMap = new ConcurrentHashMap<>();
 
         // Mapper 输入正则表达式
         String jobName = ArgumentFactory.getParameterValue(Argument.JobName);
@@ -71,32 +70,46 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
 
         // JDBC 密码
         String jdbcPass = ArgumentFactory.getParameterValue(Argument.JDBCPassword);
-        ArgumentFactory.printInputArgument(Argument.JDBCPassword, jdbcPass, false);
+        ArgumentFactory.printInputArgument(Argument.JDBCPassword, jdbcPass, true);
 
         // Workbook 路径
         String workbook = ArgumentFactory.getParameterValue(Argument.Workbook);
         ArgumentFactory.printInputArgument(Argument.Workbook, workbook, false);
 
         // Sheet配置: sheet索引,hdfs目录名,sheet名称,数据中字段的分割符
-        String[] sheetArray = ArgumentFactory.getParameterValues(Argument.Sheet);
-        ArgumentFactory.printInputArgument(Argument.Sheet, sheetArray);
-//        Map<String, String> indexHDFSDirMap = this.analysisSheetConfig(excelSheetConfigMap, sheetArray);
+        String sheetName = ArgumentFactory.getParameterValue(Argument.Sheet);
+        ArgumentFactory.printInputArgument(Argument.Sheet, sheetName, false);
 
         // Title配置: sheetIndex,标题分割符,字段名1|字段名2|...
-        String[] titleArray = ArgumentFactory.getParameterValues(Argument.Title);
-        ArgumentFactory.printInputArgument(Argument.Title, titleArray);
-//        this.analysisTitleConfig(excelSheetConfigMap, indexHDFSDirMap, titleArray);
-        // Title配置: sheetIndex,标题分割符,字段名1|字段名2|...
+        String sheetTitles = ArgumentFactory.getParameterValue(Argument.Title);
+        ArgumentFactory.printInputArgument(Argument.Title, sheetTitles, false);
+
+        // 要执行的 SQL 语句
+        String executeSQL = ArgumentFactory.getParameterValue(Argument.JDBCSql);
+        ArgumentFactory.printInputArgument(Argument.JDBCSql, executeSQL, false);
+
+        // 输入 Reduce 时，Value 的正则表达式
+        String reduceInPatternValue = ArgumentFactory.getParameterValue(ExcelArgument.ReduceInPatternValue);
+        ArgumentFactory.printInputArgument(ExcelArgument.ReduceInPatternValue, reduceInPatternValue, false);
 
 
         // 准备工作
-//        ArgumentFactory.checkNullValueForArgument(Argument.MapperInputFormatRegex, matcherRegex);
-//        ArgumentFactory.checkNullValuesForArgument(Argument.InputPath, hdfsInputPathArray);
-//        ArgumentFactory.checkNullValueForArgument(Argument.Workbook, workbook);
-//        ArgumentFactory.checkNullValuesForArgument(Argument.Sheet, sheetArray);
+        ArgumentFactory.checkNullValueForArgument(Argument.JDBCDriver, jdbcUrl);
+        ArgumentFactory.checkNullValueForArgument(Argument.JDBCUrl, jdbcUrl);
+        ArgumentFactory.checkNullValueForArgument(Argument.Workbook, workbook);
+        ArgumentFactory.checkNullValueForArgument(Argument.Sheet, sheetName);
+        ArgumentFactory.checkNullValueForArgument(Argument.JDBCSql, executeSQL);
+        ArgumentFactory.checkNullValueForArgument(ExcelArgument.ReduceInPatternValue, reduceInPatternValue);
         if (StringUtils.isBlank(jobName)) {
             jobName = this.getClass().getName();
         }
+
+        String[] sheetTitleArray = null;
+        if (sheetTitles != null) {
+            sheetTitleArray = sheetTitles.split("\\|");
+        }
+
+        Pattern valuePattern = Pattern.compile(reduceInPatternValue);
 
         System.out.println("=================================================================");
         System.out.println();
@@ -107,13 +120,6 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
         Path outputPath = new Path(workbook);
 
         DBConfiguration.configureDB(this.getConf(), jdbcDriver, jdbcUrl, jdbcUser, jdbcPass);
-
-//        // 如果输出路径已经存在，则删除
-//        FileSystem fileSystem = FileSystem.newInstance(this.getConf());
-//        if (fileSystem.exists(outputPath)) {
-//            fileSystem.delete(outputPath, true);
-//        }
-
 
         Job job = Job.getInstance(this.getConf(), jobName);
         job.setJarByClass(this.getClass());
@@ -126,16 +132,9 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
         job.setOutputValueClass(Text.class);
         job.setOutputFormatClass(ExcelFileOutputFormat.class);
 
-
-        String mediaSelectQuery = "SELECT id, name FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC";
-//        String mediaSelectQuery = "SELECT id, name, description, creator, create_time, md5, creator_id, oss_addr, file_path, duration, surfix, type, oss_etag, flag, state, checker_id FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC";
-        HiveInputFormat.setInput(job, SimpleDataWritable.class, mediaSelectQuery, this.getCountQuery(mediaSelectQuery));
-//        String hotelSelectQuery = "SELECT * FROM mysql.savor_hotel";
-//        HiveInputFormat.setInput(job, SimpleDataWritable.class, hotelSelectQuery, this.getCountQuery(hotelSelectQuery));
-        String sheetName = "媒体表";
-        String[] sheetTitles = {"媒体标识", "媒体名称"};
-        Pattern valuePattern = Pattern.compile("^([^\\u0001]+)\\u0001(.*)$");
-        ExcelFileOutputFormat.setOutputPath(job, outputPath, sheetName, sheetTitles, valuePattern);
+        // 设置输入输出
+        HiveInputFormat.setInput(job, SimpleDataWritable.class, executeSQL, this.getCountQuery(executeSQL));
+        ExcelFileOutputFormat.setOutputPath(job, outputPath, sheetName, sheetTitleArray, valuePattern);
 
         boolean status = job.waitForCompletion(true);
         if (!status) {
@@ -165,7 +164,7 @@ public class ExportExcelFromJDBCScheduler extends Configured implements Tool {
     public static class HiveInputMapper extends Mapper<LongWritable, SimpleDataWritable, Text, Text> {
         @Override
         public void map(LongWritable key, SimpleDataWritable value, Context context) throws IOException, InterruptedException {
-            System.out.println(key + "\t" + value);
+//            System.out.println(key + "\t" + value);
             context.write(new Text(key.toString()), new Text(value.toString()));
         }
     }
