@@ -11,7 +11,7 @@
 
     <groupId>com.littlehotspot.hadoop.mr.export.excel</groupId>
     <artifactId>jdbc-excel</artifactId>
-    <version>LHS.HADOOP.2.10.1.2.1.0.0-SNAPSHOT</version>
+    <version>LHS.HADOOP.2.10.1.2.1.0.1-SNAPSHOT</version>
 
     <name>Hadoop Map-Reduce Export Excel [JDBC Excel]</name>
     <packaging>jar</packaging>

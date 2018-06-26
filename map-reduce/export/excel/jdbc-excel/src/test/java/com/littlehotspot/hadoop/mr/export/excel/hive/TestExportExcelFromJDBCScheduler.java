@@ -65,13 +65,11 @@ public class TestExportExcelFromJDBCScheduler {
                     "jdbcUrl=jdbc:hive2://onlinemain:10000/default",
                     "jdbcUsername=",
                     "jdbcPassword=",
-                    "workbook=/john.lee/excel/2018年05月01-05月15号开机率明细(hive)",
-//                    "workbook=hdfs://onlinemain:8020/john.lee/excel/2018年05月01-05月15号开机率明细(hive).xls",
-                    "sheet=媒体表",
-                    "title=媒体标识|媒体名称",
-                    "jdbcSql=SELECT id, name FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC",
-//                    "jdbcSql=SELECT id, name, description, creator, create_time, md5, creator_id, oss_addr, file_path, duration, surfix, type, oss_etag, flag, state, checker_id FROM mysql.savor_media WHERE create_time >= '2017-07-01 00:00:00' AND create_time <= '2017-07-30 23:59:59' ORDER BY id ASC",
-                    "reduceInRegexValue=^([^\\u0001]+)\\u0001([^\\u0001]*)$"
+                    "workbook=/john.lee/excel/一代单机旧片源(hive)",
+                    "sheet=一代旧片源",
+                    "title=area_no|hotel_name|room_name|box_mac|media_name",
+                    "jdbcSql=SELECT collect_set(area_no)[0] as area_no,collect_set(hotel_name)[0] as hotel_name,collect_set(room_name)[0] as room_name,box_mac,collect_set(media_name)[0] as media_name FROM default.stand_alone_old_file_final WHERE hotel_name IS NOT NULL GROUP BY box_mac ORDER BY area_no,media_name,hotel_name,room_name,box_mac",
+                    "reduceInRegexValue=^([^\\u0001]*)\\u0001([^\\u0001]*)\\u0001([^\\u0001]*)\\u0001([^\\u0001]*)\\u0001([^\\u0001]*)$"
             };
             ToolRunner.run(this.conf, new ExportExcelFromJDBCScheduler(), args);
         } catch (Exception e) {
