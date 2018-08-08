@@ -106,7 +106,6 @@ public class SourceBean {
 
     /**
      * 媒体类型
-     *
      */
     private String mediaType;
 
@@ -149,7 +148,6 @@ public class SourceBean {
         this.setTimestamps(matcher.group(9));
 
     }
-
 
 
     public String rowLine1() {

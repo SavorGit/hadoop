@@ -11,13 +11,6 @@
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mediabox;
 
 import com.littlehotspot.hadoop.mr.nginx.bean.Argument;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.HBaseHelper;
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.JDBCTool;
-import com.littlehotspot.hadoop.mr.nginx.mysql.MysqlCommonVariables;
-import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorArea;
-import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorBox;
-import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorHotel;
-import com.littlehotspot.hadoop.mr.nginx.mysql.model.SavorTv;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -26,17 +19,16 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.filter.*;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
-import org.apache.hadoop.hbase.mapreduce.*;
+import org.apache.hadoop.hbase.mapreduce.HFileOutputFormat2;
+import org.apache.hadoop.hbase.mapreduce.KeyValueSortReducer;
+import org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles;
+import org.apache.hadoop.hbase.mapreduce.SimpleTotalOrderPartitioner;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.filecache.DistributedCache;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -44,11 +36,6 @@ import org.apache.hadoop.util.Tool;
 
 import java.io.IOException;
 import java.net.URI;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -94,7 +81,7 @@ public class InToHbase extends Configured implements Tool {
 
                 ImmutableBytesWritable rowKey = new ImmutableBytesWritable(rowKeyBytes);
                 context.write(rowKey, put);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -102,7 +89,6 @@ public class InToHbase extends Configured implements Tool {
 
 
     }
-
 
 
     @Override
@@ -145,7 +131,7 @@ public class InToHbase extends Configured implements Tool {
                 fileSystem.delete(outputPath, true);
             }
 
-            HTable hTable = new HTable(this.getConf(),"media_sta");
+            HTable hTable = new HTable(this.getConf(), "media_sta");
 
             FileOutputFormat.setOutputPath(job, outputPath);
             job.setMapperClass(MobileMapper.class);

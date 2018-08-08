@@ -18,7 +18,7 @@ import org.apache.hadoop.util.Tool;
  */
 public class StaOfCaa2 extends Configured implements Tool {
 
-//    private HBaseHelper hBaseHelper;
+    //    private HBaseHelper hBaseHelper;
 //
 //
 //    private String areasJson;
@@ -340,7 +340,7 @@ public class StaOfCaa2 extends Configured implements Tool {
 //            if (!status) {
 //                throw new Exception("MapReduce task execute failed.........");
 //            }
-            return 0;
+        return 0;
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //            return 1;

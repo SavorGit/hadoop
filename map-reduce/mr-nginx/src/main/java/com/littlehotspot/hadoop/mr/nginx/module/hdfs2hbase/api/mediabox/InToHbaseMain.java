@@ -10,7 +10,6 @@
  */
 package com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.mediabox;
 
-import com.littlehotspot.hadoop.mr.nginx.module.hdfs2hbase.api.boxindex.BoxUserIndex;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 

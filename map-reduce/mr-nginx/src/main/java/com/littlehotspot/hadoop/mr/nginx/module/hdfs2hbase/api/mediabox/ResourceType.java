@@ -15,9 +15,7 @@ public enum ResourceType {
     CON(0x0001),
     ADS(0x0101),
     ADV(0x0102),
-    PRO(0x0103)
-
-    ;
+    PRO(0x0103);
     private int value;
 
     public int getValue() {
