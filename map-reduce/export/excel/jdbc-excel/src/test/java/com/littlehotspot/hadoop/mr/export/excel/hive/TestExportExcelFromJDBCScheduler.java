@@ -62,13 +62,14 @@ public class TestExportExcelFromJDBCScheduler {
             String[] args = {
                     "jobName=Export hive to excel",
                     "jdbcDriver=org.apache.hive.jdbc.HiveDriver",
-                    "jdbcUrl=jdbc:hive2://onlinemain:10000/default",
+                    "jdbcUrl=jdbc:hive2://onlined1:10000/default",
                     "jdbcUsername=",
                     "jdbcPassword=",
                     "workbook=/john.lee/excel/一代单机旧片源(hive)",
                     "sheet=一代旧片源",
                     "title=area_no|hotel_name|room_name|box_mac|media_name",
-                    "jdbcSql=SELECT collect_set(area_no)[0] as area_no,collect_set(hotel_name)[0] as hotel_name,collect_set(room_name)[0] as room_name,box_mac,collect_set(media_name)[0] as media_name FROM default.stand_alone_old_file_final WHERE hotel_name IS NOT NULL GROUP BY box_mac ORDER BY area_no,media_name,hotel_name,room_name,box_mac",
+//                    "jdbcSql=SELECT collect_set(area_no)[0] as area_no,collect_set(hotel_name)[0] as hotel_name,collect_set(room_name)[0] as room_name,box_mac,collect_set(media_name)[0] as media_name FROM archive.box_logs_offline_v1_old_media_20180901 WHERE hotel_name IS NOT NULL GROUP BY box_mac ORDER BY area_no,media_name,hotel_name,room_name,box_mac",
+                    "jdbcSql=SELECT collect_set(area_no)[0] AS area_no,collect_set(hotel_name)[0] AS hotel_name,collect_set(room_name)[0] AS room_name,box_mac,collect_set(media_name)[0] AS media_name FROM archive.box_logs_offline_v1_old_media_20180901 WHERE hotel_name IS NOT NULL GROUP BY box_mac ORDER BY area_no,media_name,hotel_name,room_name,box_mac",
                     "reduceInRegexValue=^([^\\u0001]*)\\u0001([^\\u0001]*)\\u0001([^\\u0001]*)\\u0001([^\\u0001]*)\\u0001([^\\u0001]*)$"
             };
             ToolRunner.run(this.conf, new ExportExcelFromJDBCScheduler(), args);
