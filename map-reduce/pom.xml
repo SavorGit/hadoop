@@ -47,6 +47,7 @@
         <module>mr-demo</module>
         <module>kudu</module>
         <module>export</module>
+        <module>wang-feng</module>
     </modules>
 
 </project>
