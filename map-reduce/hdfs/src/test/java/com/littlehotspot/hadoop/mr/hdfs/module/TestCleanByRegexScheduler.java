@@ -10,15 +10,9 @@
  */
 package com.littlehotspot.hadoop.mr.hdfs.module;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 import org.fusesource.jansi.Ansi;
-import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.Locale;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -33,33 +27,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-public class TestCleanByRegexScheduler {
-
-    private static final String FORMAT_PRINT_TIME_CONSUMING = "执行 %s 用时 %s 毫秒";
-    private static final String FORMAT_COLOR_PRINT_TIME_CONSUMING = "@|blue 执行|@ @|green %s|@ @|blue 用时|@ @|red %s|@ @|blue 毫秒|@\n";
-
-    private DecimalFormat decimalFormat;
-
-    private Configuration conf;
-
-    @Before
-    public void init() throws IOException {
-        System.out.println();
-        System.setProperty("hadoop.home.dir", "D:\\GreenProfram\\HadoopEcosphere\\applications\\hadoop2.6_x64-for-win");
-        Locale.setDefault(Locale.CHINA);
-        this.decimalFormat = new DecimalFormat();
-
-        this.conf = new Configuration();
-
-//        this.conf.setBoolean("dfs.permissions", false);
-//        this.conf.set("mapred.job.tracker", "local");
-//        this.conf.set("mapreduce.framework.name", "yarn");
-//        this.conf.set("yarn.resoucemanager.hostname", "localhost");
-//        this.conf.set("yarn.resourcemanager.scheduler.address", "localhost:8030");
-//        this.conf.set("yarn.resourcemanager.address", "localhost:8032");
-//        this.conf.set("yarn.resourcemanager.resource-tracker.address", "localhost:8035");
-//        this.conf.set("yarn.resourcemanager.admin.address", "localhost:8033");
-    }
+public class TestCleanByRegexScheduler extends TestAbstractScheduler {
 
     @Test
     public void run() {

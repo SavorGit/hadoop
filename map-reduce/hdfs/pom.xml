@@ -79,6 +79,40 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
 
+                    <!-- 利用正则表达式转换文件内容格式 -->
+                    <execution>
+                        <id>convert-by-regex</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <classifier>convert-by-regex-02</classifier>
+                            <outputDirectory>${project.build.directory}/main-jars</outputDirectory>
+                            <includes>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/util/Argument.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/util/ArgumentUtil.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/util/ArgumentFactory.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/util/MapReduceConstant.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/util/MapReduceConstant$*.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/util/ConvertByRegexConstant.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/util/ConvertByRegexConstant*.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/mapper/ConvertByRegexMapper.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/reducer/GeneralReducer.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/module/ConvertByRegexScheduler.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/module/ConvertByRegexScheduler*.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/module/ConvertByRegexMain.class</include>
+                            </includes>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.littlehotspot.hadoop.mr.hdfs.module.ConvertByRegexMain</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
                     <!-- 利用正则表达式清洗 HDFS 文件 -->
                     <execution>
                         <id>clean-by-regex</id>
@@ -89,7 +123,7 @@
                         <configuration>
                             <!--<finalName>nginx-log</finalName>-->
                             <classifier>clean-by-regex</classifier>
-                            <outputDirectory>${project.build.directory}/main-jar</outputDirectory>
+                            <outputDirectory>${project.build.directory}/main-jars</outputDirectory>
                             <includes>
                                 <include>**/com/littlehotspot/hadoop/mr/hdfs/util/Argument.class</include>
                                 <include>**/com/littlehotspot/hadoop/mr/hdfs/util/ArgumentUtil.class</include>
@@ -100,12 +134,8 @@
                                 <include>**/com/littlehotspot/hadoop/mr/hdfs/util/CleanByRegexConstant$*.class</include>
                                 <include>**/com/littlehotspot/hadoop/mr/hdfs/mapper/CleanByRegexMapper.class</include>
                                 <include>**/com/littlehotspot/hadoop/mr/hdfs/reducer/GeneralReducer.class</include>
-                                <include>
-                                    **/com/littlehotspot/hadoop/mr/hdfs/module/CleanByRegexScheduler.class
-                                </include>
-                                <include>
-                                    **/com/littlehotspot/hadoop/mr/hdfs/module/CleanByRegexScheduler$*.class
-                                </include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/module/CleanByRegexScheduler.class</include>
+                                <include>**/com/littlehotspot/hadoop/mr/hdfs/module/CleanByRegexScheduler$*.class</include>
                                 <include>**/com/littlehotspot/hadoop/mr/hdfs/module/CleanByRegexMain.class</include>
                             </includes>
                             <archive>

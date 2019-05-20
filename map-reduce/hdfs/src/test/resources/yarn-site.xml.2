@@ -22,6 +22,10 @@
         <value>org.apache.hadoop.mapred.ShuffleHandler</value>
     </property>
     <property>
+        <name>yarn.nodemanager.aux-services.mapreduce_shuffle.class</name>
+        <value>org.apache.hadoop.mapred.ShuffleHandler</value>
+    </property>
+    <property>
         <name>yarn.resoucemanager.hostname</name>
         <value>localhost</value>
     </property>
@@ -48,5 +52,23 @@
         <name>yarn.resourcemanager.webapp.address</name>
         <value>localhost:8088</value>
         <description>The address of the RM web application.</description>
+    </property>
+
+
+    <property>
+        <name>yarn.scheduler.minimum-allocation-mb</name>
+        <value>512</value>
+    </property>
+    <property>
+        <name>yarn.scheduler.maximum-allocation-mb</name>
+        <value>2048</value>
+    </property>
+    <property>
+        <name>yarn.scheduler.minimum-allocation-vcores</name>
+        <value>1</value>
+    </property>
+    <property>
+        <name>yarn.scheduler.maximum-allocation-vcores</name>
+        <value>2</value>
     </property>
 </configuration>
