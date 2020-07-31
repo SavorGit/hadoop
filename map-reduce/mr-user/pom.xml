@@ -80,7 +80,8 @@
         <dependency>
             <groupId>net.lizhaoweb.spring.hadoop.hbase</groupId>
             <artifactId>util</artifactId>
-            <version>JL.SPRING.4.2.1.0.1.0.0</version>
+            <!--<version>JL.SPRING.4.2.1.0.1.0.0</version>-->
+            <version>JL.SPRING.4.2.1.0.1.0.1-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
