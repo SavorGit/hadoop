@@ -219,6 +219,7 @@
         <module>storm</module>
         <module>hadoop-web</module>
         <module>spark</module>
+        <module>flume</module>
     </modules>
 
 </project>

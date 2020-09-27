@@ -17,3 +17,8 @@ JAVA 组 HADOOP 仓库
     VM ： 修改版本号，用数字表示
     VFT： 微调版本号，用数字表示
 </code></pre>
+
+
+
+### 项目配置说明：
+操作系统环境变量配置 RUNTIME_ENVIRONMENT 运行环境变量设置，取值为 local/development/release/produce (分别代表 本地/研发/预发布/生产 环境)。
