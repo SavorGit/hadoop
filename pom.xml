@@ -94,7 +94,7 @@
         <runtime.environment>${env.RUNTIME_ENVIRONMENT}</runtime.environment>
 
         <project.jkd.version>1.7</project.jkd.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <lombok.version>1.16.8</lombok.version>
         <hadoop.version>2.6.0</hadoop.version>
         <hbase.version>1.2.0</hbase.version>
