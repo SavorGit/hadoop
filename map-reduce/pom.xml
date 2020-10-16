@@ -48,6 +48,7 @@
         <module>kudu</module>
         <module>export</module>
         <module>wang-feng</module>
+        <module>box-statistics</module>
     </modules>
 
 </project>
