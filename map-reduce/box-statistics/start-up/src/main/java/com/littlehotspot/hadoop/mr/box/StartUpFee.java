@@ -21,12 +21,10 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.lib.input.CombineTextInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import org.apache.oozie.action.hadoop.LauncherMain;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -82,6 +80,7 @@ public class StartUpFee extends Configured implements Tool {
         Options options = new Options();
         options.addOption("h", "help", false, "Print options' information");
         options.addOption("jn", "jobName", true, "The name of job");
+        options.addOption("o", "output", true, "The path of data output");
 
         // withValueSeparator(char sep)指定参数值之间的分隔符
         Option inputOption = OptionBuilder.withArgName("args")
@@ -92,14 +91,6 @@ public class StartUpFee extends Configured implements Tool {
                 .create("i");
         options.addOption(inputOption);
 
-//        Option outputOption = OptionBuilder.withArgName("args")
-//                .withLongOpt("output")
-//                .hasArgs()
-//                .withValueSeparator(',')
-//                .withDescription("The paths of data output")
-//                .create("o");
-//        options.addOption(outputOption);
-        options.addOption("o", "output", true, "The paths of data output");
 
 //        Option property = OptionBuilder.withArgName("property=name")
 //                .hasArgs()
@@ -175,9 +166,9 @@ public class StartUpFee extends Configured implements Tool {
             FileInputFormat.addInputPath(job, inputPath);// 如果此处不设置的话，可以通过mapreduce.input.fileinputformat.inputdir来设置。
         }
         job.setMapperClass(StartUpFeeMapper.class);// 如果此处不设置的话，可以通过mapreduce.job.map.class来设置。
-        job.setMapOutputKeyClass(Text.class);// 如果此处不设置的话，可以通过mapreduce.map.output.key.class来设置。
-        job.setMapOutputValueClass(NullWritable.class);// 如果此处不设置的话，可以通过mapreduce.map.output.value.class来设置。
-        job.setInputFormatClass(CombineTextInputFormat.class);// 如果此处不设置的话，可以通过mapreduce.job.inputformat.class来设置。
+//        job.setMapOutputKeyClass(Text.class);// 如果此处不设置的话，可以通过mapreduce.map.output.key.class来设置。
+//        job.setMapOutputValueClass(NullWritable.class);// 如果此处不设置的话，可以通过mapreduce.map.output.value.class来设置。
+//        job.setInputFormatClass(CombineTextInputFormat.class);// 如果此处不设置的话，可以通过mapreduce.job.inputformat.class来设置，配合mapreduce.input.fileinputformat.split.maxsize使用。
 
 //        Path[] inputPaths = new Path[_inputPaths.length];
 //        for (int index = 0; index < _inputPaths.length; index++) {
@@ -196,7 +187,7 @@ public class StartUpFee extends Configured implements Tool {
         job.setOutputKeyClass(Text.class);// 如果此处不设置的话，可以通过mapreduce.job.output.key.class来设置。
         job.setOutputValueClass(NullWritable.class);// 如果此处不设置的话，可以通过mapreduce.job.output.value.class来设置。
 
-        job.setJar("E:\\WorkSpace\\Company\\Savor\\Git\\JAVA\\hadoop\\map-reduce\\box-statistics\\start-up\\target\\start-up-LHS.HADOOP.2.11.1.0.1.0.0-SNAPSHOT.jar");
+//        job.setJar("E:\\WorkSpace\\Company\\Savor\\Git\\JAVA\\hadoop\\map-reduce\\box-statistics\\start-up\\target\\start-up-LHS.HADOOP.2.11.1.0.1.0.0-SNAPSHOT.jar");
         boolean status = job.waitForCompletion(true);
         if (!status) {
             String exceptionMessage = String.format("MapReduce[Box-StartUp-Fee] task[%s] execute failed", _jobName);
@@ -214,11 +205,11 @@ public class StartUpFee extends Configured implements Tool {
      *             -h,--help             Print options' information
      *             -i,--input <args>     The paths of data input
      *             -jn,--jobName <arg>   The name of job
-     *             -o,--output <arg>     The paths of data output
+     *             -o,--output <arg>     The path of data output
      * @throws Exception 异常
      */
     public static void main(String[] args) throws Exception {
-        Configuration configuration = LauncherMain.loadActionConf();
+        Configuration configuration = new Configuration();
         ToolRunner.run(configuration, new StartUpFee(), args);
     }
 }

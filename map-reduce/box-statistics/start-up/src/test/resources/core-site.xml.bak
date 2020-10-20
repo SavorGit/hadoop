@@ -13,17 +13,17 @@
   See the License for the specific language governing permissions and
   limitations under the License. See accompanying LICENSE file.
 -->
- 
+
 <!-- Put site-specific property overrides in this file. -->
- 
+
 <configuration>
-	<property>
-		<name>fs.defaultFS</name>
-		<value>hdfs://onlined1:8020</value>
-		<!--<value>hdfs://localhost:9000</value>-->
-	</property>
-	<!--<property>-->
-		<!--<name>hadoop.tmp.dir</name>-->
-		<!--<value>/D:/GreenProfram/HadoopEcosphere/tmp/hadoop</value>-->
-	<!--</property>-->
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://onlined1:8020</value>
+        <!--<value>hdfs://localhost:9000</value>-->
+    </property>
+    <!--<property>-->
+    <!--<name>hadoop.tmp.dir</name>-->
+    <!--<value>/D:/GreenProfram/HadoopEcosphere/tmp/hadoop</value>-->
+    <!--</property>-->
 </configuration>

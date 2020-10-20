@@ -37,7 +37,7 @@ public class TestStartUpFee {
      * -h,--help             Print options' information
      * -i,--input <args>     The paths of data input
      * -jn,--jobName <arg>   The name of job
-     * -o,--output <arg>     The paths of data output
+     * -o,--output <arg>     The path of data output
      */
     @Test
     public void testHelp() {
@@ -55,16 +55,32 @@ public class TestStartUpFee {
      * -h,--help             Print options' information
      * -i,--input <args>     The paths of data input
      * -jn,--jobName <arg>   The name of job
-     * -o,--output <arg>     The paths of data output
+     * -o,--output <arg>     The path of data output
+     */
+    @Test
+    public void testDefault() {
+        try {
+            String[] args = {"-jn=test job", "-i", "E:\\hadoop-data\\source", "-o=E:\\hadoop-data\\export\\" + System.currentTimeMillis()};
+            StartUpFee.main(args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * usage: Options
+     * -h,--help             Print options' information
+     * -i,--input <args>     The paths of data input
+     * -jn,--jobName <arg>   The name of job
+     * -o,--output <arg>     The path of data output
      */
     @Test
     public void testLocal() {
         try {
-            String[] args = {"-jn=test job", "-i", "/home/data/flume/netty/conn/source/2020-09-17,/home/data/flume/netty/conn/source/2020-09-18", "-o=/test/lizhao"};
+            String[] args = {"-jn=test job", "-i", "hdfs://onlined1:8020/home/data/flume/netty/conn/source/2020-09-17,hdfs://onlined1:8020/home/data/flume/netty/conn/source/2020-09-18", "-o=/test/lizhao"};
             Configuration configuration = new Configuration();
-            configuration.set("mapreduce.framework.name", "local");//以yarn形式提交
-            configuration.set("yarn.resourcemanager.hostname", "onlined1");
-            configuration.set("mapreduce.app-submission.cross-platform", "true");//跨平台提交
+            configuration.set("fs.defaultFS", "hdfs://localhost:9000");
+            configuration.set("mapreduce.framework.name", "local");//以local形式提交
             ToolRunner.run(configuration, new StartUpFee(), args);
         } catch (Exception e) {
             e.printStackTrace();
@@ -76,15 +92,16 @@ public class TestStartUpFee {
      * -h,--help             Print options' information
      * -i,--input <args>     The paths of data input
      * -jn,--jobName <arg>   The name of job
-     * -o,--output <arg>     The paths of data output
+     * -o,--output <arg>     The path of data output
      */
     @Test
     public void testYarn() {
         try {
-            String[] args = {"-jn='test job'", "-i", "/home/data/flume/netty/conn/source/2020-09-17,/home/data/flume/netty/conn/source/2020-09-18", "-o=/test/lizhao"};
+            String[] args = {"-jn=test job", "-i", "/home/data/flume/netty/conn/source/2020-09-17,/home/data/flume/netty/conn/source/2020-09-18", "-o=/test/lizhao"};
             Configuration configuration = new Configuration();
+            configuration.set("fs.defaultFS", "hdfs://onlined1:8020");
             configuration.set("mapreduce.job.jar", "E:\\WorkSpace\\Company\\Savor\\Git\\JAVA\\hadoop\\map-reduce\\box-statistics\\start-up\\target\\start-up-LHS.HADOOP.2.11.1.0.1.0.0-SNAPSHOT.jar");//指定Jar包，也可以在job中设置
-            configuration.set("mapreduce.framework.name", "local");//以yarn形式提交
+            configuration.set("mapreduce.framework.name", "yarn");//以yarn形式提交
             configuration.set("yarn.resourcemanager.hostname", "onlined1");
             configuration.set("mapreduce.app-submission.cross-platform", "true");//跨平台提交
             ToolRunner.run(configuration, new StartUpFee(), args);
