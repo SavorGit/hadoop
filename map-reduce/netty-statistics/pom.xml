@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>map-reduce</artifactId>
+        <groupId>com.littlehotspot.hadoop</groupId>
+        <version>LHS.HADOOP.2.0.0.0.1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.littlehotspot.hadoop.mr</groupId>
+    <artifactId>netty-statistics</artifactId>
+    <version>LHS.HADOOP.2.12.0.0.1.0.0-SNAPSHOT</version>
+
+    <name>Netty Statistics</name>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <modules>
+        <module>box-sta</module>
+    </modules>
+</project>
