@@ -3,12 +3,12 @@
  * STUPID BIRD PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  * @Project : hadoop
- * @Package : com.littlehotspot.hadoop.mr.box
+ * @Package : com.littlehotspot.hadoop.mr.netty.box
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
- * @Time : 17:43
+ * @Time : 10:43
  */
-package com.littlehotspot.hadoop.mr.box;
+package com.littlehotspot.hadoop.mr.netty.box;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.StringUtils;
@@ -25,6 +25,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.oozie.action.hadoop.LauncherMain;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -32,100 +33,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 计算开机费用
+ * 机顶盒连接Netty数据转换
  *
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
  * @EMAIL 404644381@qq.com
- * @notes Created on 2020年10月14日<br>
+ * @notes Created on 2020年12月25日<br>
  * Revision of last commit:$Revision$<br>
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
-@SuppressWarnings({"WeakerAccess", "JavaDoc", "AccessStaticViaInstance", "UnusedAssignment"})
-public class StartUpFee extends Configured implements Tool {
-
-    /**
-     * LongWritable 偏移量 long，表示该行在文件中的位置，而不是行号
-     * Text map阶段的输入数据 一行文本信息 字符串类型 String
-     * Text map阶段的数据字符串类型 String
-     * IntWritable map阶段输出的value类型，对应java中的int型，表示行号
-     */
-    public static class StartUpFeeMapper extends Mapper<LongWritable, Text, Text, Text> {
-
-        private static final Pattern REGISTER_CHANNEL = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) REGISTER \\[ FATAL \\] -Register channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/([a-zA-Z0-9]{12}) : ([a-zA-Z0-9]+)\\] on netty server");
-        private static final Pattern UNREGISTER_CHANNEL = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) UNREGISTER \\[ FATAL \\] -Unregister channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\] on netty server");
-        private static final Pattern REGISTER_ZOOKEEPER = Pattern.compile("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3} REGISTER \\[ FATAL \\] -Register zookeeper \\(([a-zA-Z0-9]+)\\|[a-zA-Z0-9/.]+/([a-zA-Z0-9]{12}) : (.+)\\)");
-        private static final Pattern UNREGISTER_ZOOKEEPER = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) UNREGISTER \\[ FATAL \\] -Unregister zookeeper \\(([a-zA-Z0-9]+)\\|([a-zA-Z0-9/.]+)\\)");
-
-        private static final String FIELD_SEPARATOR = "|";
-
-        private Text outKey = new Text();
-        private Text outValue = new Text();
-
-        @Override
-        protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-//            System.out.println("In Mapper " + value);
-            outKey.clear();
-            outValue.clear();
-
-            Matcher registerZookeeperMatcher = REGISTER_ZOOKEEPER.matcher(value.toString());
-            if (registerZookeeperMatcher.find()) {
-                String cid = registerZookeeperMatcher.group(1);
-                String mac = registerZookeeperMatcher.group(2);
-                String info = registerZookeeperMatcher.group(3);
-                outKey.set(cid);
-                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "INFO" + FIELD_SEPARATOR + info);
-                context.write(outKey, outValue);
-                return;
-            }
-            Matcher unregisterZookeeperMatcher = UNREGISTER_ZOOKEEPER.matcher(value.toString());
-            if (unregisterZookeeperMatcher.find()) {// 不处理，不使用
-                return;
-            }
-            Matcher registerChannelMatcher = REGISTER_CHANNEL.matcher(value.toString());
-            if (registerChannelMatcher.find()) {
-                String time = registerChannelMatcher.group(1);
-                String mac = registerChannelMatcher.group(2);
-                String cid = registerChannelMatcher.group(3);
-                outKey.set(cid);
-                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "REGISTER" + FIELD_SEPARATOR + time);
-                context.write(outKey, outValue);
-                return;
-            }
-            Matcher unregisterChannelMatcher = UNREGISTER_CHANNEL.matcher(value.toString());
-            if (unregisterChannelMatcher.find()) {
-                String time = unregisterChannelMatcher.group(1);
-                String mac = unregisterChannelMatcher.group(2);
-                if ("null".equals(mac)) {// 没有注册机顶盒不处理，不使用
-                    return;
-                }
-                String cid = unregisterChannelMatcher.group(3);
-                outKey.set(cid);
-                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "UNREGISTER" + FIELD_SEPARATOR + time);
-                context.write(outKey, outValue);
-                return;
-            }
-            System.out.println("Mapper " + value);
-        }
-    }
-
-    public static class StartUpFeeReducer extends Reducer<Text, Text, Text, NullWritable> {
-
-        @Override
-        protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
-            try {
-                for (Text _value : value) {
-                    if (_value == null) {
-                        continue;
-                    }
-                    context.write(_value, NullWritable.get());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
+@SuppressWarnings({"AccessStaticViaInstance", "WeakerAccess", "JavaDoc", "UnusedAssignment", "unused"})
+public class ConvertConnectionData extends Configured implements Tool {
 
     @Override
     public int run(String[] args) throws Exception {
@@ -183,7 +102,6 @@ public class StartUpFee extends Configured implements Tool {
             System.out.println("\t[Input]Input paths : " + Arrays.asList(_inputPaths));
             _outputPath = cli.getOptionValue("o");
             System.out.println("\t[Input]Output path : " + _outputPath);
-//            verbose = Boolean.parseBoolean(cli.getOptionValue("verbose", "false"));
             verbose = cli.hasOption("verbose");
             System.out.println("\t[Input]Verbose     : " + verbose);
 //
@@ -227,7 +145,7 @@ public class StartUpFee extends Configured implements Tool {
             Path inputPath = new Path(_inputPath);
             FileInputFormat.addInputPath(job, inputPath);// 如果此处不设置的话，可以通过mapreduce.input.fileinputformat.inputdir来设置。
         }
-        job.setMapperClass(StartUpFeeMapper.class);// 如果此处不设置的话，可以通过mapreduce.job.map.class来设置。
+        job.setMapperClass(_Mapper.class);// 如果此处不设置的话，可以通过mapreduce.job.map.class来设置。
         job.setMapOutputKeyClass(Text.class);// 如果此处不设置的话，可以通过mapreduce.map.output.key.class来设置。
         job.setMapOutputValueClass(Text.class);// 如果此处不设置的话，可以通过mapreduce.map.output.value.class来设置。
 //        job.setInputFormatClass(CombineTextInputFormat.class);// 如果此处不设置的话，可以通过mapreduce.job.inputformat.class来设置，配合mapreduce.input.fileinputformat.split.maxsize使用。
@@ -247,7 +165,7 @@ public class StartUpFee extends Configured implements Tool {
         // 作业输出
         Path outputPath = new Path(_outputPath);
         FileOutputFormat.setOutputPath(job, outputPath);// 如果此处不设置的话，可以通过mapreduce.output.fileoutputformat.outputdir来设置。
-        job.setReducerClass(StartUpFeeReducer.class);// 如果此处不设置的话，可以通过mapreduce.job.reduce.class来设置。
+        job.setReducerClass(_Reducer.class);// 如果此处不设置的话，可以通过mapreduce.job.reduce.class来设置。
         job.setOutputKeyClass(Text.class);// 如果此处不设置的话，可以通过mapreduce.job.output.key.class来设置。
         job.setOutputValueClass(NullWritable.class);// 如果此处不设置的话，可以通过mapreduce.job.output.value.class来设置。
 //        job.setOutputFormatClass(TextOutputFormat.class);// 如果此处不设置的话，可以通过mapreduce.job.outputformat.class来设置。
@@ -261,21 +179,126 @@ public class StartUpFee extends Configured implements Tool {
         return 0;
     }
 
-
     /**
-     * 主方法。
-     *
-     * @param args 参数列表。参数名：
-     *             usage: Options
-     *             -h,--help             Print options' information
-     *             -i,--input <args>     The paths of data input
-     *             -jn,--jobName <arg>   The name of job
-     *             -o,--output <arg>     The path of data output
-     * @throws Exception 异常
+     * LongWritable 偏移量 long，表示该行在文件中的位置，而不是行号
+     * Text map阶段的输入数据 一行文本信息 字符串类型 String
+     * Text map阶段的数据字符串类型 String
+     * IntWritable map阶段输出的value类型，对应java中的int型，表示行号
      */
-    public static void main(String[] args) throws Exception {
-        Configuration configuration = new Configuration();
-//        Configuration configuration = LauncherMain.loadActionConf();
-        ToolRunner.run(configuration, new StartUpFee(), args);
+    public static class _Mapper extends Mapper<LongWritable, Text, Text, Text> {
+
+        private static final Pattern REGISTER_CHANNEL = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) REGISTER \\[ FATAL \\] -Register channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/([a-zA-Z0-9]{12}) : ([a-zA-Z0-9]+)\\] on netty server");
+        private static final Pattern UNREGISTER_CHANNEL = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) UNREGISTER \\[ FATAL \\] -Unregister channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\] on netty server");
+        private static final Pattern REGISTER_ZOOKEEPER = Pattern.compile("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3} REGISTER \\[ FATAL \\] -Register zookeeper \\(([a-zA-Z0-9]+)\\|[a-zA-Z0-9/.]+/([a-zA-Z0-9]{12}) : (.+)\\)");
+        private static final Pattern UNREGISTER_ZOOKEEPER = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) UNREGISTER \\[ FATAL \\] -Unregister zookeeper \\(([a-zA-Z0-9]+)\\|([a-zA-Z0-9/.]+)\\)");
+
+        private static final String FIELD_SEPARATOR = "|";
+
+        private Text outKey = new Text();
+        private Text outValue = new Text();
+
+        @Override
+        protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+            outKey.clear();
+            outValue.clear();
+
+            Matcher registerZookeeperMatcher = REGISTER_ZOOKEEPER.matcher(value.toString());
+            if (registerZookeeperMatcher.find()) {
+                String cid = registerZookeeperMatcher.group(1);
+                String mac = registerZookeeperMatcher.group(2);
+                String info = registerZookeeperMatcher.group(3);
+                outKey.set(cid);
+                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "INFO" + FIELD_SEPARATOR + info);
+                context.write(outKey, outValue);
+                return;
+            }
+            Matcher unregisterZookeeperMatcher = UNREGISTER_ZOOKEEPER.matcher(value.toString());
+            if (unregisterZookeeperMatcher.find()) {// 不处理，不使用
+                return;
+            }
+            Matcher registerChannelMatcher = REGISTER_CHANNEL.matcher(value.toString());
+            if (registerChannelMatcher.find()) {
+                String time = registerChannelMatcher.group(1);
+                String mac = registerChannelMatcher.group(2);
+                String cid = registerChannelMatcher.group(3);
+                outKey.set(cid);
+                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "REGISTER" + FIELD_SEPARATOR + time);
+                context.write(outKey, outValue);
+                return;
+            }
+            Matcher unregisterChannelMatcher = UNREGISTER_CHANNEL.matcher(value.toString());
+            if (unregisterChannelMatcher.find()) {
+                String time = unregisterChannelMatcher.group(1);
+                String mac = unregisterChannelMatcher.group(2);
+                if ("null".equals(mac)) {// 没有注册机顶盒不处理，不使用
+                    return;
+                }
+                String cid = unregisterChannelMatcher.group(3);
+                outKey.set(cid);
+                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "UNREGISTER" + FIELD_SEPARATOR + time);
+                context.write(outKey, outValue);
+                return;
+            }
+            System.out.println("Mapper " + value);
+        }
+
+    }
+
+    public static class _Reducer extends Reducer<Text, Text, Text, NullWritable> {
+
+        @Override
+        protected void reduce(Text key, Iterable<Text> value, Context context) throws IOException, InterruptedException {
+            try {
+                for (Text _value : value) {
+                    if (_value == null) {
+                        continue;
+                    }
+                    context.write(_value, NullWritable.get());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public static class Main {
+
+
+        /**
+         * 主方法。
+         *
+         * @param args 参数列表。参数名：
+         *             usage: Options
+         *             -h,--help             Print options' information
+         *             -i,--input <args>     The paths of data input
+         *             -jn,--jobName <arg>   The name of job
+         *             -o,--output <arg>     The path of data output
+         * @throws Exception 异常
+         */
+        public static void main(String[] args) throws Exception {
+            Configuration configuration = new Configuration();
+            ToolRunner.run(configuration, new ConvertConnectionData(), args);
+        }
+    }
+
+    public static class OozieMain {
+
+
+        /**
+         * 主方法。
+         *
+         * @param args 参数列表。参数名：
+         *             usage: Options
+         *             -h,--help             Print options' information
+         *             -i,--input <args>     The paths of data input
+         *             -jn,--jobName <arg>   The name of job
+         *             -o,--output <arg>     The path of data output
+         * @throws Exception 异常
+         */
+        public static void main(String[] args) throws Exception {
+            Configuration configuration = LauncherMain.loadActionConf();
+            ToolRunner.run(configuration, new ConvertConnectionData(), args);
+        }
     }
 }

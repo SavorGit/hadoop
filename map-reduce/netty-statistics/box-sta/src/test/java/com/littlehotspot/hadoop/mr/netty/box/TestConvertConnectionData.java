@@ -1,14 +1,14 @@
-/*
+/**
  * Copyright (c) 2020, Stupid Bird and/or its affiliates. All rights reserved.
  * STUPID BIRD PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  * @Project : hadoop
- * @Package : com.littlehotspot.hadoop.mr.box
+ * @Package : com.littlehotspot.hadoop.mr.netty.box
  * @author <a href="http://www.lizhaoweb.net">李召(John.Lee)</a>
  * @EMAIL 404644381@qq.com
- * @Time : 17:44
+ * @Time : 11:02
  */
-package com.littlehotspot.hadoop.mr.box;
+package com.littlehotspot.hadoop.mr.netty.box;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -24,13 +24,13 @@ import java.net.URI;
  * @author <a href="http://www.lizhaoweb.cn">李召(John.Lee)</a>
  * @version 1.0.0.0.1
  * @EMAIL 404644381@qq.com
- * @notes Created on 2020年10月14日<br>
+ * @notes Created on 2020年12月25日<br>
  * Revision of last commit:$Revision$<br>
  * Author of last commit:$Author$<br>
  * Date of last commit:$Date$<br>
  */
 @SuppressWarnings("JavaDoc")
-public class TestStartUpFee {
+public class TestConvertConnectionData {
 
     @Before
     public void initHadoopEnv() {
@@ -50,8 +50,7 @@ public class TestStartUpFee {
     public void testHelp() {
         try {
             String[] args = {"-h"};
-            Configuration configuration = new Configuration();
-            ToolRunner.run(configuration, new StartUpFee(), args);
+            ConvertConnectionData.Main.main(args);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,7 +67,7 @@ public class TestStartUpFee {
     public void testDefault() {
         try {
             String[] args = {"-jn=test job", "-i", "E:\\hadoop-data\\source", "-o=E:\\hadoop-data\\export\\" + System.currentTimeMillis()};
-            StartUpFee.main(args);
+            ConvertConnectionData.Main.main(args);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -87,7 +86,7 @@ public class TestStartUpFee {
             String[] args = {"-jn=test job", "--verbose", "-i", "E:\\hadoop-data\\source", "-o=E:\\hadoop-data\\export\\" + System.currentTimeMillis()};
             Configuration configuration = new Configuration();
             configuration.set("mapreduce.framework.name", "local");//以local形式提交
-            ToolRunner.run(configuration, new StartUpFee(), args);
+            ToolRunner.run(configuration, new ConvertConnectionData(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -109,7 +108,7 @@ public class TestStartUpFee {
             configuration.set("mapreduce.framework.name", "local");//以local形式提交
             FileSystem fileSystem = FileSystem.get(new URI("hdfs://localhost:9000/"), configuration);
             fileSystem.delete(new Path("/test/lizhao"));
-            ToolRunner.run(configuration, new StartUpFee(), args);
+            ToolRunner.run(configuration, new ConvertConnectionData(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -132,7 +131,7 @@ public class TestStartUpFee {
             configuration.set("mapreduce.framework.name", "yarn");//以yarn形式提交
             configuration.set("yarn.resourcemanager.hostname", "onlined1");
             configuration.set("mapreduce.app-submission.cross-platform", "true");//跨平台提交
-            ToolRunner.run(configuration, new StartUpFee(), args);
+            ToolRunner.run(configuration, new ConvertConnectionData(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }

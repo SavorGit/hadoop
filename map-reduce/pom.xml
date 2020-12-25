@@ -54,6 +54,7 @@
         <module>export</module>
         <module>wang-feng</module>
         <module>box-statistics</module>
+        <module>netty-statistics</module>
     </modules>
 
 </project>
