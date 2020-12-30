@@ -30,7 +30,7 @@ import java.net.URI;
  * Date of last commit:$Date$<br>
  */
 @SuppressWarnings("JavaDoc")
-public class TestConvertConnectionData {
+public class TestConvertFatalData {
 
     @Before
     public void initHadoopEnv() {
@@ -50,7 +50,7 @@ public class TestConvertConnectionData {
     public void testHelp() {
         try {
             String[] args = {"-h"};
-            ConvertConnectionData.Main.main(args);
+            ConvertFatalData.Main.main(args);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -66,8 +66,8 @@ public class TestConvertConnectionData {
     @Test
     public void testDefault() {
         try {
-            String[] args = {"-jn=test job", "-i", "E:\\hadoop-data\\source\\connection", "-o=E:\\hadoop-data\\export\\" + System.currentTimeMillis()};
-            ConvertConnectionData.Main.main(args);
+            String[] args = {"-jn=test job", "-i", "E:\\hadoop-data\\source\\fatal", "-o=E:\\hadoop-data\\export\\" + System.currentTimeMillis()};
+            ConvertFatalData.Main.main(args);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -83,10 +83,10 @@ public class TestConvertConnectionData {
     @Test
     public void testDefaultLocal() {
         try {
-            String[] args = {"-jn=test job", "--verbose", "-i", "E:\\hadoop-data\\source\\connection", "-o=E:\\hadoop-data\\export\\" + System.currentTimeMillis()};
+            String[] args = {"-jn=test job", "--verbose", "-i", "E:\\hadoop-data\\source\\fatal", "-o=E:\\hadoop-data\\export\\" + System.currentTimeMillis()};
             Configuration configuration = new Configuration();
             configuration.set("mapreduce.framework.name", "local");//以local形式提交
-            ToolRunner.run(configuration, new ConvertConnectionData(), args);
+            ToolRunner.run(configuration, new ConvertFatalData(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -108,7 +108,7 @@ public class TestConvertConnectionData {
             configuration.set("mapreduce.framework.name", "local");//以local形式提交
             FileSystem fileSystem = FileSystem.get(new URI("hdfs://localhost:9000/"), configuration);
             fileSystem.delete(new Path("/test/lizhao"));
-            ToolRunner.run(configuration, new ConvertConnectionData(), args);
+            ToolRunner.run(configuration, new ConvertFatalData(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -131,7 +131,7 @@ public class TestConvertConnectionData {
             configuration.set("mapreduce.framework.name", "yarn");//以yarn形式提交
             configuration.set("yarn.resourcemanager.hostname", "onlined1");
             configuration.set("mapreduce.app-submission.cross-platform", "true");//跨平台提交
-            ToolRunner.run(configuration, new ConvertConnectionData(), args);
+            ToolRunner.run(configuration, new ConvertFatalData(), args);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -44,12 +44,12 @@ import java.util.regex.Pattern;
  * Date of last commit:$Date$<br>
  */
 @SuppressWarnings({"AccessStaticViaInstance", "WeakerAccess", "JavaDoc", "UnusedAssignment", "unused"})
-public class ConvertConnectionData extends Configured implements Tool {
+public class ConvertFatalData extends Configured implements Tool {
 
     @Override
     public int run(String[] args) throws Exception {
         System.out.println();
-        System.out.println("Jar netty-push netty_connect-log action configuration");
+        System.out.println("Jar netty-push fatal-log action configuration");
         System.out.println("=================================================================");
 
 
@@ -130,7 +130,7 @@ public class ConvertConnectionData extends Configured implements Tool {
 
 
         System.out.println("=================================================================");
-        System.out.println("\n>>> Invoking netty-push netty_connect-log job task now >>>\n");
+        System.out.println("\n>>> Invoking netty-push fatal-log job task now >>>\n");
         System.out.flush();
 
         Job job = Job.getInstance(this.getConf(), _jobName);
@@ -187,7 +187,8 @@ public class ConvertConnectionData extends Configured implements Tool {
      */
     public static class _Mapper extends Mapper<LongWritable, Text, Text, Text> {
 
-        private static final Pattern REGISTER_CHANNEL = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) REGISTER \\[ FATAL \\] -Register channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/([a-zA-Z0-9]{12}) : ([a-zA-Z0-9]+)\\] on netty server");
+        private static final Pattern MULTIPLE_CHANNEL = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) ERROR FATAL \\[nioEventLoopGroup-\\d+-\\d+\\] [a-zA-Z0-9)(:_.]+ -Multiple channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\] is registered, SerialNO\\[([a-zA-Z0-9-_]+)\\]$");
+        //        2020-12-21 12:57:18.179 ERROR FATAL [nioEventLoopGroup-3-6] cn.savor.small.netty.server.NettyServerHandler.channelRead0():200 -Multiple channel(39.107.204.75:8010-39.144.7.1:26148)[null/null : 9e7fe412] is registered, SerialNO[97c487c91608526637504]
         private static final Pattern UNREGISTER_CHANNEL = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) UNREGISTER \\[ FATAL \\] -Unregister channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\] on netty server");
         private static final Pattern REGISTER_ZOOKEEPER = Pattern.compile("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3} REGISTER \\[ FATAL \\] -Register zookeeper \\(([a-zA-Z0-9]+)\\|[a-zA-Z0-9/.]+/([a-zA-Z0-9]{12}) : (.+)\\)");
         private static final Pattern UNREGISTER_ZOOKEEPER = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) UNREGISTER \\[ FATAL \\] -Unregister zookeeper \\(([a-zA-Z0-9]+)\\|([a-zA-Z0-9/.]+)\\)");
@@ -217,13 +218,17 @@ public class ConvertConnectionData extends Configured implements Tool {
             if (unregisterZookeeperMatcher.find()) {// 不处理，不使用
                 return;
             }
-            Matcher registerChannelMatcher = REGISTER_CHANNEL.matcher(valueStr);
-            if (registerChannelMatcher.find()) {
-                String time = registerChannelMatcher.group(1);
-                String mac = registerChannelMatcher.group(2);
-                String cid = registerChannelMatcher.group(3);
-                outKey.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "REGISTER");
-                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "REGISTER" + FIELD_SEPARATOR + time);
+            Matcher multipleChannelMatcher = MULTIPLE_CHANNEL.matcher(valueStr);
+            if (multipleChannelMatcher.find()) {
+                String time = multipleChannelMatcher.group(1);
+                String mac = multipleChannelMatcher.group(2);
+                if ("null".equals(mac)) {// 没有注册机顶盒不处理，不使用
+                    return;
+                }
+                String cid = multipleChannelMatcher.group(3);
+                String sno = multipleChannelMatcher.group(4);
+                outKey.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "MULTIPLE");
+                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "MULTIPLE" + FIELD_SEPARATOR + time + FIELD_SEPARATOR + sno);
                 context.write(outKey, outValue);
                 return;
             }
@@ -279,7 +284,7 @@ public class ConvertConnectionData extends Configured implements Tool {
          */
         public static void main(String[] args) throws Exception {
             Configuration configuration = new Configuration();
-            ToolRunner.run(configuration, new ConvertConnectionData(), args);
+            ToolRunner.run(configuration, new ConvertFatalData(), args);
         }
     }
 
@@ -299,7 +304,7 @@ public class ConvertConnectionData extends Configured implements Tool {
          */
         public static void main(String[] args) throws Exception {
             Configuration configuration = LauncherMain.loadActionConf();
-            ToolRunner.run(configuration, new ConvertConnectionData(), args);
+            ToolRunner.run(configuration, new ConvertFatalData(), args);
         }
     }
 }
