@@ -173,7 +173,7 @@ public class ConvertFatalData extends Configured implements Tool {
 //        job.setJar("E:\\WorkSpace\\Company\\Savor\\Git\\JAVA\\hadoop\\map-reduce\\box-statistics\\start-up\\target\\start-up-LHS.HADOOP.2.11.1.0.1.0.0-SNAPSHOT.jar");
         boolean status = job.waitForCompletion(verbose);
         if (!status) {
-            String exceptionMessage = String.format("MapReduce[Box-StartUp-Fee] task[%s] execute failed", _jobName);
+            String exceptionMessage = String.format("MapReduce[Netty-Fatal] task[%s] execute failed", _jobName);
             throw new Exception(exceptionMessage);
         }
         return 0;
@@ -188,10 +188,9 @@ public class ConvertFatalData extends Configured implements Tool {
     public static class _Mapper extends Mapper<LongWritable, Text, Text, Text> {
 
         private static final Pattern MULTIPLE_CHANNEL = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) ERROR FATAL \\[nioEventLoopGroup-\\d+-\\d+\\] [a-zA-Z0-9)(:_.]+ -Multiple channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\] is registered, SerialNO\\[([a-zA-Z0-9-_]+)\\]$");
-        //        2020-12-21 12:57:18.179 ERROR FATAL [nioEventLoopGroup-3-6] cn.savor.small.netty.server.NettyServerHandler.channelRead0():200 -Multiple channel(39.107.204.75:8010-39.144.7.1:26148)[null/null : 9e7fe412] is registered, SerialNO[97c487c91608526637504]
-        private static final Pattern UNREGISTER_CHANNEL = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) UNREGISTER \\[ FATAL \\] -Unregister channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\] on netty server");
-        private static final Pattern REGISTER_ZOOKEEPER = Pattern.compile("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3} REGISTER \\[ FATAL \\] -Register zookeeper \\(([a-zA-Z0-9]+)\\|[a-zA-Z0-9/.]+/([a-zA-Z0-9]{12}) : (.+)\\)");
-        private static final Pattern UNREGISTER_ZOOKEEPER = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) UNREGISTER \\[ FATAL \\] -Unregister zookeeper \\(([a-zA-Z0-9]+)\\|([a-zA-Z0-9/.]+)\\)");
+        private static final Pattern SEND_HEARTBEAT = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) INFO  FATAL \\[nioEventLoopGroup-\\d+-\\d+\\] [a-zA-Z0-9)(:_.]+ -Send heartbeat to client channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\]$");
+        private static final Pattern RECEIVE_HEARTBEAT = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) INFO  FATAL \\[nioEventLoopGroup-\\d+-\\d+\\] [a-zA-Z0-9)(:_.]+ -Receive heartbeat to client channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\] .+$");
+        private static final Pattern USER_EVENT_TRIGGERED = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) INFO  FATAL \\[nioEventLoopGroup-\\d+-\\d+\\] [a-zA-Z0-9)(:_.]+ -userEventTriggered channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\] on netty server$");
 
         private static final String FIELD_SEPARATOR = "|";
 
@@ -204,20 +203,10 @@ public class ConvertFatalData extends Configured implements Tool {
             outValue.clear();
 
             String valueStr = value.toString();
-            Matcher registerZookeeperMatcher = REGISTER_ZOOKEEPER.matcher(valueStr);
-            if (registerZookeeperMatcher.find()) {
-                String cid = registerZookeeperMatcher.group(1);
-                String mac = registerZookeeperMatcher.group(2);
-                String info = registerZookeeperMatcher.group(3);
-                outKey.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "INFO");
-                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "INFO" + FIELD_SEPARATOR + info);
-                context.write(outKey, outValue);
-                return;
-            }
-            Matcher unregisterZookeeperMatcher = UNREGISTER_ZOOKEEPER.matcher(valueStr);
-            if (unregisterZookeeperMatcher.find()) {// 不处理，不使用
-                return;
-            }
+//            Matcher userEventTriggeredMatcher = USER_EVENT_TRIGGERED.matcher(valueStr);
+//            if (userEventTriggeredMatcher.find()) {// 不处理，不使用
+//                return;
+//            }
             Matcher multipleChannelMatcher = MULTIPLE_CHANNEL.matcher(valueStr);
             if (multipleChannelMatcher.find()) {
                 String time = multipleChannelMatcher.group(1);
@@ -232,20 +221,33 @@ public class ConvertFatalData extends Configured implements Tool {
                 context.write(outKey, outValue);
                 return;
             }
-            Matcher unregisterChannelMatcher = UNREGISTER_CHANNEL.matcher(valueStr);
-            if (unregisterChannelMatcher.find()) {
-                String time = unregisterChannelMatcher.group(1);
-                String mac = unregisterChannelMatcher.group(2);
+            Matcher sendHeartbeatChannelMatcher = SEND_HEARTBEAT.matcher(valueStr);
+            if (sendHeartbeatChannelMatcher.find()) {
+                String time = sendHeartbeatChannelMatcher.group(1);
+                String mac = sendHeartbeatChannelMatcher.group(2);
                 if ("null".equals(mac)) {// 没有注册机顶盒不处理，不使用
                     return;
                 }
-                String cid = unregisterChannelMatcher.group(3);
-                outKey.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "UNREGISTER");
-                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "UNREGISTER" + FIELD_SEPARATOR + time);
+                String cid = sendHeartbeatChannelMatcher.group(3);
+                outKey.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "SEND_HEART");
+                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "SEND_HEART" + FIELD_SEPARATOR + time);
                 context.write(outKey, outValue);
                 return;
             }
-            System.out.println("Mapper " + value);
+            Matcher receiveHeartbeatZookeeperMatcher = RECEIVE_HEARTBEAT.matcher(valueStr);
+            if (receiveHeartbeatZookeeperMatcher.find()) {
+                String cid = receiveHeartbeatZookeeperMatcher.group(1);
+                String mac = receiveHeartbeatZookeeperMatcher.group(2);
+                if ("null".equals(mac)) {// 没有注册机顶盒不处理，不使用
+                    return;
+                }
+                String info = receiveHeartbeatZookeeperMatcher.group(3);
+                outKey.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "RECEIVE_HEART");
+                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "RECEIVE_HEART" + FIELD_SEPARATOR + info);
+                context.write(outKey, outValue);
+                return;
+            }
+//            System.out.println("Mapper " + value);
         }
 
     }

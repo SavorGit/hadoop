@@ -44,12 +44,12 @@ import java.util.regex.Pattern;
  * Date of last commit:$Date$<br>
  */
 @SuppressWarnings({"AccessStaticViaInstance", "WeakerAccess", "JavaDoc", "UnusedAssignment", "unused"})
-public class ConvertConnectionData extends Configured implements Tool {
+public class ConvertPushData extends Configured implements Tool {
 
     @Override
     public int run(String[] args) throws Exception {
         System.out.println();
-        System.out.println("Jar netty-push netty_connect-log action configuration");
+        System.out.println("Jar netty-push push-log action configuration");
         System.out.println("=================================================================");
 
 
@@ -130,7 +130,7 @@ public class ConvertConnectionData extends Configured implements Tool {
 
 
         System.out.println("=================================================================");
-        System.out.println("\n>>> Invoking netty-push netty_connect-log job task now >>>\n");
+        System.out.println("\n>>> Invoking netty-push push-log job task now >>>\n");
         System.out.flush();
 
         Job job = Job.getInstance(this.getConf(), _jobName);
@@ -173,7 +173,7 @@ public class ConvertConnectionData extends Configured implements Tool {
 //        job.setJar("E:\\WorkSpace\\Company\\Savor\\Git\\JAVA\\hadoop\\map-reduce\\box-statistics\\start-up\\target\\start-up-LHS.HADOOP.2.11.1.0.1.0.0-SNAPSHOT.jar");
         boolean status = job.waitForCompletion(verbose);
         if (!status) {
-            String exceptionMessage = String.format("MapReduce[Netty-Connection] task[%s] execute failed", _jobName);
+            String exceptionMessage = String.format("MapReduce[Netty-Push] task[%s] execute failed", _jobName);
             throw new Exception(exceptionMessage);
         }
         return 0;
@@ -187,10 +187,10 @@ public class ConvertConnectionData extends Configured implements Tool {
      */
     public static class _Mapper extends Mapper<LongWritable, Text, Text, Text> {
 
-        private static final Pattern REGISTER_CHANNEL = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) REGISTER \\[ FATAL \\] -Register channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/([a-zA-Z0-9]{12}) : ([a-zA-Z0-9]+)\\] on netty server$");
-        private static final Pattern UNREGISTER_CHANNEL = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) UNREGISTER \\[ FATAL \\] -Unregister channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\] on netty server$");
-        private static final Pattern REGISTER_ZOOKEEPER = Pattern.compile("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3} REGISTER \\[ FATAL \\] -Register zookeeper \\(([a-zA-Z0-9]+)\\|[a-zA-Z0-9/.]+/([a-zA-Z0-9]{12}) : (.+)\\)$");
-        private static final Pattern UNREGISTER_ZOOKEEPER = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) UNREGISTER \\[ FATAL \\] -Unregister zookeeper \\(([a-zA-Z0-9]+)\\|([a-zA-Z0-9/.]+)\\)$");
+        private static final Pattern MULTIPLE_CHANNEL = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) ERROR FATAL \\[nioEventLoopGroup-\\d+-\\d+\\] [a-zA-Z0-9)(:_.]+ -Multiple channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\] is registered, SerialNO\\[([a-zA-Z0-9-_]+)\\]$");
+        private static final Pattern SEND_HEARTBEAT = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) INFO  FATAL \\[nioEventLoopGroup-\\d+-\\d+\\] [a-zA-Z0-9)(:_.]+ -Send heartbeat to client channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\]$");
+        private static final Pattern RECEIVE_HEARTBEAT = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) INFO  FATAL \\[nioEventLoopGroup-\\d+-\\d+\\] [a-zA-Z0-9)(:_.]+ -Receive heartbeat to client channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\] .+$");
+        private static final Pattern USER_EVENT_TRIGGERED = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) INFO  FATAL \\[nioEventLoopGroup-\\d+-\\d+\\] [a-zA-Z0-9)(:_.]+ -userEventTriggered channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\] on netty server$");
 
         private static final String FIELD_SEPARATOR = "|";
 
@@ -203,40 +203,47 @@ public class ConvertConnectionData extends Configured implements Tool {
             outValue.clear();
 
             String valueStr = value.toString();
-            Matcher registerZookeeperMatcher = REGISTER_ZOOKEEPER.matcher(valueStr);
-            if (registerZookeeperMatcher.find()) {
-                String cid = registerZookeeperMatcher.group(1);
-                String mac = registerZookeeperMatcher.group(2);
-                String info = registerZookeeperMatcher.group(3);
-                outKey.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "INFO");
-                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "INFO" + FIELD_SEPARATOR + info);
-                context.write(outKey, outValue);
-                return;
-            }
-//            Matcher unregisterZookeeperMatcher = UNREGISTER_ZOOKEEPER.matcher(valueStr);
-//            if (unregisterZookeeperMatcher.find()) {// 不处理，不使用
+//            Matcher userEventTriggeredMatcher = USER_EVENT_TRIGGERED.matcher(valueStr);
+//            if (userEventTriggeredMatcher.find()) {// 不处理，不使用
 //                return;
 //            }
-            Matcher registerChannelMatcher = REGISTER_CHANNEL.matcher(valueStr);
-            if (registerChannelMatcher.find()) {
-                String time = registerChannelMatcher.group(1);
-                String mac = registerChannelMatcher.group(2);
-                String cid = registerChannelMatcher.group(3);
-                outKey.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "REGISTER");
-                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "REGISTER" + FIELD_SEPARATOR + time);
-                context.write(outKey, outValue);
-                return;
-            }
-            Matcher unregisterChannelMatcher = UNREGISTER_CHANNEL.matcher(valueStr);
-            if (unregisterChannelMatcher.find()) {
-                String time = unregisterChannelMatcher.group(1);
-                String mac = unregisterChannelMatcher.group(2);
+            Matcher multipleChannelMatcher = MULTIPLE_CHANNEL.matcher(valueStr);
+            if (multipleChannelMatcher.find()) {
+                String time = multipleChannelMatcher.group(1);
+                String mac = multipleChannelMatcher.group(2);
                 if ("null".equals(mac)) {// 没有注册机顶盒不处理，不使用
                     return;
                 }
-                String cid = unregisterChannelMatcher.group(3);
-                outKey.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "UNREGISTER");
-                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "UNREGISTER" + FIELD_SEPARATOR + time);
+                String cid = multipleChannelMatcher.group(3);
+                String sno = multipleChannelMatcher.group(4);
+                outKey.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "MULTIPLE");
+                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "MULTIPLE" + FIELD_SEPARATOR + time + FIELD_SEPARATOR + sno);
+                context.write(outKey, outValue);
+                return;
+            }
+            Matcher sendHeartbeatChannelMatcher = SEND_HEARTBEAT.matcher(valueStr);
+            if (sendHeartbeatChannelMatcher.find()) {
+                String time = sendHeartbeatChannelMatcher.group(1);
+                String mac = sendHeartbeatChannelMatcher.group(2);
+                if ("null".equals(mac)) {// 没有注册机顶盒不处理，不使用
+                    return;
+                }
+                String cid = sendHeartbeatChannelMatcher.group(3);
+                outKey.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "SEND_HEART");
+                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "SEND_HEART" + FIELD_SEPARATOR + time);
+                context.write(outKey, outValue);
+                return;
+            }
+            Matcher receiveHeartbeatZookeeperMatcher = RECEIVE_HEARTBEAT.matcher(valueStr);
+            if (receiveHeartbeatZookeeperMatcher.find()) {
+                String cid = receiveHeartbeatZookeeperMatcher.group(1);
+                String mac = receiveHeartbeatZookeeperMatcher.group(2);
+                if ("null".equals(mac)) {// 没有注册机顶盒不处理，不使用
+                    return;
+                }
+                String info = receiveHeartbeatZookeeperMatcher.group(3);
+                outKey.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "RECEIVE_HEART");
+                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "RECEIVE_HEART" + FIELD_SEPARATOR + info);
                 context.write(outKey, outValue);
                 return;
             }
@@ -279,7 +286,7 @@ public class ConvertConnectionData extends Configured implements Tool {
          */
         public static void main(String[] args) throws Exception {
             Configuration configuration = new Configuration();
-            ToolRunner.run(configuration, new ConvertConnectionData(), args);
+            ToolRunner.run(configuration, new ConvertPushData(), args);
         }
     }
 
@@ -299,7 +306,7 @@ public class ConvertConnectionData extends Configured implements Tool {
          */
         public static void main(String[] args) throws Exception {
             Configuration configuration = LauncherMain.loadActionConf();
-            ToolRunner.run(configuration, new ConvertConnectionData(), args);
+            ToolRunner.run(configuration, new ConvertPushData(), args);
         }
     }
 }
