@@ -187,7 +187,8 @@ public class ConvertPushData extends Configured implements Tool {
      */
     public static class _Mapper extends Mapper<LongWritable, Text, Text, Text> {
 
-        private static final Pattern MULTIPLE_CHANNEL = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) ERROR FATAL \\[nioEventLoopGroup-\\d+-\\d+\\] [a-zA-Z0-9)(:_.]+ -Multiple channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\] is registered, SerialNO\\[([a-zA-Z0-9-_]+)\\]$");
+        private static final Pattern PUSH_MESSAGE = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) INFO   \\[resin-port-\\d+-\\d+\\] [a-zA-Z0-9)(:_.]+ -Netty push setSendMessageBean \\t\\t\\[MessageChannel\\].+ \\t\\t\\[JSON\\].+,\\\"box_mac\\\":\\\"([a-zA-Z0-9]+)\\\",.+ \\t\\t\\[CMD\\]SERVER_ORDER_REQ \\t\\t\\[SendMessage\\](.+)$");
+        //2020-12-21 10:35:53.305 INFO   [resin-port-8081-20] c.s.small.web.netty.push.service.impl.DefaultPushService.setSendMessageBean():119 -Netty push setSendMessageBean 		[MessageChannel]MessageChannel(channelId=2ee7197b, channelInfo=ChannelInfo(channelId=2ee7197b, localSocket=ChannelInfo.SocketInfo(hostString=39.107.204.75, port=8010), remoteSocket=ChannelInfo.SocketInfo(hostString=113.67.29.171, port=56879)), httpHost=39.107.204.75, httpPort=8081, nettyHost=39.107.204.75, nettyPort=8010, cmd=HEART_CLENT_TO_SERVER, content=[I am a mini Heart Pakage..., {"box_id":"14432","hotel_id":"1065","room_id":"10366","ssid":"302"}], serialnumber=7b5551bf1608518123124, boxId=null, ip=192.168.6.225, mac=40E793253523, hotelId=null, roomId=null, ssid=null, connectCode=null, zkConnectString=127.0.0.1:2181, zkSessionTimeout=10000, zkPersistentPath=/netty/registry, effectiveTime=0, requestId=null, callbackURL=null) 		[JSON]{"channel_info":{"id":"2ee7197b","local_socket":{"port":8010,"host":"39.107.204.75"},"remote_socket":{"port":56879,"host":"113.67.29.171"}},"http_host":"39.107.204.75","http_port":8081,"netty_host":"39.107.204.75","netty_port":8010,"command":"HEART_CLENT_TO_SERVER","message_contents":["I am a mini Heart Pakage...","{\"box_id\":\"14432\",\"hotel_id\":\"1065\",\"room_id\":\"10366\",\"ssid\":\"302\"}"],"serial_number":"7b5551bf1608518123124","box_ip":"192.168.6.225","box_mac":"40E793253523","zk_connect":"127.0.0.1:2181","zk_session_timeout":10000,"zk_persistent_path":"/netty/registry"} 		[CMD]SERVER_ORDER_REQ 		[SendMessage]{"action":130,"id":"9687","forscreen_char":"","rotation":0,"wordsize":"50","color":"#ffffff","finish_time":"2020-12-21 12:35:52","img_id":363,"img_oss_addr":"http:\/\/oss.littlehotspot.com\/media\/resource\/RNEwsCSjyB.jpg","filename":"RNEwsCSjyB.jpg","music_id":0,"music_oss_addr":"","font_id":0,"font_oss_addr":"","play_times":1800,"type":1,"waiterName":"","waiterIconUrl":""}
         private static final Pattern SEND_HEARTBEAT = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) INFO  FATAL \\[nioEventLoopGroup-\\d+-\\d+\\] [a-zA-Z0-9)(:_.]+ -Send heartbeat to client channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\]$");
         private static final Pattern RECEIVE_HEARTBEAT = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) INFO  FATAL \\[nioEventLoopGroup-\\d+-\\d+\\] [a-zA-Z0-9)(:_.]+ -Receive heartbeat to client channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\] .+$");
         private static final Pattern USER_EVENT_TRIGGERED = Pattern.compile("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}) INFO  FATAL \\[nioEventLoopGroup-\\d+-\\d+\\] [a-zA-Z0-9)(:_.]+ -userEventTriggered channel\\(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+\\)\\[[nul0-9.]+/([a-zA-Z0-9]+) : ([a-zA-Z0-9]+)\\] on netty server$");
@@ -207,43 +208,17 @@ public class ConvertPushData extends Configured implements Tool {
 //            if (userEventTriggeredMatcher.find()) {// 不处理，不使用
 //                return;
 //            }
-            Matcher multipleChannelMatcher = MULTIPLE_CHANNEL.matcher(valueStr);
-            if (multipleChannelMatcher.find()) {
-                String time = multipleChannelMatcher.group(1);
-                String mac = multipleChannelMatcher.group(2);
+            Matcher pushMessageMatcher = PUSH_MESSAGE.matcher(valueStr);
+            if (pushMessageMatcher.find()) {
+                String time = pushMessageMatcher.group(1);
+                String mac = pushMessageMatcher.group(2);
                 if ("null".equals(mac)) {// 没有注册机顶盒不处理，不使用
                     return;
                 }
-                String cid = multipleChannelMatcher.group(3);
-                String sno = multipleChannelMatcher.group(4);
-                outKey.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "MULTIPLE");
-                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "MULTIPLE" + FIELD_SEPARATOR + time + FIELD_SEPARATOR + sno);
-                context.write(outKey, outValue);
-                return;
-            }
-            Matcher sendHeartbeatChannelMatcher = SEND_HEARTBEAT.matcher(valueStr);
-            if (sendHeartbeatChannelMatcher.find()) {
-                String time = sendHeartbeatChannelMatcher.group(1);
-                String mac = sendHeartbeatChannelMatcher.group(2);
-                if ("null".equals(mac)) {// 没有注册机顶盒不处理，不使用
-                    return;
-                }
-                String cid = sendHeartbeatChannelMatcher.group(3);
-                outKey.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "SEND_HEART");
-                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "SEND_HEART" + FIELD_SEPARATOR + time);
-                context.write(outKey, outValue);
-                return;
-            }
-            Matcher receiveHeartbeatZookeeperMatcher = RECEIVE_HEARTBEAT.matcher(valueStr);
-            if (receiveHeartbeatZookeeperMatcher.find()) {
-                String cid = receiveHeartbeatZookeeperMatcher.group(1);
-                String mac = receiveHeartbeatZookeeperMatcher.group(2);
-                if ("null".equals(mac)) {// 没有注册机顶盒不处理，不使用
-                    return;
-                }
-                String info = receiveHeartbeatZookeeperMatcher.group(3);
-                outKey.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "RECEIVE_HEART");
-                outValue.set(cid + FIELD_SEPARATOR + mac + FIELD_SEPARATOR + "RECEIVE_HEART" + FIELD_SEPARATOR + info);
+//                String cid = pushMessageMatcher.group(3);
+                String message = pushMessageMatcher.group(3);
+                outKey.set(mac + FIELD_SEPARATOR + "PUSH");
+                outValue.set(mac + FIELD_SEPARATOR + "PUSH" + FIELD_SEPARATOR + time + FIELD_SEPARATOR + message);
                 context.write(outKey, outValue);
                 return;
             }
