@@ -51,39 +51,18 @@
         <url>http://www.littlehotspot.com</url>
     </issueManagement>
 
-    <distributionManagement>
-        <repository>
-            <id>nexus-releases</id>
-            <name>Nexus Release Repository</name>
-            <url>http://nexus.lizhaoweb.net:8081/content/repositories/releases</url>
-            <uniqueVersion>true</uniqueVersion>
-        </repository>
-        <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <name>Nexus Snapshot Repository</name>
-            <url>http://nexus.lizhaoweb.net:8081/content/repositories/snapshots</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
-
     <repositories>
         <repository>
             <id>nexus.lizhaoweb.net</id>
             <name>Nexus Release Repository</name>
-            <url>http://nexus.lizhaoweb.net/content/groups/public</url>
+            <url>http://nexus.lizhaoweb.net/content/groups/maven-public/</url>
         </repository>
     </repositories>
 
     <pluginRepositories>
         <pluginRepository>
             <id>nexus.lizhaoweb.net</id>
-            <url>http://nexus.lizhaoweb.net/content/groups/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
+            <url>http://nexus.lizhaoweb.net/content/groups/maven-public/</url>
         </pluginRepository>
     </pluginRepositories>
 
