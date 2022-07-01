@@ -75,7 +75,7 @@
         <project.jkd.version>1.7</project.jkd.version>
         <junit.version>4.12</junit.version>
         <lombok.version>1.16.8</lombok.version>
-        <hadoop.version>2.6.0</hadoop.version>
+        <hadoop.version>2.7.0</hadoop.version>
         <hbase.version>1.2.0</hbase.version>
         <hive.version>1.1.0</hive.version>
         <spark.version>1.6.0</spark.version>
