@@ -92,7 +92,7 @@ public class CleanByRegexScheduler extends Configured implements Tool {
         // 准备工作
         ArgumentFactory.checkNullValueForArgument(Argument.MapperInputFormatRegex, matcherRegex);
         if (hdfsInputPathArray == null && hdfsInputPathRegex == null) {
-            String exceptionMessage = "The argument[\'" + Argument.InputPath.getName() + "\' OR \'" + Argument.InputPathReg.getName() + "\'] for this program is null";
+            String exceptionMessage = "The argument['" + Argument.InputPath.getName() + "' OR '" + Argument.InputPathReg.getName() + "'] for this program is null";
             throw new IllegalArgumentException(exceptionMessage);
         }
         ArgumentFactory.checkNullValueForArgument(Argument.OutputPath, hdfsOutputPath);

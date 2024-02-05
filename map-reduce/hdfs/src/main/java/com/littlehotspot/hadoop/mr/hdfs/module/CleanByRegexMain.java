@@ -39,6 +39,7 @@ public class CleanByRegexMain {
      * @throws Exception 异常
      */
     public static void main(String[] args) throws Exception {
+        System.out.println(CleanByRegexMain.class.getName());
         if (args.length < 2) {
             throw new IllegalArgumentException("please write input path and output path...");
         }
